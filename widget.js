@@ -12,7 +12,7 @@ console.log("Clinic:", clinic);
   // Then call: window.DentalBotWidget.init({ apiUrl: "http://localhost:8000", clinicId: "smile-city-001" })
 
   const defaultOptions = {
-    apiUrl: "http://localhost:8000",
+    apiUrl: "",
     clinicId: "",
     buttonLabel: "Chat with us",
     title: "Dental Assistant",
