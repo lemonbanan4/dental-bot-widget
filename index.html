@@ -4,13 +4,32 @@
         <meta charset="utf-8" />
         <title>Dental AI Demo</title>
     </head>
-    <body>
-        <h1>Dental AI Assistant Demo</h1>
+    <body class="bg-black text-white font-sans">
+  <div class="min-h-screen flex flex-col justify-center items-center text-center relative overflow-hidden">
+    
+    <!-- Background gradient + particles -->
+    <div class="absolute inset-0">
+      <canvas id="particles"></canvas> <!-- subtle animated particles -->
+    </div>
 
+    <!-- Hero content -->
+    <div class="z-10 p-8 backdrop-blur-md bg-white/5 rounded-2xl">
+      <h1 class="text-5xl font-bold text-cyan-400 mb-4">Dental AI Assistant</h1>
+      <p class="text-lg text-white/70 mb-6">The future of dental clinics, powered by AI</p>
+      <div class="mb-6">
         <script
-        src="/widget.js"
-        data-clinic="smile-city-001"
-        data-api="https://dental-bot-api.onrender.com"
+          src="/widget.js"
+          data-clinic="smile-city-001"
+          data-api="https://dental-bot-api.onrender.com"
         ></script>
-    </body>
+      </div>
+      <a href="#demo" class="px-6 py-3 bg-cyan-500 rounded-full text-black font-bold hover:scale-105 transition-transform">
+        Try the AI Now
+      </a>
+    </div>
+    
+  </div>
+</body>
+
 </html>
+
