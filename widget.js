@@ -1,7 +1,15 @@
 (() => {
+  // Prevent duplicate widget instances
+  if (document.getElementById('dbot-root')) {
+    console.warn('DentalBotWidget: widget already initialized');
+    return;
+  }
+  let _root = null;
   const script = document.currentScript;
   const apiUrl = (script?.dataset?.api || "").replace(/\/$/, "");
   const clinicId = (script?.dataset?.clinic || "").trim();
+  const analyticsUrl = (script?.dataset?.analytics || "").trim();
+  const enableStream = (script?.dataset?.stream === '1' || script?.dataset?.stream === 'true');
 
   console.log("Dental bot widget loaded");
   console.log("API:", apiUrl);
@@ -16,10 +24,14 @@
     .dbot-launcher{position:fixed;right:20px;bottom:20px;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:999999}
     .dbot-panel{position:fixed;right:20px;bottom:70px;width:340px;height:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);
-      background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.25);display:none;flex-direction:column;overflow:hidden;border:1px solid #e5e7eb;z-index:999999;
-      font:14px/1.4 system-ui,-apple-system,sans-serif}
+      background:#fff;border-radius:14px;box-shadow:0 24px 80px rgba(2,6,23,0.35);display:none;flex-direction:column;overflow:hidden;border:1px solid #eef2f7;z-index:999999;
+      font:14px/1.4 system-ui,-apple-system,sans-serif;transform-origin:bottom right;transition:transform .18s ease,opacity .18s ease}
     .dbot-panel.open{display:flex}
+    .dbot-panel.open{transform:translateY(0);opacity:1}
+    .dbot-panel{transform:translateY(6px);opacity:0}
     .dbot-header{padding:10px 12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .dbot-header-inner{display:flex;align-items:center;gap:10px}
+    .dbot-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#06b6d4);display:inline-block;flex:0 0 32px;box-shadow:0 6px 18px rgba(2,6,23,0.18)}
     .dbot-title{font-weight:700;font-size:13px}
     .dbot-actions{display:flex;gap:8px;align-items:center}
     .dbot-hbtn{background:#fff;color:#111;border:1px solid rgba(255,255,255,0.35);border-radius:10px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px}
@@ -29,10 +41,17 @@
     .dbot-msg{padding:10px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
     .dbot-msg.user{background:#111;color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
     .dbot-msg.bot{background:#fff;color:#111;align-self:flex-start;border:1px solid #e6e6e6;border-bottom-left-radius:6px}
+    .dbot-msg.typing{opacity:.9;font-style:italic;color:#666}
+    .dbot-msg.typing::after{content:"";display:inline-block;margin-left:8px;width:18px;height:8px;vertical-align:middle}
+    .dbot-msg.typing span{display:inline-block}
+    .dbot-msg.typing .dots::after{content:".";animation:dots .9s steps(3,end) infinite}
+    @keyframes dots{0%{content:"."}33%{content:".."}66%{content:"..."}100%{content:"."}}
     .dbot-msg a{color:inherit;text-decoration:underline}
     .dbot-input{display:flex;padding:10px;gap:8px;border-top:1px solid #e5e7eb;background:#fff}
     .dbot-input textarea{flex:1;resize:none;border:1px solid #d1d5db;border-radius:10px;padding:10px;min-height:44px;font:inherit;outline:none}
     .dbot-input button{background:#111;color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+    .dbot-launcher{transition:transform .12s ease,box-shadow .12s ease}
+    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
     .dbot-note{font-size:11px;color:#666;padding:0 12px 10px;background:#fff}
     .dbot-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:999999}
     .dbot-modal{width:360px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb}
@@ -44,6 +63,9 @@
     .dbot-modal-actions{display:flex;gap:8px;justify-content:flex-end}
     .dbot-btn{border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer;border:1px solid #ddd;background:#fff}
     .dbot-btn.primary{background:#111;color:#fff;border-color:#111}
+    .dbot-cta{display:block;padding:10px;border-radius:8px;text-align:center;background:#16a34a;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(16,185,129,0.12)}
+    .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   `;
 
   function ensureStyleTag() {
@@ -54,9 +76,27 @@
     document.head.appendChild(tag);
   }
 
+  // Simple analytics event collector (hook for host pages)
+  function trackEvent(name, payload = {}) {
+    try {
+      window.__dentalBotEvents = window.__dentalBotEvents || [];
+      window.__dentalBotEvents.push({ event: name, ts: Date.now(), ...payload });
+      // fire-and-forget POST to analytics endpoint if provided
+      if (analyticsUrl) {
+        try {
+          navigator.sendBeacon
+            ? navigator.sendBeacon(analyticsUrl, JSON.stringify({ event: name, ts: Date.now(), ...payload }))
+            : fetch(analyticsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: name, ts: Date.now(), ...payload }) }).catch(()=>{});
+        } catch (e) {}
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
   function linkifyToFragment(text) {
     const urlRegex = /(https?:\/\/[^\s)]+)\b/g;
-    const parts = text.split(urlRegex);
+    const parts = String(text).split(urlRegex);
     const frag = document.createDocumentFragment();
     for (const part of parts) {
       if (urlRegex.test(part)) {
@@ -75,6 +115,7 @@
 
   function createElements() {
     const launcher = document.createElement("button");
+    launcher.type = "button";
     launcher.className = "dbot-launcher";
     launcher.textContent = "Chat";
 
@@ -88,26 +129,36 @@
     title.className = "dbot-title";
     title.textContent = "Clinic Assistant";
 
+    const headerInner = document.createElement("div");
+    headerInner.className = "dbot-header-inner";
+    const avatar = document.createElement("div");
+    avatar.className = "dbot-avatar";
+
     const actions = document.createElement("div");
     actions.className = "dbot-actions";
 
     const bookBtn = document.createElement("button");
+    bookBtn.type = "button";
     bookBtn.className = "dbot-hbtn";
     bookBtn.textContent = "Book";
     bookBtn.disabled = true;
 
     const leadBtn = document.createElement("button");
+    leadBtn.type = "button";
     leadBtn.className = "dbot-hbtn";
     leadBtn.textContent = "Call me back";
 
     const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
     closeBtn.className = "dbot-close";
     closeBtn.textContent = "×";
     closeBtn.setAttribute("aria-label", "Close");
 
     actions.appendChild(bookBtn);
     actions.appendChild(leadBtn);
-    header.appendChild(title);
+    headerInner.appendChild(avatar);
+    headerInner.appendChild(title);
+    header.appendChild(headerInner);
     header.appendChild(actions);
     header.appendChild(closeBtn);
 
@@ -118,10 +169,13 @@
     inputWrap.className = "dbot-input";
 
     const textarea = document.createElement("textarea");
+    textarea.setAttribute("aria-label", "Chat input");
     textarea.placeholder = "Type your question…";
 
     const sendBtn = document.createElement("button");
+    sendBtn.type = "button";
     sendBtn.textContent = "Send";
+    sendBtn.className = "dbot-send-btn";
 
     inputWrap.appendChild(textarea);
     inputWrap.appendChild(sendBtn);
@@ -170,20 +224,42 @@
       </div>
     `;
 
-    document.body.appendChild(launcher);
-    document.body.appendChild(panel);
-    document.body.appendChild(backdrop);
+    _root.appendChild(launcher);
+    _root.appendChild(panel);
+    _root.appendChild(backdrop);
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, backdrop, title };
+    // accessibility: announcements
+    messages.setAttribute('role', 'log');
+    messages.setAttribute('aria-live', 'polite');
+
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, backdrop, title, avatar };
   }
+
 
   function addMessage(container, text, who) {
+    // Special-case typing indicator to allow CSS animation
+    if (String(text).trim() === "Typing…") {
+      const tdiv = document.createElement("div");
+      tdiv.className = `dbot-msg bot typing`;
+      const span = document.createElement('span');
+      span.textContent = 'Typing';
+      const dots = document.createElement('span');
+      dots.className = 'dots';
+      tdiv.appendChild(span);
+      tdiv.appendChild(dots);
+      container.appendChild(tdiv);
+      container.scrollTop = container.scrollHeight;
+      return tdiv;
+    }
     const div = document.createElement("div");
     div.className = `dbot-msg ${who}`;
-    div.appendChild(linkifyToFragment(text));
+    // Use the safe linkify helper to avoid inserting HTML directly
+    div.appendChild(linkifyToFragment(String(text)));
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
+    return div;
   }
+
 
   function getSessionKey() {
     const key = `dbot_session_${clinicId}`;
@@ -203,14 +279,24 @@
   async function sendChat(ui, state) {
     const text = ui.textarea.value.trim();
     if (!text || state.sending) return;
+    // enforce a reasonable length to avoid accidental huge messages
+    if (text.length > 2000) {
+      addMessage(ui.messages, 'Message too long. Please shorten to 2000 characters.', 'bot');
+      return;
+    }
 
     state.sending = true;
     ui.sendBtn.disabled = true;
+    // send-button spinner
+    ui.sendBtn.dataset._orig = ui.sendBtn.textContent;
+    ui.sendBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Sending';
+    ui.sendBtn.setAttribute('aria-busy','true');
+    trackEvent('send', { clinic: clinicId });
     addMessage(ui.messages, text, "user");
     ui.textarea.value = "";
 
-    // typing indicator
-    addMessage(ui.messages, "…", "bot");
+    // typing indicator (more explanatory for users)
+    addMessage(ui.messages, "Typing…", "bot");
 
     try {
       const payload = {
@@ -220,34 +306,121 @@
         metadata: { page_url: location.href }
       };
 
-      const res = await fetch(`${apiUrl}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      if (enableStream) {
+        const res = await fetch(`${apiUrl}/chat?stream=1`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await res.json();
+        if (!res.ok) {
+          const typingErr = ui.messages.querySelector('.dbot-msg.bot.typing');
+          if (typingErr) typingErr.remove();
+          addMessage(ui.messages, `Server error ${res.status}`, "bot");
+          trackEvent('error', { clinic: clinicId, status: res.status });
+        } else {
+          const reader = res.body.getReader();
+          const dec = new TextDecoder();
+          let buf = "";
+          let acc = "";
+          const typingEl = ui.messages.querySelector('.dbot-msg.bot.typing');
+          try {
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) break;
+              buf += dec.decode(value, { stream: true });
+              const lines = buf.split('\n');
+              buf = lines.pop();
+              for (const line of lines) {
+                if (!line.trim()) continue;
+                let obj;
+                try { obj = JSON.parse(line); } catch (e) { continue; }
+                if (obj.text) {
+                  acc += obj.text;
+                  if (typingEl) typingEl.textContent = acc;
+                } else if (obj.done) {
+                  if (obj.booking_url) {
+                    const ctaEl = ui.panel.querySelector(".dbot-cta");
+                    if (ctaEl) ctaEl.href = obj.booking_url;
+                    if (ui.bookBtn) {
+                      ui.bookBtn.disabled = false;
+                      ui.bookBtn.onclick = () => window.open(obj.booking_url, '_blank', 'noopener,noreferrer');
+                    }
+                  }
+                } else if (obj.error) {
+                  if (typingEl) typingEl.remove();
+                  addMessage(ui.messages, "Error: " + obj.error, "bot");
+                  trackEvent('error', { clinic: clinicId, message: obj.error });
+                }
+              }
+            }
+            // handle any remaining buffer
+            if (buf.trim()) {
+              try {
+                const obj = JSON.parse(buf);
+                if (obj.text) {
+                  acc += obj.text;
+                }
+                if (obj.done && obj.booking_url) {
+                  const ctaEl = ui.panel.querySelector(".dbot-cta");
+                  if (ctaEl) ctaEl.href = obj.booking_url;
+                }
+              } catch (e) {}
+            }
 
-      // replace last "…" bubble
-      const bots = ui.messages.querySelectorAll(".dbot-msg.bot");
-      const last = bots[bots.length - 1];
-      if (last && last.textContent === "…") {
-        last.textContent = "";
-        last.appendChild(linkifyToFragment(data.reply || `Error ${res.status}`));
+            const typingBubble = ui.messages.querySelector('.dbot-msg.bot.typing');
+            if (typingBubble) typingBubble.remove();
+            addMessage(ui.messages, acc || `Error: empty reply`, "bot");
+            trackEvent('reply', { clinic: clinicId });
+          } catch (err) {
+            const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+            if (typing) typing.remove();
+            addMessage(ui.messages, "Network error. Please try again.", "bot");
+            trackEvent('error', { clinic: clinicId, message: String(err) });
+          }
+        }
       } else {
+        const res = await fetch(`${apiUrl}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        // remove typing bubble if present
+        const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+        if (typing) typing.remove();
+
+        // Hard-wire booking URL from response (if provided)
+        if (data && data.booking_url) {
+          const ctaEl = ui.panel.querySelector(".dbot-cta");
+          if (ctaEl) ctaEl.href = data.booking_url;
+          // enable header book button too
+          if (ui.bookBtn) {
+            ui.bookBtn.disabled = false;
+            ui.bookBtn.onclick = () => window.open(data.booking_url, '_blank', 'noopener,noreferrer');
+          }
+        }
+
+        trackEvent('reply', { clinic: clinicId });
+        // Append the assistant reply
         addMessage(ui.messages, data.reply || `Error ${res.status}`, "bot");
       }
     } catch (err) {
-      const bots = ui.messages.querySelectorAll(".dbot-msg.bot");
-      const last = bots[bots.length - 1];
-      if (last && last.textContent === "…") {
-        last.textContent = "Network error. Please try again.";
-      } else {
-        addMessage(ui.messages, "Network error. Please try again.", "bot");
-      }
+      const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+      if (typing) typing.remove();
+      addMessage(ui.messages, "Network error. Please try again.", "bot");
+      trackEvent('error', { clinic: clinicId, message: String(err) });
     } finally {
       state.sending = false;
       ui.sendBtn.disabled = false;
+      // restore send button
+      if (ui.sendBtn.dataset._orig) {
+        ui.sendBtn.innerHTML = ui.sendBtn.dataset._orig;
+        delete ui.sendBtn.dataset._orig;
+        ui.sendBtn.removeAttribute('aria-busy');
+      }
       ui.textarea.focus();
     }
   }
@@ -301,12 +474,50 @@
 
   // INIT
   ensureStyleTag();
+  // create a root container to avoid duplicates and to scope widget elements
+  _root = document.getElementById('dbot-root') || document.createElement('div');
+  _root.id = 'dbot-root';
+  if (!_root.parentElement) document.body.appendChild(_root);
   const ui = createElements();
+  // set modal aria-labelledby for accessibility
+  try {
+    const modal = ui.backdrop.querySelector('.dbot-modal');
+    const modalTitle = modal && modal.querySelector('.dbot-modal-h > div');
+    if (modal && modalTitle) {
+      modalTitle.id = 'dbot-modal-title';
+      modal.setAttribute('aria-labelledby', 'dbot-modal-title');
+    }
+  } catch (e) {}
+  const cta = document.createElement("div");
+  cta.style.padding = "10px";
+  cta.style.borderBottom = "1px solid #e5e7eb";
+  cta.innerHTML = `
+    <a
+      href="#"
+      class="dbot-cta"
+      target="_blank"
+      style="
+        display:block;
+        text-align:center;
+        background:#16a34a;
+        color:white;
+        padding:10px;
+        border-radius:8px;
+        font-weight:600;
+        text-decoration:none;
+      "
+    >
+      Book appointment
+    </a>
+  `;
+  ui.panel.appendChild(cta);
+
   const state = { sessionId: getSessionKey(), sending: false, clinic: null };
 
   // open/close
   ui.launcher.onclick = () => {
     ui.panel.classList.toggle("open");
+    trackEvent('open', { clinic: clinicId });
     if (ui.panel.classList.contains("open") && ui.messages.childElementCount === 0) {
       addMessage(ui.messages, "Hi! I can help with opening hours, services, insurance, prices (ranges), and bookings.", "bot");
     }
@@ -332,14 +543,34 @@
   ui.backdrop.querySelector(".dbot-modal-h .dbot-close").onclick = () => closeLeadModal(ui);
   ui.backdrop.querySelector(".submit").onclick = () => submitLead(ui, state);
 
+  // Global key handler: Esc closes modal or panel
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (ui.backdrop.style.display === 'flex') {
+        closeLeadModal(ui);
+      } else if (ui.panel.classList.contains('open')) {
+        ui.panel.classList.remove('open');
+        ui.launcher.focus();
+      }
+    }
+  });
+
   // fetch clinic info for book button + title
   fetchClinicPublic().then((c) => {
     if (!c) return;
     state.clinic = c;
     ui.title.textContent = c.clinic_name || "Clinic Assistant";
     if (c.booking_url) {
+      const ctaEl = ui.panel.querySelector(".dbot-cta");
+      if (ctaEl) ctaEl.href = c.booking_url;
       ui.bookBtn.disabled = false;
       ui.bookBtn.onclick = () => window.open(c.booking_url, "_blank", "noopener,noreferrer");
+    }
+    // set avatar to clinic logo when available
+    if (c.logo_url && ui.avatar) {
+      ui.avatar.style.backgroundImage = `url(${c.logo_url})`;
+      ui.avatar.style.backgroundSize = 'cover';
+      ui.avatar.style.backgroundPosition = 'center';
     }
   });
 })();
