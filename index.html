@@ -35,40 +35,11 @@
       margin-bottom: 50px;
     }
 
-    .widget-wrapper {
-      position: relative;
-      display: inline-block;
-      padding: 40px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      z-index: 2;
-      overflow: hidden;
-    }
-
-    /* Glow effect behind widget */
-    .widget-wrapper::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(0, 150, 136, 0.4) 0%, rgba(0, 150, 136, 0) 70%);
-      filter: blur(80px);
-      animation: glow 6s ease-in-out infinite alternate;
-      z-index: -1;
-    }
-
-    @keyframes glow {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(10px, -10px) scale(1.05); }
-      100% { transform: translate(0, 0) scale(1); }
-    }
+    /* Host should not include widget styling; widget renders itself via Shadow DOM. */
 
     a.cta {
       display: inline-block;
-      margin-top: 30px;
+      margin-top: 16px;
       padding: 15px 30px;
       background-color: #00796b;
       color: #fff;
@@ -130,13 +101,11 @@
     <h1>Dental AI Assistant</h1>
     <p>Streamline your clinic operations, enhance patient care, and see your practice thrive with AI-driven insights.</p>
     
-    <div class="widget-wrapper">
-      <script
-        src="/widget.js"
-        data-clinic="smile-city-001"
-        data-api="https://dental-bot-api.onrender.com"
-      ></script>
-    </div>
+    <script
+      src="/widget.js"
+      data-clinic="smile-city-001"
+      data-api="https://dental-bot-api.onrender.com"
+    ></script>
 
     <a id="try-it" href="#demo" class="cta">Try it Now</a>
   </div>
