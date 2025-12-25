@@ -58,7 +58,7 @@
     .dbot-msg-action.primary{background:#16a34a;color:#fff;border-color:transparent}
     .dbot-msg-action:disabled{opacity:.6;cursor:not-allowed}
     /* Lead slide-in panel: non-blocking, anchored near the widget */
-    .dbot-modal-backdrop{position:fixed;right:20px;bottom:80px;width:360px;display:none;z-index:100000;pointer-events:auto}
+    .dbot-modal-backdrop{position:fixed;right:20px;bottom:80px;width:360px;display:none;z-index:1000000;pointer-events:auto;display:none;align-items:flex-end;justify-content:flex-end}
     .dbot-modal{width:100%;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb;transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
     .dbot-modal.open{transform:translateY(0)}
     .dbot-modal-h{padding:12px 12px;background:#111;color:#fff;font-weight:800;display:flex;justify-content:space-between;align-items:center}
@@ -286,6 +286,7 @@
       // disabled until we have a booking URL
       bookBtn.disabled = true;
       bookBtn.onclick = () => {
+        try { trackEvent('cta_book', { clinic: clinicId, source: 'message' }); } catch (e) {}
         try {
           const bookingEl = ui.panel.querySelector('.dbot-cta');
           const url = bookingEl && bookingEl.href && bookingEl.href !== '#' ? bookingEl.href : null;
@@ -297,7 +298,7 @@
       callBtn.type = 'button';
       callBtn.className = 'dbot-msg-action dbot-msg-callback';
       callBtn.textContent = '📞 Request callback';
-      callBtn.onclick = () => openLeadModal(ui);
+      callBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'message' }); } catch (e) {} ; openLeadModal(ui); };
 
       actions.appendChild(bookBtn);
       actions.appendChild(callBtn);
@@ -399,7 +400,7 @@
                     if (ctaEl) ctaEl.href = obj.booking_url;
                     if (ui.bookBtn) {
                       ui.bookBtn.disabled = false;
-                      ui.bookBtn.onclick = () => window.open(obj.booking_url, '_blank', 'noopener,noreferrer');
+                      ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; window.open(obj.booking_url, '_blank', 'noopener,noreferrer'); };
                     }
                     // enable per-message Book buttons when booking_url arrives
                     try {
@@ -459,7 +460,7 @@
           // enable header book button too
           if (ui.bookBtn) {
             ui.bookBtn.disabled = false;
-            ui.bookBtn.onclick = () => window.open(data.booking_url, '_blank', 'noopener,noreferrer');
+            ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_reply' }); } catch (e) {} ; window.open(data.booking_url, '_blank', 'noopener,noreferrer'); };
           }
         }
 
@@ -486,7 +487,7 @@
   }
 
   function openLeadModal(ui) {
-    ui.backdrop.style.display = "block";
+    ui.backdrop.style.display = "flex";
     const modal = ui.backdrop.querySelector(".dbot-modal");
     // slide-in
     modal.classList.add('open');
@@ -533,6 +534,7 @@
       status.textContent = "Sent! The clinic will contact you.";
       // Non-blocking chat update
       try { addMessage(ui.messages, "We'll call you shortly — thank you!", 'bot'); } catch (e) {}
+      try { trackEvent('lead_submitted', { clinic: clinicId, session: state.sessionId }); } catch (e) {}
       setTimeout(() => closeLeadModal(ui), 900);
     } catch (e) {
       status.textContent = "Network error. Please try again.";
@@ -578,6 +580,16 @@
     </a>
   `;
   ui.panel.appendChild(cta);
+
+  // Track header CTA clicks for analytics (non-PII event)
+  try {
+    const ctaAnchor = ui.panel.querySelector('.dbot-cta');
+    if (ctaAnchor) {
+      ctaAnchor.addEventListener('click', () => {
+        try { trackEvent('cta_book', { clinic: clinicId, source: 'panel_cta' }); } catch (e) {}
+      });
+    }
+  } catch (e) {}
 
   const state = { sessionId: getSessionKey(), sending: false, clinic: null };
 
@@ -630,7 +642,7 @@
   });
 
   // lead modal controls
-  ui.leadBtn.onclick = () => openLeadModal(ui);
+  ui.leadBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'header' }); } catch (e) {} ; openLeadModal(ui); };
   ui.backdrop.addEventListener("click", (e) => {
     if (e.target === ui.backdrop) closeLeadModal(ui);
   });
@@ -641,9 +653,14 @@
   // Global key handler: Esc closes modal or panel
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (ui.backdrop.style.display === 'flex') {
-        closeLeadModal(ui);
-      } else if (ui.panel.classList.contains('open')) {
+      try {
+        const modal = ui.backdrop && ui.backdrop.querySelector && ui.backdrop.querySelector('.dbot-modal');
+        if (modal && modal.classList.contains('open')) {
+          closeLeadModal(ui);
+          return;
+        }
+      } catch (err) {}
+      if (ui.panel.classList.contains('open')) {
         ui.panel.classList.remove('open');
         ui.launcher.focus();
       }
@@ -659,7 +676,10 @@
       const ctaEl = ui.panel.querySelector(".dbot-cta");
       if (ctaEl) ctaEl.href = c.booking_url;
       ui.bookBtn.disabled = false;
-      ui.bookBtn.onclick = () => window.open(c.booking_url, "_blank", "noopener,noreferrer");
+      ui.bookBtn.onclick = () => {
+        try { trackEvent('cta_book', { clinic: clinicId, source: 'header' }); } catch (e) {}
+        window.open(c.booking_url, "_blank", "noopener,noreferrer");
+      };
       // enable any per-message Book buttons that were rendered earlier
       try {
         const msgs = ui.messages.querySelectorAll('.dbot-msg-book');
