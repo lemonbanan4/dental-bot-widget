@@ -138,8 +138,55 @@
       ></script>
     </div>
 
-    <a href="#demo" class="cta">Try it Now</a>
+    <a id="try-it" href="#demo" class="cta">Try it Now</a>
   </div>
 
 </body>
+
+<script>
+// Wire the demo "Try it Now" button to open the embedded DentalBot widget.
+// The widget creates a host element with id `dbot-host` and attaches an open shadowRoot.
+// We attempt to click the in-shadow launcher; if the widget isn't ready yet we poll briefly.
+(function () {
+  document.addEventListener('click', function (ev) {
+    const btn = ev.target.closest && ev.target.closest('#try-it');
+    if (!btn) return;
+    ev.preventDefault();
+
+    function openWidget() {
+      // Prefer the programmatic API if available
+      if (window.DentalBot && typeof window.DentalBot.open === 'function') {
+        try { window.DentalBot.open(); return true; } catch (e) {}
+      }
+      const host = document.getElementById('dbot-host');
+      if (!host) return false;
+      const sr = host.shadowRoot;
+      if (!sr) return false;
+      // Prefer clicking the launcher button if present
+      const launcher = sr.querySelector('.dbot-launcher');
+      if (launcher) {
+        launcher.click();
+        return true;
+      }
+      // Fallback: open the panel directly
+      const panel = sr.querySelector('.dbot-panel');
+      if (panel) {
+        panel.classList.add('open');
+        const ta = sr.querySelector('textarea');
+        try { if (ta) ta.focus({ preventScroll: true }); } catch (e) { if (ta) ta.focus(); }
+        return true;
+      }
+      return false;
+    }
+
+    if (!openWidget()) {
+      // Poll a short while (up to ~5s) for the widget to initialize
+      let tries = 0;
+      const iv = setInterval(() => {
+        if (openWidget() || ++tries > 50) clearInterval(iv);
+      }, 100);
+    }
+  });
+})();
+</script>
 </html>

@@ -526,16 +526,44 @@
 
   const state = { sessionId: getSessionKey(), sending: false, clinic: null };
 
-  // open/close
-  ui.launcher.onclick = () => {
-    ui.panel.classList.toggle("open");
-    trackEvent('open', { clinic: clinicId });
-    if (ui.panel.classList.contains("open") && ui.messages.childElementCount === 0) {
-      addMessage(ui.messages, "Hi! I can help with opening hours, services, insurance, prices (ranges), and bookings.", "bot");
+  // open/close helpers
+  function openPanel() {
+    if (!ui.panel.classList.contains('open')) {
+      ui.panel.classList.add('open');
+      trackEvent('open', { clinic: clinicId });
+      if (ui.messages.childElementCount === 0) {
+        addMessage(ui.messages, "Hi! I can help with opening hours, services, insurance, prices (ranges), and bookings.", "bot");
+      }
+      try {
+        // smoothly bring the panel into view and focus the textarea without scrolling the page caret
+        const host = document.getElementById('dbot-host');
+        if (host) host.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (e) {}
+      try { ui.textarea.focus({ preventScroll: true }); } catch (e) { ui.textarea.focus(); }
     }
-    ui.textarea.focus();
-  };
-  ui.closeBtn.onclick = () => ui.panel.classList.remove("open");
+  }
+
+  function closePanel() {
+    if (ui.panel.classList.contains('open')) {
+      ui.panel.classList.remove('open');
+      trackEvent('close', { clinic: clinicId });
+    }
+  }
+
+  function togglePanel() {
+    if (ui.panel.classList.contains('open')) closePanel(); else openPanel();
+  }
+
+  ui.launcher.onclick = togglePanel;
+  ui.closeBtn.onclick = closePanel;
+
+  // expose a tiny global API for host pages to open/close the widget programmatically
+  try {
+    window.DentalBot = window.DentalBot || {};
+    window.DentalBot.open = openPanel;
+    window.DentalBot.close = closePanel;
+    window.DentalBot.toggle = togglePanel;
+  } catch (e) {}
 
   // send
   ui.sendBtn.onclick = () => sendChat(ui, state);
