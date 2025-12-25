@@ -53,8 +53,14 @@
     .dbot-launcher{transition:transform .12s ease,box-shadow .12s ease}
     .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
     .dbot-note{font-size:11px;color:#666;padding:0 12px 10px;background:#fff}
-    .dbot-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:999999}
-    .dbot-modal{width:360px;max-width:calc(100vw - 40px);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb}
+    .dbot-msg-actions{display:flex;gap:8px;margin-top:8px}
+    .dbot-msg-action{background:#fff;border:1px solid #e6e6e6;padding:6px 8px;border-radius:8px;font-weight:700;cursor:pointer}
+    .dbot-msg-action.primary{background:#16a34a;color:#fff;border-color:transparent}
+    .dbot-msg-action:disabled{opacity:.6;cursor:not-allowed}
+    /* Lead slide-in panel: non-blocking, anchored near the widget */
+    .dbot-modal-backdrop{position:fixed;right:20px;bottom:80px;width:360px;display:none;z-index:100000;pointer-events:auto}
+    .dbot-modal{width:100%;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb;transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
+    .dbot-modal.open{transform:translateY(0)}
     .dbot-modal-h{padding:12px 12px;background:#111;color:#fff;font-weight:800;display:flex;justify-content:space-between;align-items:center}
     .dbot-modal-c{padding:12px;display:flex;flex-direction:column;gap:10px}
     .dbot-field{display:flex;flex-direction:column;gap:6px}
@@ -268,6 +274,43 @@
     // Use the safe linkify helper to avoid inserting HTML directly
     div.appendChild(linkifyToFragment(String(text)));
     container.appendChild(div);
+    // If this is an assistant message, add conversion CTAs beneath it
+    if (who === 'bot') {
+      const actions = document.createElement('div');
+      actions.className = 'dbot-msg-actions';
+
+      const bookBtn = document.createElement('button');
+      bookBtn.type = 'button';
+      bookBtn.className = 'dbot-msg-action primary dbot-msg-book';
+      bookBtn.textContent = '📅 Book appointment';
+      // disabled until we have a booking URL
+      bookBtn.disabled = true;
+      bookBtn.onclick = () => {
+        try {
+          const bookingEl = ui.panel.querySelector('.dbot-cta');
+          const url = bookingEl && bookingEl.href && bookingEl.href !== '#' ? bookingEl.href : null;
+          if (url) window.open(url, '_blank', 'noopener,noreferrer');
+        } catch (e) {}
+      };
+
+      const callBtn = document.createElement('button');
+      callBtn.type = 'button';
+      callBtn.className = 'dbot-msg-action dbot-msg-callback';
+      callBtn.textContent = '📞 Request callback';
+      callBtn.onclick = () => openLeadModal(ui);
+
+      actions.appendChild(bookBtn);
+      actions.appendChild(callBtn);
+      div.appendChild(actions);
+      // If a booking URL already exists in the panel, enable the button
+      try {
+        const existingBooking = ui.panel.querySelector('.dbot-cta');
+        if (existingBooking && existingBooking.href && existingBooking.href !== '#') {
+          const b = div.querySelector('.dbot-msg-book');
+          if (b) b.disabled = false;
+        }
+      } catch (e) {}
+    }
     container.scrollTop = container.scrollHeight;
     return div;
   }
@@ -358,6 +401,11 @@
                       ui.bookBtn.disabled = false;
                       ui.bookBtn.onclick = () => window.open(obj.booking_url, '_blank', 'noopener,noreferrer');
                     }
+                    // enable per-message Book buttons when booking_url arrives
+                    try {
+                      const msgs = ui.messages.querySelectorAll('.dbot-msg-book');
+                      for (const b of msgs) b.disabled = false;
+                    } catch (e) {}
                   }
                 } else if (obj.error) {
                   if (typingEl) typingEl.remove();
@@ -438,12 +486,17 @@
   }
 
   function openLeadModal(ui) {
-    ui.backdrop.style.display = "flex";
+    ui.backdrop.style.display = "block";
     const modal = ui.backdrop.querySelector(".dbot-modal");
-    modal.querySelector(".dbot-name").focus();
+    // slide-in
+    modal.classList.add('open');
+    const nameEl = modal.querySelector(".dbot-name");
+    try { if (nameEl) nameEl.focus({ preventScroll: true }); } catch (e) { if (nameEl) nameEl.focus(); }
   }
 
   function closeLeadModal(ui) {
+    const modal = ui.backdrop.querySelector(".dbot-modal");
+    if (modal) modal.classList.remove('open');
     ui.backdrop.style.display = "none";
     ui.backdrop.querySelector(".dbot-lead-status").textContent = "";
   }
@@ -458,7 +511,7 @@
     status.textContent = "Sending…";
 
     try {
-      const res = await fetch(`${apiUrl}/lead`, {
+      const res = await fetch(`${apiUrl}/leads`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -478,6 +531,8 @@
       }
 
       status.textContent = "Sent! The clinic will contact you.";
+      // Non-blocking chat update
+      try { addMessage(ui.messages, "We'll call you shortly — thank you!", 'bot'); } catch (e) {}
       setTimeout(() => closeLeadModal(ui), 900);
     } catch (e) {
       status.textContent = "Network error. Please try again.";
@@ -605,6 +660,11 @@
       if (ctaEl) ctaEl.href = c.booking_url;
       ui.bookBtn.disabled = false;
       ui.bookBtn.onclick = () => window.open(c.booking_url, "_blank", "noopener,noreferrer");
+      // enable any per-message Book buttons that were rendered earlier
+      try {
+        const msgs = ui.messages.querySelectorAll('.dbot-msg-book');
+        for (const b of msgs) b.disabled = false;
+      } catch (e) {}
     }
     // set avatar to clinic logo when available
     if (c.logo_url && ui.avatar) {
