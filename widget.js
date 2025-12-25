@@ -153,13 +153,13 @@
     const bookBtn = document.createElement("button");
     bookBtn.type = "button";
     bookBtn.className = "dbot-hbtn";
-    bookBtn.textContent = "Book";
+    bookBtn.textContent = "Book appointment";
     bookBtn.disabled = true;
 
     const leadBtn = document.createElement("button");
     leadBtn.type = "button";
     leadBtn.className = "dbot-hbtn";
-    leadBtn.textContent = "Call me back";
+    leadBtn.textContent = "Request callback";
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
@@ -274,44 +274,7 @@
     // Use the safe linkify helper to avoid inserting HTML directly
     div.appendChild(linkifyToFragment(String(text)));
     container.appendChild(div);
-    // If this is an assistant message, add conversion CTAs beneath it
-    if (who === 'bot') {
-      const actions = document.createElement('div');
-      actions.className = 'dbot-msg-actions';
-
-      const bookBtn = document.createElement('button');
-      bookBtn.type = 'button';
-      bookBtn.className = 'dbot-msg-action primary dbot-msg-book';
-      bookBtn.textContent = '📅 Book appointment';
-      // disabled until we have a booking URL
-      bookBtn.disabled = true;
-      bookBtn.onclick = () => {
-        try { trackEvent('cta_book', { clinic: clinicId, source: 'message' }); } catch (e) {}
-        try {
-          const bookingEl = ui.panel.querySelector('.dbot-cta');
-          const url = bookingEl && bookingEl.href && bookingEl.href !== '#' ? bookingEl.href : null;
-          if (url) window.open(url, '_blank', 'noopener,noreferrer');
-        } catch (e) {}
-      };
-
-      const callBtn = document.createElement('button');
-      callBtn.type = 'button';
-      callBtn.className = 'dbot-msg-action dbot-msg-callback';
-      callBtn.textContent = '📞 Request callback';
-      callBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'message' }); } catch (e) {} ; openLeadModal(ui); };
-
-      actions.appendChild(bookBtn);
-      actions.appendChild(callBtn);
-      div.appendChild(actions);
-      // If a booking URL already exists in the panel, enable the button
-      try {
-        const existingBooking = ui.panel.querySelector('.dbot-cta');
-        if (existingBooking && existingBooking.href && existingBooking.href !== '#') {
-          const b = div.querySelector('.dbot-msg-book');
-          if (b) b.disabled = false;
-        }
-      } catch (e) {}
-    }
+    // assistant messages are rendered without per-message CTAs (use header CTAs instead)
     container.scrollTop = container.scrollHeight;
     return div;
   }
@@ -396,17 +359,10 @@
                   if (typingEl) typingEl.textContent = acc;
                 } else if (obj.done) {
                   if (obj.booking_url) {
-                    const ctaEl = ui.panel.querySelector(".dbot-cta");
-                    if (ctaEl) ctaEl.href = obj.booking_url;
                     if (ui.bookBtn) {
                       ui.bookBtn.disabled = false;
                       ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; window.open(obj.booking_url, '_blank', 'noopener,noreferrer'); };
                     }
-                    // enable per-message Book buttons when booking_url arrives
-                    try {
-                      const msgs = ui.messages.querySelectorAll('.dbot-msg-book');
-                      for (const b of msgs) b.disabled = false;
-                    } catch (e) {}
                   }
                 } else if (obj.error) {
                   if (typingEl) typingEl.remove();
@@ -423,8 +379,10 @@
                   acc += obj.text;
                 }
                 if (obj.done && obj.booking_url) {
-                  const ctaEl = ui.panel.querySelector(".dbot-cta");
-                  if (ctaEl) ctaEl.href = obj.booking_url;
+                  if (ui.bookBtn) {
+                    ui.bookBtn.disabled = false;
+                    ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; window.open(obj.booking_url, '_blank', 'noopener,noreferrer'); };
+                  }
                 }
               } catch (e) {}
             }
@@ -455,9 +413,7 @@
 
         // Hard-wire booking URL from response (if provided)
         if (data && data.booking_url) {
-          const ctaEl = ui.panel.querySelector(".dbot-cta");
-          if (ctaEl) ctaEl.href = data.booking_url;
-          // enable header book button too
+          // enable header book button
           if (ui.bookBtn) {
             ui.bookBtn.disabled = false;
             ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_reply' }); } catch (e) {} ; window.open(data.booking_url, '_blank', 'noopener,noreferrer'); };
@@ -557,39 +513,8 @@
       modal.setAttribute('aria-labelledby', 'dbot-modal-title');
     }
   } catch (e) {}
-  const cta = document.createElement("div");
-  cta.style.padding = "10px";
-  cta.style.borderBottom = "1px solid #e5e7eb";
-  cta.innerHTML = `
-    <a
-      href="#"
-      class="dbot-cta"
-      target="_blank"
-      style="
-        display:block;
-        text-align:center;
-        background:#16a34a;
-        color:white;
-        padding:10px;
-        border-radius:8px;
-        font-weight:600;
-        text-decoration:none;
-      "
-    >
-      Book appointment
-    </a>
-  `;
-  ui.panel.appendChild(cta);
-
-  // Track header CTA clicks for analytics (non-PII event)
-  try {
-    const ctaAnchor = ui.panel.querySelector('.dbot-cta');
-    if (ctaAnchor) {
-      ctaAnchor.addEventListener('click', () => {
-        try { trackEvent('cta_book', { clinic: clinicId, source: 'panel_cta' }); } catch (e) {}
-      });
-    }
-  } catch (e) {}
+  // Note: removed separate panel CTA to avoid duplicate booking CTAs.
+  // The header `bookBtn` is the single prominent booking control.
 
   const state = { sessionId: getSessionKey(), sending: false, clinic: null };
 
@@ -673,18 +598,11 @@
     state.clinic = c;
     ui.title.textContent = c.clinic_name || "Clinic Assistant";
     if (c.booking_url) {
-      const ctaEl = ui.panel.querySelector(".dbot-cta");
-      if (ctaEl) ctaEl.href = c.booking_url;
       ui.bookBtn.disabled = false;
       ui.bookBtn.onclick = () => {
         try { trackEvent('cta_book', { clinic: clinicId, source: 'header' }); } catch (e) {}
         window.open(c.booking_url, "_blank", "noopener,noreferrer");
       };
-      // enable any per-message Book buttons that were rendered earlier
-      try {
-        const msgs = ui.messages.querySelectorAll('.dbot-msg-book');
-        for (const b of msgs) b.disabled = false;
-      } catch (e) {}
     }
     // set avatar to clinic logo when available
     if (c.logo_url && ui.avatar) {
