@@ -69,11 +69,8 @@
   `;
 
   function ensureStyleTag() {
-    if (document.getElementById("dbot-styles")) return;
-    const tag = document.createElement("style");
-    tag.id = "dbot-styles";
-    tag.textContent = styles;
-    document.head.appendChild(tag);
+    // Left as a no-op for Shadow DOM usage; styles are injected into the widget's shadow root.
+    return;
   }
 
   // Simple analytics event collector (hook for host pages)
@@ -114,6 +111,16 @@
   }
 
   function createElements() {
+    // Create a host element for the widget and attach a shadow root to isolate styles
+    const host = document.createElement('div');
+    host.setAttribute('id', 'dbot-host');
+    const shadow = host.attachShadow({ mode: 'open' });
+
+    // inject styles into the shadow root
+    const shadowStyle = document.createElement('style');
+    shadowStyle.textContent = styles;
+    shadow.appendChild(shadowStyle);
+
     const launcher = document.createElement("button");
     launcher.type = "button";
     launcher.className = "dbot-launcher";
@@ -227,9 +234,11 @@
     // (Removed demo innerHTML and placeholder style block to avoid duplicate IDs)
 
 
-    _root.appendChild(launcher);
-    _root.appendChild(panel);
-    _root.appendChild(backdrop);
+    // append host to the scoped root and UI into the shadow root
+    _root.appendChild(host);
+    shadow.appendChild(launcher);
+    shadow.appendChild(panel);
+    shadow.appendChild(backdrop);
 
     // accessibility: announcements
     messages.setAttribute('role', 'log');
