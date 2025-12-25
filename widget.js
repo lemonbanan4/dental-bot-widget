@@ -224,6 +224,9 @@
       </div>
     `;
 
+    // (Removed demo innerHTML and placeholder style block to avoid duplicate IDs)
+
+
     _root.appendChild(launcher);
     _root.appendChild(panel);
     _root.appendChild(backdrop);
