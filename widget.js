@@ -585,7 +585,7 @@
       ui.panel.classList.add('open');
       trackEvent('open', { clinic: clinicId });
       if (ui.messages.childElementCount === 0) {
-        addMessage(ui.messages, "Hi! I can help with opening hours, services, insurance, prices (ranges), and bookings.", "bot");
+        addMessage(ui.messages, "Welcome! I can help you find opening hours, services, prices or book an appointment. Ask me anything!", "bot");
       }
       try {
         // smoothly bring the panel into view and focus the textarea without scrolling the page caret
