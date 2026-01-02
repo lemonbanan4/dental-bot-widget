@@ -103,16 +103,20 @@
   }
 
   function linkifyToFragment(text) {
-    const urlRegex = /(https?:\/\/[^\s)]+)\b/g;
-    const parts = String(text).split(urlRegex);
+    // Use a global regex for splitting but a non-global (or anchored) check
+    // for detecting URL parts to avoid lastIndex issues with `.test()`.
+    const splitRegex = /(https?:\/\/[^\s)]+)\b/;
+    const isUrl = /^(https?:\/\/[^\s)]+)\b$/;
+    const parts = String(text).split(splitRegex);
     const frag = document.createDocumentFragment();
     for (const part of parts) {
-      if (urlRegex.test(part)) {
+      if (!part) continue;
+      if (isUrl.test(part)) {
         const a = document.createElement("a");
         a.href = part;
         a.textContent = part;
         a.target = "_blank";
-        a.rel = "noopener noreferrer";
+        a.rel = "noopener noreferrer nofollow";
         frag.appendChild(a);
       } else {
         frag.appendChild(document.createTextNode(part));
@@ -339,9 +343,14 @@
   }
 
   async function fetchClinicPublic() {
-    const res = await fetch(`${apiUrl}/public/clinic/${encodeURIComponent(clinicId)}`);
-    if (!res.ok) return null;
-    return await res.json();
+    try {
+      const res = await fetch(`${apiUrl}/public/clinic/${encodeURIComponent(clinicId)}`);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      try { console.warn('DentalBotWidget: fetchClinicPublic failed', e); } catch (err) {}
+      return null;
+    }
   }
 
   async function sendChat(ui, state) {
