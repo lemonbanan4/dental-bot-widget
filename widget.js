@@ -10,6 +10,9 @@
   const clinicId = (script?.dataset?.clinic || "").trim();
   const analyticsUrl = (script?.dataset?.analytics || "").trim();
   const enableStream = (script?.dataset?.stream === '1' || script?.dataset?.stream === 'true');
+  // brand customization hooks
+  const themeColor = (script?.dataset?.theme || "").trim();
+  const titleOverride = (script?.dataset?.title || "").trim();
 
   console.log("Dental bot widget loaded");
   console.log("API:", apiUrl);
@@ -69,7 +72,9 @@
     .dbot-modal-actions{display:flex;gap:8px;justify-content:flex-end}
     .dbot-btn{border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer;border:1px solid #ddd;background:#fff}
     .dbot-btn.primary{background:#111;color:#fff;border-color:#111}
-    .dbot-cta{display:block;padding:10px;border-radius:8px;text-align:center;background:#16a34a;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(16,185,129,0.12)}
+    :host{ --dbot-accent: #16a34a; }
+    .dbot-cta{display:block;padding:10px;border-radius:8px;text-align:center;background:var(--dbot-accent);color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(16,185,129,0.12)}
+    .dbot-btn.primary{background:var(--dbot-accent);color:#fff;border-color:var(--dbot-accent)}
     .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
   `;
@@ -140,7 +145,7 @@
 
     const title = document.createElement("div");
     title.className = "dbot-title";
-    title.textContent = "Clinic Assistant";
+    title.textContent = titleOverride || "Clinic Assistant";
 
     const headerInner = document.createElement("div");
     headerInner.className = "dbot-header-inner";
@@ -155,6 +160,8 @@
     bookBtn.className = "dbot-hbtn";
     bookBtn.textContent = "Book appointment";
     bookBtn.disabled = true;
+    // storage for booking url
+    bookBtn.dataset.bookingUrl = "";
 
     const leadBtn = document.createElement("button");
     leadBtn.type = "button";
@@ -242,6 +249,10 @@
 
     // append host to the scoped root and UI into the shadow root
     _root.appendChild(host);
+    // apply theme color if provided
+    if (themeColor) {
+      try { host.style.setProperty('--dbot-accent', themeColor); } catch (e) {}
+    }
     shadow.appendChild(launcher);
     shadow.appendChild(panel);
     shadow.appendChild(backdrop);
@@ -271,10 +282,48 @@
     }
     const div = document.createElement("div");
     div.className = `dbot-msg ${who}`;
-    // Use the safe linkify helper to avoid inserting HTML directly
-    div.appendChild(linkifyToFragment(String(text)));
+    // Render message text with clickable links.
+    // NOTE: this uses innerHTML to convert plain URLs into anchors.
+    // The input originates from the clinic assistant / LLM; if you expect
+    // untrusted HTML in messages, prefer a safer approach.
+      try {
+        // Use DOM-safe linkification to avoid injecting arbitrary HTML
+        const frag = linkifyToFragment(String(text));
+        div.appendChild(frag);
+      } catch (e) {
+        div.appendChild(document.createTextNode(String(text)));
+      }
     container.appendChild(div);
-    // assistant messages are rendered without per-message CTAs (use header CTAs instead)
+    // render primary CTAs after assistant messages (high-conversion placement)
+    if (who === 'bot') {
+      const acts = document.createElement('div');
+      acts.className = 'dbot-msg-actions';
+      // Book appointment (uses available booking URL if present)
+      const b = document.createElement('button');
+      b.className = 'dbot-msg-action primary';
+      b.type = 'button';
+      b.textContent = '📅 Book appointment';
+      const bookingUrl = (ui && ui.bookBtn && ui.bookBtn.dataset.bookingUrl) ? ui.bookBtn.dataset.bookingUrl : '';
+      if (!bookingUrl) b.disabled = true;
+      b.onclick = () => {
+        try { trackEvent('cta_book', { clinic: clinicId, source: 'message' }); } catch (e) {}
+        const url = (bookingUrl) || (ui && ui.bookBtn && ui.bookBtn.dataset.bookingUrl) || '';
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      };
+      acts.appendChild(b);
+
+      // Request callback (opens the slide-in lead modal)
+      const cb = document.createElement('button');
+      cb.className = 'dbot-msg-action';
+      cb.type = 'button';
+      cb.textContent = '📞 Request callback';
+      cb.onclick = () => {
+        try { trackEvent('cta_callback', { clinic: clinicId, source: 'message' }); } catch (e) {}
+        try { openLeadModal(ui); } catch (e) { window.dispatchEvent(new CustomEvent('dbot_open_lead')); }
+      };
+      acts.appendChild(cb);
+      container.appendChild(acts);
+    }
     container.scrollTop = container.scrollHeight;
     return div;
   }
@@ -358,10 +407,11 @@
                   acc += obj.text;
                   if (typingEl) typingEl.textContent = acc;
                 } else if (obj.done) {
-                  if (obj.booking_url) {
+                    if (obj.booking_url) {
                     if (ui.bookBtn) {
                       ui.bookBtn.disabled = false;
-                      ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; window.open(obj.booking_url, '_blank', 'noopener,noreferrer'); };
+                      ui.bookBtn.dataset.bookingUrl = obj.booking_url;
+                      ui.bookBtn.onclick = function() { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer'); };
                     }
                   }
                 } else if (obj.error) {
@@ -381,7 +431,8 @@
                 if (obj.done && obj.booking_url) {
                   if (ui.bookBtn) {
                     ui.bookBtn.disabled = false;
-                    ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; window.open(obj.booking_url, '_blank', 'noopener,noreferrer'); };
+                    ui.bookBtn.dataset.bookingUrl = obj.booking_url;
+                    ui.bookBtn.onclick = function() { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_stream' }); } catch (e) {} ; const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer'); };
                   }
                 }
               } catch (e) {}
@@ -416,7 +467,8 @@
           // enable header book button
           if (ui.bookBtn) {
             ui.bookBtn.disabled = false;
-            ui.bookBtn.onclick = () => { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_reply' }); } catch (e) {} ; window.open(data.booking_url, '_blank', 'noopener,noreferrer'); };
+            ui.bookBtn.dataset.bookingUrl = data.booking_url;
+            ui.bookBtn.onclick = function() { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_reply' }); } catch (e) {} ; const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer'); };
           }
         }
 
@@ -599,9 +651,10 @@
     ui.title.textContent = c.clinic_name || "Clinic Assistant";
     if (c.booking_url) {
       ui.bookBtn.disabled = false;
-      ui.bookBtn.onclick = () => {
+      ui.bookBtn.dataset.bookingUrl = c.booking_url;
+      ui.bookBtn.onclick = function() {
         try { trackEvent('cta_book', { clinic: clinicId, source: 'header' }); } catch (e) {}
-        window.open(c.booking_url, "_blank", "noopener,noreferrer");
+        const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer');
       };
     }
     // set avatar to clinic logo when available
