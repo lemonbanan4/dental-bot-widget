@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DentalBot Widget Demo</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px 20px; line-height: 1.5; background-color: #f9fafb; }
+    h1 { margin-bottom: 1rem; color: #111; }
+    .card { background: #fff; border: 1px solid #e5e7eb; padding: 24px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: monospace; color: #d946ef; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Widget Configuration Test</h1>
+  
+  <div class="card">
+    <h3>Current Settings</h3>
+    <ul>
+      <li><strong>Clinic ID:</strong> <code>demo-clinic</code></li>
+      <li><strong>Theme Color:</strong> <code>#7c3aed</code> (Purple)</li>
+      <li><strong>Stream:</strong> Enabled</li>
+    </ul>
+    <p>To test other configurations, edit this file (<code>public/demo.html</code>) and change the <code>data-</code> attributes in the script tag below.</p>
+  </div>
+
+  <!-- WIDGET EMBED -->
+  <script 
+    src="/widget.js"
+    data-clinic="demo-clinic"
+    data-api="https://dental-bot-api.onrender.com"
+    data-theme="#7c3aed"
+    data-title="Demo Assistant"
+    data-stream="1"
+    defer
+  ></script>
+</body>
+</html>
