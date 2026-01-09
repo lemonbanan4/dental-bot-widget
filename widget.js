@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.1", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.2", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -22,6 +22,7 @@ console.log("DentalBot Widget LIVE — v1.1.1", new Date().toISOString());
   const enableSound = (script?.dataset?.sound === '1' || script?.dataset?.sound === 'true');
   const autoOpenScroll = (script?.dataset?.autoOpenScroll === '1' || script?.dataset?.autoOpenScroll === 'true');
   const welcomeMessageOverride = (script?.dataset?.welcome || "").trim();
+  const avatarOverride = (script?.dataset?.avatar || "").trim();
 
   console.log("Dental bot widget loaded");
   console.log("API:", apiUrl);
@@ -203,6 +204,11 @@ console.log("DentalBot Widget LIVE — v1.1.1", new Date().toISOString());
     headerInner.className = "dbot-header-inner";
     const avatar = document.createElement("div");
     avatar.className = "dbot-avatar";
+    if (avatarOverride) {
+      avatar.style.backgroundImage = `url(${avatarOverride})`;
+      avatar.style.backgroundSize = 'cover';
+      avatar.style.backgroundPosition = 'center';
+    }
 
     const actions = document.createElement("div");
     actions.className = "dbot-actions";
@@ -798,7 +804,7 @@ console.log("DentalBot Widget LIVE — v1.1.1", new Date().toISOString());
       };
     }
     // set avatar to clinic logo when available
-    if (c.logo_url && ui.avatar) {
+    if (c.logo_url && ui.avatar && !avatarOverride) {
       ui.avatar.style.backgroundImage = `url(${c.logo_url})`;
       ui.avatar.style.backgroundSize = 'cover';
       ui.avatar.style.backgroundPosition = 'center';
