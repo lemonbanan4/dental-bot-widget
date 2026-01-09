@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.6", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.7", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -71,6 +71,10 @@ console.log("DentalBot Widget LIVE — v1.0.6", new Date().toISOString());
     .dbot-msg-action{background:#fff;border:1px solid #e6e6e6;padding:6px 8px;border-radius:8px;font-weight:700;cursor:pointer}
     .dbot-msg-action.primary{background:#16a34a;color:#fff;border-color:transparent}
     .dbot-msg-action:disabled{opacity:.6;cursor:not-allowed}
+    .dbot-feedback{display:flex;gap:6px;margin-top:6px;justify-content:flex-end;border-top:1px solid rgba(0,0,0,0.05);padding-top:4px}
+    .dbot-feedback-btn{background:transparent;border:none;cursor:pointer;font-size:12px;padding:2px 4px;opacity:0.4;transition:all .2s;border-radius:4px}
+    .dbot-feedback-btn:hover{opacity:1;background:rgba(0,0,0,0.05)}
+    .dbot-feedback-btn.selected{opacity:1;background:rgba(0,0,0,0.1)}
     /* Lead slide-in panel: non-blocking, anchored near the widget */
     .dbot-modal-backdrop{position:fixed;right:20px;bottom:80px;width:360px;display:none;z-index:1000000;pointer-events:auto;display:none;align-items:flex-end;justify-content:flex-end}
     .dbot-modal{width:100%;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb;transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
@@ -338,6 +342,37 @@ console.log("DentalBot Widget LIVE — v1.0.6", new Date().toISOString());
       } catch (e) {
         div.appendChild(document.createTextNode(String(text)));
       }
+
+    // Add feedback buttons for bot messages
+    if (who === 'bot') {
+      const fb = document.createElement('div');
+      fb.className = 'dbot-feedback';
+      
+      const btnUp = document.createElement('button');
+      btnUp.className = 'dbot-feedback-btn';
+      btnUp.textContent = '👍';
+      btnUp.title = 'Helpful';
+      btnUp.onclick = function() {
+        if (this.classList.contains('selected') || btnDown.classList.contains('selected')) return;
+        this.classList.add('selected');
+        try { trackEvent('feedback', { clinic: clinicId, type: 'up', message: text.substring(0, 50) }); } catch (e) {}
+      };
+
+      const btnDown = document.createElement('button');
+      btnDown.className = 'dbot-feedback-btn';
+      btnDown.textContent = '👎';
+      btnDown.title = 'Not helpful';
+      btnDown.onclick = function() {
+        if (this.classList.contains('selected') || btnUp.classList.contains('selected')) return;
+        this.classList.add('selected');
+        try { trackEvent('feedback', { clinic: clinicId, type: 'down', message: text.substring(0, 50) }); } catch (e) {}
+      };
+
+      fb.appendChild(btnUp);
+      fb.appendChild(btnDown);
+      div.appendChild(fb);
+    }
+
     container.appendChild(div);
     // render primary CTAs after assistant messages (high-conversion placement)
     if (who === 'bot') {
