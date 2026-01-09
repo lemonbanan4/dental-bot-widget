@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.2", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -18,6 +18,8 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
   // brand customization hooks
   const themeColor = (script?.dataset?.theme || "").trim();
   const titleOverride = (script?.dataset?.title || "").trim();
+  const autoOpenMobile = (script?.dataset?.autoOpenMobile === '1' || script?.dataset?.autoOpenMobile === 'true');
+  const enableSound = (script?.dataset?.sound === '1' || script?.dataset?.sound === 'true');
 
   console.log("Dental bot widget loaded");
   console.log("API:", apiUrl);
@@ -106,6 +108,25 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
     } catch (e) {
       /* ignore */
     }
+  }
+
+  function playSound() {
+    if (!enableSound) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
   }
 
   function linkifyToFragment(text) {
@@ -340,6 +361,7 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
       };
       acts.appendChild(cb);
       container.appendChild(acts);
+      if (enableSound) playSound();
     }
     container.scrollTop = container.scrollHeight;
     return div;
@@ -697,4 +719,9 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
       ui.avatar.style.backgroundPosition = 'center';
     }
   });
+
+  // Auto-open on mobile if configured
+  if (autoOpenMobile && window.innerWidth <= 768) {
+    setTimeout(openPanel, 1000);
+  }
 })();
