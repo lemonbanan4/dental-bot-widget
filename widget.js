@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.7", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.8", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -688,7 +688,12 @@ console.log("DentalBot Widget LIVE — v1.0.7", new Date().toISOString());
       state.unreadCount = 0;
       trackEvent('open', { clinic: clinicId });
       if (ui.messages.childElementCount === 0) {
-        addMessage(ui.messages, "Welcome! I can help you find opening hours, services, prices or book an appointment. Ask me anything!", "bot");
+        const hour = new Date().getHours();
+        let greeting = "Welcome";
+        if (hour < 12) greeting = "Good morning";
+        else if (hour < 18) greeting = "Good afternoon";
+        else greeting = "Good evening";
+        addMessage(ui.messages, `${greeting}! I can help you find opening hours, services, prices or book an appointment. Ask me anything!`, "bot");
       }
       try {
         // smoothly bring the panel into view and focus the textarea without scrolling the page caret
