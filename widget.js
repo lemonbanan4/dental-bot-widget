@@ -413,7 +413,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
       
       const btnCopy = document.createElement('button');
       btnCopy.className = 'dbot-feedback-btn';
-      btnCopy.textContent = '📋';
+      btnCopy.textContent = 'Copy';
       btnCopy.title = 'Copy text';
       btnCopy.onclick = async function() {
         try {
