@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.5", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.6", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -560,6 +560,13 @@ console.log("DentalBot Widget LIVE — v1.0.5", new Date().toISOString());
     // slide-in
     modal.classList.add('open');
     const nameEl = modal.querySelector(".dbot-name");
+    // Pre-fill name if previously saved
+    try {
+      const savedName = localStorage.getItem(`dbot_lead_name_${clinicId}`);
+      if (nameEl && !nameEl.value && savedName) {
+        nameEl.value = savedName;
+      }
+    } catch (e) {}
     try { if (nameEl) nameEl.focus({ preventScroll: true }); } catch (e) { if (nameEl) nameEl.focus(); }
   }
 
@@ -597,6 +604,11 @@ console.log("DentalBot Widget LIVE — v1.0.5", new Date().toISOString());
         const data = await res.json().catch(() => ({}));
         status.textContent = `Error ${res.status}: ${data.detail || "Could not send"}`;
         return;
+      }
+
+      // Save name for next time
+      if (name) {
+        try { localStorage.setItem(`dbot_lead_name_${clinicId}`, name); } catch (e) {}
       }
 
       status.textContent = "Sent! The clinic will contact you.";
