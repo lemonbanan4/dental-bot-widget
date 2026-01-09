@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -149,6 +149,34 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
     } catch (e) {}
   }
 
+  function saveHistory() {
+    if (!clinicId) return;
+    const history = [];
+    const msgs = ui.messages.querySelectorAll('.dbot-msg');
+    msgs.forEach(msg => {
+      if (msg.classList.contains('typing')) return;
+      const who = msg.classList.contains('user') ? 'user' : 'bot';
+      const clone = msg.cloneNode(true);
+      const fb = clone.querySelector('.dbot-feedback');
+      if (fb) fb.remove();
+      const text = clone.innerText.trim();
+      if (text) history.push({ text, who });
+    });
+    try { localStorage.setItem(`dbot_history_${clinicId}`, JSON.stringify(history)); } catch (e) {}
+  }
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(`dbot_history_${clinicId}`);
+      if (raw) {
+        const history = JSON.parse(raw);
+        if (Array.isArray(history)) {
+          history.forEach(h => addMessage(ui.messages, h.text, h.who, false));
+        }
+      }
+    } catch (e) {}
+  }
+
   function linkifyToFragment(text) {
     // Use a global regex for splitting but a non-global (or anchored) check
     // for detecting URL parts to avoid lastIndex issues with `.test()`.
@@ -277,7 +305,7 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
 
     const powered = document.createElement("a");
     powered.className = "dbot-powered";
-    powered.textContent = "Powered by Lemonify";
+    powered.textContent = "Powered by lemontechno";
     powered.href = "https://lemontechno.org";
     powered.target = "_blank";
     powered.rel = "noopener noreferrer";
@@ -344,7 +372,7 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
   }
 
 
-  function addMessage(container, text, who) {
+  function addMessage(container, text, who, save = true) {
     // Special-case typing indicator to allow CSS animation
     if (String(text).trim() === "Typing…") {
       const tdiv = document.createElement("div");
@@ -456,6 +484,7 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
       }
     }
     container.scrollTop = container.scrollHeight;
+    if (save) saveHistory();
     return div;
   }
 
@@ -721,6 +750,9 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
   // Note: removed separate panel CTA to avoid duplicate booking CTAs.
   // The header `bookBtn` is the single prominent booking control.
 
+  // Load history before initializing state or opening panel
+  loadHistory();
+
   const state = { sessionId: getSessionKey(), sending: false, clinic: null, unreadCount: 0 };
 
   // open/close helpers
@@ -792,6 +824,7 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
       ui.messages.innerHTML = "";
       state.sessionId = `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       localStorage.setItem(`dbot_session_${clinicId}`, state.sessionId);
+      localStorage.removeItem(`dbot_history_${clinicId}`);
       addMessage(ui.messages, "Conversation cleared. How can I help you?", "bot");
       trackEvent('clear_chat', { clinic: clinicId });
     }
@@ -832,6 +865,9 @@ console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
         try { trackEvent('cta_book', { clinic: clinicId, source: 'header' }); } catch (e) {}
         const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer');
       };
+      // Re-enable any booking buttons in the restored history
+      const historyBtns = ui.messages.querySelectorAll('.dbot-msg-action.primary:disabled');
+      historyBtns.forEach(btn => btn.disabled = false);
     }
     // set avatar to clinic logo when available
     if (c.logo_url && ui.avatar && !avatarOverride) {
