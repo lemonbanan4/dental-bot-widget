@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.8", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -37,8 +37,9 @@ console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
     .dbot-launcher{position:fixed;right:20px;bottom:20px;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:999999}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
-    .dbot-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:10px;border:2px solid #fff;display:none;font-size:10px;font-weight:700;text-align:center;line-height:14px;box-sizing:border-box;padding:0 3px}
-    .dbot-badge.visible{display:block}
+    .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:12px;background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:none;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
+    .dbot-tooltip.visible{display:block;opacity:1;transform:translateY(0)}
+    .dbot-tooltip::after{content:"";position:absolute;top:100%;right:20px;border:6px solid transparent;border-top-color:#111}
     .dbot-panel{position:fixed;right:20px;bottom:70px;width:340px;height:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);
       background:#fff;border-radius:14px;box-shadow:0 24px 80px rgba(2,6,23,0.35);display:none;flex-direction:column;overflow:hidden;border:1px solid #eef2f7;z-index:999999;
       font:14px/1.4 system-ui,-apple-system,sans-serif;transform-origin:bottom right;transition:transform .18s ease,opacity .18s ease}
@@ -217,9 +218,10 @@ console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
     launcher.className = "dbot-launcher";
     launcher.textContent = "Chat";
 
-    const badge = document.createElement("span");
-    badge.className = "dbot-badge";
-    launcher.appendChild(badge);
+    const tooltip = document.createElement("div");
+    tooltip.className = "dbot-tooltip";
+    tooltip.textContent = "New Message";
+    launcher.appendChild(tooltip);
 
     const panel = document.createElement("div");
     panel.className = "dbot-panel";
@@ -393,7 +395,7 @@ console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, printBtn, clearBtn, backdrop, title, avatar, badge };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, printBtn, clearBtn, backdrop, title, avatar, tooltip };
   }
 
 
@@ -502,10 +504,8 @@ console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
       acts.appendChild(cb);
       container.appendChild(acts);
       if (enableSound) playSound();
-      if (ui && ui.panel && !ui.panel.classList.contains('open') && ui.badge) {
-        state.unreadCount = (state.unreadCount || 0) + 1;
-        ui.badge.textContent = state.unreadCount;
-        ui.badge.classList.add('visible');
+      if (ui && ui.panel && !ui.panel.classList.contains('open') && ui.tooltip) {
+        ui.tooltip.classList.add('visible');
       }
     }
     container.scrollTop = container.scrollHeight;
@@ -784,11 +784,9 @@ console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
   function openPanel() {
     if (!ui.panel.classList.contains('open')) {
       ui.panel.classList.add('open');
-      if (ui.badge) {
-        ui.badge.classList.remove('visible');
-        ui.badge.textContent = '';
+      if (ui.tooltip) {
+        ui.tooltip.classList.remove('visible');
       }
-      state.unreadCount = 0;
       trackEvent('open', { clinic: clinicId });
       if (ui.messages.childElementCount === 0) {
         if (welcomeMessageOverride) {
