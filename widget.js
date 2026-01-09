@@ -3,9 +3,6 @@
 // ------------------------------------------------------------------
 console.log("DentalBot Widget LIVE — v1.0.0", new Date().toISOString());
 
-// ... Paste the rest of your existing widget code below this line ...
-// ... (The code that was previously in dental-bot-api/static/widget.js) ...
-
 (() => {
   // Prevent duplicate widget instances
   if (document.getElementById('dbot-root')) {
