@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.7", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -53,6 +53,7 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
     .dbot-hbtn{background:#fff;color:#111;border:1px solid rgba(255,255,255,0.35);border-radius:10px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px}
     .dbot-hbtn:disabled{opacity:.5;cursor:not-allowed}
     .dbot-clear{padding:3px 6px;font-size:12px;background-color:#16a34a;}
+    .dbot-print{padding:3px 6px;font-size:12px}
     .dbot-close{background:transparent;color:#fff;border:none;font-size:18px;cursor:pointer;line-height:1}
     .dbot-messages{flex:1;padding:12px;overflow-y:auto;gap:8px;display:flex;flex-direction:column;background:#fafafa}
     .dbot-msg{padding:10px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
@@ -256,6 +257,29 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
     leadBtn.className = "dbot-hbtn";
     leadBtn.textContent = "Request callback";
 
+    const printBtn = document.createElement("button");
+    printBtn.type = "button";
+    printBtn.className = "dbot-hbtn dbot-print";
+    printBtn.textContent = "Print";
+    printBtn.title = "Print transcript";
+    printBtn.onclick = () => {
+      const msgs = messages.querySelectorAll('.dbot-msg');
+      if (msgs.length === 0) return;
+      let content = `<html><head><title>Chat Transcript</title><style>body{font-family:system-ui,sans-serif;padding:40px;max-width:800px;margin:0 auto}h1{margin-bottom:20px;border-bottom:1px solid #ccc;padding-bottom:10px}.msg{margin-bottom:16px}.meta{font-weight:bold;font-size:0.9em;margin-bottom:4px;color:#555}.user .meta{color:#111}.bot .meta{color:#16a34a}</style></head><body><h1>Chat Transcript</h1>`;
+      msgs.forEach(msg => {
+        if (msg.classList.contains('typing')) return;
+        const isUser = msg.classList.contains('user');
+        const clone = msg.cloneNode(true);
+        const artifacts = clone.querySelectorAll('.dbot-feedback, .dbot-msg-actions');
+        artifacts.forEach(el => el.remove());
+        const text = clone.innerText.trim();
+        if (text) content += `<div class="msg ${isUser?'user':'bot'}"><div class="meta">${isUser ? 'You' : 'Assistant'}</div><div>${text.replace(/\n/g, '<br>')}</div></div>`;
+      });
+      content += `<script>window.print();</script></body></html>`;
+      const win = window.open('', '_blank');
+      if (win) { win.document.write(content); win.document.close(); }
+    };
+
     const clearBtn = document.createElement("button");
     clearBtn.type = "button";
     clearBtn.className = "dbot-hbtn dbot-clear";
@@ -270,6 +294,7 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
 
     actions.appendChild(bookBtn);
     actions.appendChild(leadBtn);
+    actions.appendChild(printBtn);
     actions.appendChild(clearBtn);
     headerInner.appendChild(avatar);
     headerInner.appendChild(title);
@@ -305,7 +330,7 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
 
     const powered = document.createElement("a");
     powered.className = "dbot-powered";
-    powered.textContent = "Powered by Lemontechno";
+    powered.textContent = "Powered by lemontechno";
     powered.href = "https://lemontechno.org";
     powered.target = "_blank";
     powered.rel = "noopener noreferrer";
@@ -368,7 +393,7 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, backdrop, title, avatar, badge };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, printBtn, clearBtn, backdrop, title, avatar, badge };
   }
 
 
