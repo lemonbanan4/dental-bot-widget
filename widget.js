@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.2", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.3", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -65,7 +65,7 @@ console.log("DentalBot Widget LIVE — v1.1.2", new Date().toISOString());
     @keyframes dots{0%{content:"."}33%{content:".."}66%{content:"..."}100%{content:"."}}
     .dbot-msg a{color:inherit;text-decoration:underline}
     .dbot-input{display:flex;padding:10px;gap:8px;border-top:1px solid #e5e7eb;background:#fff}
-    .dbot-input textarea{flex:1;resize:none;border:1px solid #d1d5db;border-radius:10px;padding:10px;min-height:44px;font:inherit;outline:none}
+    .dbot-input textarea{flex:1;resize:none;border:1px solid #d1d5db;border-radius:10px;padding:10px;min-height:44px;max-height:120px;font:inherit;outline:none;overflow-y:auto}
     .dbot-input button{background:#111;color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
     .dbot-launcher{transition:transform .12s ease,box-shadow .12s ease}
     .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
@@ -256,6 +256,10 @@ console.log("DentalBot Widget LIVE — v1.1.2", new Date().toISOString());
     const textarea = document.createElement("textarea");
     textarea.setAttribute("aria-label", "Chat input");
     textarea.placeholder = "Type your question…";
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
 
     const sendBtn = document.createElement("button");
     sendBtn.type = "button";
@@ -470,6 +474,7 @@ console.log("DentalBot Widget LIVE — v1.1.2", new Date().toISOString());
     trackEvent('send', { clinic: clinicId });
     addMessage(ui.messages, text, "user");
     ui.textarea.value = "";
+    ui.textarea.style.height = "auto";
 
     // typing indicator (more explanatory for users)
     addMessage(ui.messages, "Typing…", "bot");
