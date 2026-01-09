@@ -44,7 +44,7 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
     .dbot-actions{display:flex;gap:8px;align-items:center}
     .dbot-hbtn{background:#fff;color:#111;border:1px solid rgba(255,255,255,0.35);border-radius:10px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px}
     .dbot-hbtn:disabled{opacity:.5;cursor:not-allowed}
-    .dbot-clear{padding:6px 10px;font-size:12px}
+    .dbot-clear{padding:4px 8px;font-size:12px;background-color:#16a34a;}
     .dbot-close{background:transparent;color:#fff;border:none;font-size:18px;cursor:pointer;line-height:1}
     .dbot-messages{flex:1;padding:12px;overflow-y:auto;gap:8px;display:flex;flex-direction:column;background:#fafafa}
     .dbot-msg{padding:10px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
