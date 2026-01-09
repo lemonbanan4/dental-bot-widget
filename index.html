@@ -186,6 +186,26 @@
       display: block;
     }
 
+    /* --- FOOTER --- */
+    .site-footer {
+      margin-top: 40px;
+      margin-bottom: 40px;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #64748b;
+      position: relative;
+      z-index: 10;
+    }
+    .site-footer a {
+      color: #64748b;
+      text-decoration: none;
+      margin: 0 12px;
+      transition: color 0.2s;
+    }
+    .site-footer a:hover {
+      color: #0d9488;
+    }
+
     /* NOTE: 
        We do NOT add styling for .dbot-launcher or .dbot-panel here.
        The widget is protected by Shadow DOM and handles its own styling.
@@ -237,6 +257,12 @@
     </div>
 
   </div>
+
+  <footer class="site-footer">
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Service</a>
+    <p style="margin-top: 12px; opacity: 0.7;">&copy; 2023 Lemon Techno. All rights reserved.</p>
+  </footer>
 
   <script
     src="/widget.js"
