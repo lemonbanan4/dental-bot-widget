@@ -18,8 +18,16 @@
   
   <div class="card">
     <h3>Current Settings</h3>
+    <div style="margin-bottom: 1rem;">
+      <label for="clinic-select" style="font-weight:bold; display:block; margin-bottom:0.5rem;">Switch Clinic ID:</label>
+      <select id="clinic-select" style="padding:8px; border-radius:6px; border:1px solid #ccc; width:100%; max-width:300px;">
+        <option value="demo-clinic">demo-clinic</option>
+        <option value="smile-city-001">smile-city-001</option>
+        <option value="test-clinic-a">test-clinic-a</option>
+      </select>
+    </div>
     <ul>
-      <li><strong>Clinic ID:</strong> <code>demo-clinic</code></li>
+      <li><strong>Clinic ID:</strong> <code id="display-id">demo-clinic</code></li>
       <li><strong>Theme Color:</strong> <code>#7c3aed</code> (Purple)</li>
       <li><strong>Stream:</strong> Enabled</li>
     </ul>
@@ -27,13 +35,36 @@
   </div>
 
   <!-- WIDGET EMBED -->
-  <script 
-    src="/widget.js"
-    data-clinic="demo-clinic"
-    data-api="https://dental-bot-api.onrender.com"
-    data-theme="#7c3aed"
-    data-title="Demo Assistant"
-    data-stream="1"
-  ></script>
+  <script>
+    (function() {
+      // 1. Get Clinic ID from URL or default
+      const params = new URLSearchParams(window.location.search);
+      const clinicId = params.get('clinic') || 'demo-clinic';
+
+      // 2. Update UI
+      const select = document.getElementById('clinic-select');
+      const display = document.getElementById('display-id');
+      if (select) {
+        select.value = clinicId;
+        select.addEventListener('change', (e) => {
+          const newId = e.target.value;
+          const url = new URL(window.location);
+          url.searchParams.set('clinic', newId);
+          window.location.href = url.toString();
+        });
+      }
+      if (display) display.textContent = clinicId;
+
+      // 3. Inject Widget
+      const script = document.createElement('script');
+      script.src = "/widget.js";
+      script.dataset.clinic = clinicId;
+      script.dataset.api = "https://dental-bot-api.onrender.com";
+      script.dataset.theme = "#7c3aed";
+      script.dataset.title = "Demo Assistant";
+      script.dataset.stream = "1";
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>
