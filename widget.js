@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.4", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.5", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -33,6 +33,7 @@ console.log("DentalBot Widget LIVE — v1.0.4", new Date().toISOString());
   const styles = `
     .dbot-launcher{position:fixed;right:20px;bottom:20px;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:999999}
+    .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
     .dbot-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:10px;border:2px solid #fff;display:none;font-size:10px;font-weight:700;text-align:center;line-height:14px;box-sizing:border-box;padding:0 3px}
     .dbot-badge.visible{display:block}
     .dbot-panel{position:fixed;right:20px;bottom:70px;width:340px;height:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);
@@ -410,6 +411,7 @@ console.log("DentalBot Widget LIVE — v1.0.4", new Date().toISOString());
 
     state.sending = true;
     ui.sendBtn.disabled = true;
+    ui.launcher.classList.add('typing');
     // send-button spinner
     ui.sendBtn.dataset._orig = ui.sendBtn.textContent;
     ui.sendBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Sending';
@@ -541,6 +543,7 @@ console.log("DentalBot Widget LIVE — v1.0.4", new Date().toISOString());
     } finally {
       state.sending = false;
       ui.sendBtn.disabled = false;
+      ui.launcher.classList.remove('typing');
       // restore send button
       if (ui.sendBtn.dataset._orig) {
         ui.sendBtn.innerHTML = ui.sendBtn.dataset._orig;
