@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.8", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.9", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -106,6 +106,19 @@ console.log("DentalBot Widget LIVE — v1.1.8", new Date().toISOString());
         max-width:none; max-height:none;
         border-radius:0;
       }
+    }
+    @media (prefers-color-scheme: dark) {
+      .dbot-panel, .dbot-input, .dbot-note, .dbot-powered, .dbot-modal { background: #1f1f1f; color: #e5e5e5; border-color: #333; }
+      .dbot-messages { background: #121212; }
+      .dbot-msg.bot { background: #2d2d2d; color: #e5e5e5; border-color: #404040; }
+      .dbot-msg.user { background: var(--dbot-accent); color: #fff; }
+      .dbot-input textarea, .dbot-field input, .dbot-field textarea { background: #2d2d2d; color: #fff; border-color: #404040; }
+      .dbot-hbtn, .dbot-msg-action, .dbot-btn { background: #2d2d2d; color: #fff; border-color: #404040; }
+      .dbot-send-btn { background: var(--dbot-accent); }
+      .dbot-tooltip { background: #333; }
+      .dbot-tooltip::after { border-top-color: #333; }
+      .dbot-feedback-btn:hover { background: rgba(255,255,255,0.1); }
+      .dbot-feedback-btn.selected { background: rgba(255,255,255,0.2); }
     }
   `;
 
