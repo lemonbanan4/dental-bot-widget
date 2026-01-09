@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Install Widget | Lemon Techno</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍋</text></svg>">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f0fdfa, #ffffff);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 { margin-top: 0; color: #0f172a; font-weight: 800; }
+    p { color: #64748b; margin-bottom: 24px; line-height: 1.5; }
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: left;
+      font-family: monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      border: 1px solid #334155;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-size: 1rem;
+      background-color: #0d9488;
+      color: white;
+    }
+    .btn:hover { background-color: #0f766e; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Install AI Assistant</h1>
+    <p>Copy and paste the code below into your website's HTML, just before the closing <code>&lt;/body&gt;</code> tag.</p>
+    <div class="code-block" id="snippet">&lt;script
+  src="https://widget.lemontechno.org/widget.js"
+  data-api="https://dental-bot-api.onrender.com"
+  data-clinic="CLINIC_ID_HERE"
+&gt;&lt;/script&gt;</div>
+    <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('snippet').innerText).then(()=>{const b=this;b.textContent='Copied! ✅';setTimeout(()=>b.textContent='Copy Snippet',2000)})">Copy Snippet</button>
+    <br><br>
+    <a href="/" style="color:#64748b;text-decoration:none;font-size:0.9rem">&larr; Back to Home</a>
+  </div>
+</body>
+</html>
