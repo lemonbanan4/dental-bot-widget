@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.9", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.0", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -21,6 +21,7 @@ console.log("DentalBot Widget LIVE — v1.0.9", new Date().toISOString());
   const autoOpenMobile = (script?.dataset?.autoOpenMobile === '1' || script?.dataset?.autoOpenMobile === 'true');
   const enableSound = (script?.dataset?.sound === '1' || script?.dataset?.sound === 'true');
   const autoOpenScroll = (script?.dataset?.autoOpenScroll === '1' || script?.dataset?.autoOpenScroll === 'true');
+  const welcomeMessageOverride = (script?.dataset?.welcome || "").trim();
 
   console.log("Dental bot widget loaded");
   console.log("API:", apiUrl);
@@ -689,12 +690,16 @@ console.log("DentalBot Widget LIVE — v1.0.9", new Date().toISOString());
       state.unreadCount = 0;
       trackEvent('open', { clinic: clinicId });
       if (ui.messages.childElementCount === 0) {
-        const hour = new Date().getHours();
-        let greeting = "Welcome";
-        if (hour < 12) greeting = "Good morning";
-        else if (hour < 18) greeting = "Good afternoon";
-        else greeting = "Good evening";
-        addMessage(ui.messages, `${greeting}! I can help you find opening hours, services, prices or book an appointment. Ask me anything!`, "bot");
+        if (welcomeMessageOverride) {
+          addMessage(ui.messages, welcomeMessageOverride, "bot");
+        } else {
+          const hour = new Date().getHours();
+          let greeting = "Welcome";
+          if (hour < 12) greeting = "Good morning";
+          else if (hour < 18) greeting = "Good afternoon";
+          else greeting = "Good evening";
+          addMessage(ui.messages, `${greeting}! I can help you find opening hours, services, prices or book an appointment. Ask me anything!`, "bot");
+        }
       }
       try {
         // smoothly bring the panel into view and focus the textarea without scrolling the page caret
