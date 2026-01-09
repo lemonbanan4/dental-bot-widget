@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.3", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.4", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -33,7 +33,7 @@ console.log("DentalBot Widget LIVE — v1.0.3", new Date().toISOString());
   const styles = `
     .dbot-launcher{position:fixed;right:20px;bottom:20px;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:999999}
-    .dbot-badge{position:absolute;top:-4px;right:-4px;width:12px;height:12px;background:#ef4444;border-radius:50%;border:2px solid #fff;display:none}
+    .dbot-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;background:#ef4444;color:#fff;border-radius:10px;border:2px solid #fff;display:none;font-size:10px;font-weight:700;text-align:center;line-height:14px;box-sizing:border-box;padding:0 3px}
     .dbot-badge.visible{display:block}
     .dbot-panel{position:fixed;right:20px;bottom:70px;width:340px;height:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);
       background:#fff;border-radius:14px;box-shadow:0 24px 80px rgba(2,6,23,0.35);display:none;flex-direction:column;overflow:hidden;border:1px solid #eef2f7;z-index:999999;
@@ -369,6 +369,8 @@ console.log("DentalBot Widget LIVE — v1.0.3", new Date().toISOString());
       container.appendChild(acts);
       if (enableSound) playSound();
       if (ui && ui.panel && !ui.panel.classList.contains('open') && ui.badge) {
+        state.unreadCount = (state.unreadCount || 0) + 1;
+        ui.badge.textContent = state.unreadCount;
         ui.badge.classList.add('visible');
       }
     }
@@ -623,13 +625,17 @@ console.log("DentalBot Widget LIVE — v1.0.3", new Date().toISOString());
   // Note: removed separate panel CTA to avoid duplicate booking CTAs.
   // The header `bookBtn` is the single prominent booking control.
 
-  const state = { sessionId: getSessionKey(), sending: false, clinic: null };
+  const state = { sessionId: getSessionKey(), sending: false, clinic: null, unreadCount: 0 };
 
   // open/close helpers
   function openPanel() {
     if (!ui.panel.classList.contains('open')) {
       ui.panel.classList.add('open');
-      if (ui.badge) ui.badge.classList.remove('visible');
+      if (ui.badge) {
+        ui.badge.classList.remove('visible');
+        ui.badge.textContent = '';
+      }
+      state.unreadCount = 0;
       trackEvent('open', { clinic: clinicId });
       if (ui.messages.childElementCount === 0) {
         addMessage(ui.messages, "Welcome! I can help you find opening hours, services, prices or book an appointment. Ask me anything!", "bot");
