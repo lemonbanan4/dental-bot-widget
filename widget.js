@@ -305,7 +305,7 @@ console.log("DentalBot Widget LIVE — v1.1.6", new Date().toISOString());
 
     const powered = document.createElement("a");
     powered.className = "dbot-powered";
-    powered.textContent = "Powered by lemontechno";
+    powered.textContent = "Powered by Lemontechno";
     powered.href = "https://lemontechno.org";
     powered.target = "_blank";
     powered.rel = "noopener noreferrer";
