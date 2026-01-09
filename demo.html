@@ -21,15 +21,15 @@
     <div style="margin-bottom: 1rem;">
       <label for="clinic-select" style="font-weight:bold; display:block; margin-bottom:0.5rem;">Switch Clinic ID:</label>
       <select id="clinic-select" style="padding:8px; border-radius:6px; border:1px solid #ccc; width:100%; max-width:300px;">
-        <option value="demo-clinic">demo-clinic</option>
         <option value="smile-city-001">smile-city-001</option>
+        <option value="demo-clinic">demo-clinic</option>
         <option value="test-clinic-a">test-clinic-a</option>
       </select>
     </div>
     <ul>
-      <li><strong>Clinic ID:</strong> <code id="display-id">demo-clinic</code></li>
+      <li><strong>Clinic ID:</strong> <code id="display-id">smile-city-001</code></li>
       <li><strong>Theme Color:</strong> <code>#7c3aed</code> (Purple)</li>
-      <li><strong>Stream:</strong> Enabled</li>
+      <li><strong>Stream:</strong> Disabled (Stability)</li>
     </ul>
     <p>To test other configurations, edit this file (<code>demo.html</code>) and change the <code>data-</code> attributes in the script tag below.</p>
   </div>
@@ -39,7 +39,7 @@
     (function() {
       // 1. Get Clinic ID from URL or default
       const params = new URLSearchParams(window.location.search);
-      const clinicId = params.get('clinic') || 'demo-clinic';
+      const clinicId = params.get('clinic') || 'smile-city-001';
 
       // 2. Update UI
       const select = document.getElementById('clinic-select');
@@ -62,7 +62,7 @@
       script.dataset.api = "https://dental-bot-api.onrender.com";
       script.dataset.theme = "#7c3aed";
       script.dataset.title = "Demo Assistant";
-      script.dataset.stream = "1";
+      script.dataset.stream = "0";
       document.body.appendChild(script);
     })();
   </script>

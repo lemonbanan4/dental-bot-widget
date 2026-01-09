@@ -414,9 +414,11 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
               const lines = buf.split('\n');
               buf = lines.pop();
               for (const line of lines) {
-                if (!line.trim()) continue;
+                // Handle standard JSON lines or SSE "data: {...}" lines
+                const clean = line.replace(/^data: /, '').trim();
+                if (!clean || clean === '[DONE]') continue;
                 let obj;
-                try { obj = JSON.parse(line); } catch (e) { continue; }
+                try { obj = JSON.parse(clean); } catch (e) { continue; }
                 if (obj.text) {
                   acc += obj.text;
                   if (typingEl) typingEl.textContent = acc;
