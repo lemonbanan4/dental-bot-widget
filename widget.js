@@ -177,6 +177,12 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
     leadBtn.className = "dbot-hbtn";
     leadBtn.textContent = "Request callback";
 
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "dbot-hbtn";
+    clearBtn.textContent = "Clear";
+    clearBtn.title = "Reset conversation";
+
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "dbot-close";
@@ -185,6 +191,7 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
 
     actions.appendChild(bookBtn);
     actions.appendChild(leadBtn);
+    actions.appendChild(clearBtn);
     headerInner.appendChild(avatar);
     headerInner.appendChild(title);
     header.appendChild(headerInner);
@@ -270,7 +277,7 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, backdrop, title, avatar };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, backdrop, title, avatar };
   }
 
 
@@ -636,6 +643,15 @@ console.log("DentalBot Widget LIVE — v1.0.1", new Date().toISOString());
 
   // lead modal controls
   ui.leadBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'header' }); } catch (e) {} ; openLeadModal(ui); };
+  ui.clearBtn.onclick = () => {
+    if (ui.messages.childElementCount > 0 && confirm("Start a new conversation?")) {
+      ui.messages.innerHTML = "";
+      state.sessionId = `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem(`dbot_session_${clinicId}`, state.sessionId);
+      addMessage(ui.messages, "Conversation cleared. How can I help you?", "bot");
+      trackEvent('clear_chat', { clinic: clinicId });
+    }
+  };
   ui.backdrop.addEventListener("click", (e) => {
     if (e.target === ui.backdrop) closeLeadModal(ui);
   });
