@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.4", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.5", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -378,6 +378,20 @@ console.log("DentalBot Widget LIVE — v1.1.4", new Date().toISOString());
       const fb = document.createElement('div');
       fb.className = 'dbot-feedback';
       
+      const btnCopy = document.createElement('button');
+      btnCopy.className = 'dbot-feedback-btn';
+      btnCopy.textContent = '📋';
+      btnCopy.title = 'Copy text';
+      btnCopy.onclick = async function() {
+        try {
+          await navigator.clipboard.writeText(text);
+          const original = this.textContent;
+          this.textContent = '✅';
+          setTimeout(() => { this.textContent = original; }, 2000);
+          try { trackEvent('copy', { clinic: clinicId }); } catch (e) {}
+        } catch (e) {}
+      };
+
       const btnUp = document.createElement('button');
       btnUp.className = 'dbot-feedback-btn';
       btnUp.textContent = '👍';
@@ -398,6 +412,7 @@ console.log("DentalBot Widget LIVE — v1.1.4", new Date().toISOString());
         try { trackEvent('feedback', { clinic: clinicId, type: 'down', message: text.substring(0, 50) }); } catch (e) {}
       };
 
+      fb.appendChild(btnCopy);
       fb.appendChild(btnUp);
       fb.appendChild(btnDown);
       div.appendChild(fb);
