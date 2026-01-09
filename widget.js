@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.0.2", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.0.3", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -122,7 +122,7 @@ console.log("DentalBot Widget LIVE — v1.0.2", new Date().toISOString());
       gain.connect(ctx.destination);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, ctx.currentTime);
-      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
       osc.start();
       osc.stop(ctx.currentTime + 0.5);
