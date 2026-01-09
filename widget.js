@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.1.3", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.1.4", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -95,6 +95,8 @@ console.log("DentalBot Widget LIVE — v1.1.3", new Date().toISOString());
     .dbot-btn.primary{background:var(--dbot-accent);color:#fff;border-color:var(--dbot-accent)}
     .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
+    .dbot-powered{font-size:10px;color:#aaa;text-align:center;padding:0 12px 8px;background:#fff;text-decoration:none;display:block;margin-top:-4px}
+    .dbot-powered:hover{color:#666}
     @media (max-width: 600px) {
       .dbot-panel {
         right:0; bottom:0; top:0; left:0;
@@ -273,10 +275,18 @@ console.log("DentalBot Widget LIVE — v1.1.3", new Date().toISOString());
     note.className = "dbot-note";
     note.textContent = "General information only. Not medical advice.";
 
+    const powered = document.createElement("a");
+    powered.className = "dbot-powered";
+    powered.textContent = "Powered by Lemonify";
+    powered.href = "https://lemontechno.org";
+    powered.target = "_blank";
+    powered.rel = "noopener noreferrer";
+
     panel.appendChild(header);
     panel.appendChild(messages);
     panel.appendChild(inputWrap);
     panel.appendChild(note);
+    panel.appendChild(powered);
 
     // Lead modal
     const backdrop = document.createElement("div");
