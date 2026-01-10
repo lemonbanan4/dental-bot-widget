@@ -326,7 +326,7 @@ console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
     
     const disclaimer = document.createElement("div");
     disclaimer.className = "ai-disclaimer";
-    disclaimer.innerHTML = "<strong>Note:</strong> Some answers are AI-generated. Please do not share sensitive personal data.";
+    disclaimer.innerHTML = "<strong>Note:</strong> Please do not share sensitive personal data.";
     messages.appendChild(disclaimer);
 
     const inputWrap = document.createElement("div");
