@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -34,46 +34,79 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
   }
 
   const styles = `
-    .dbot-launcher{position:fixed;right:20px;bottom:20px;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
-      font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);z-index:999999}
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999999;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      gap: 16px;
+      pointer-events: none;
+    }
+    .dbot-launcher{pointer-events:auto;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
+      font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease}
+    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
     .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:12px;background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:none;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
     .dbot-tooltip.visible{display:block;opacity:1;transform:translateY(0)}
     .dbot-tooltip::after{content:"";position:absolute;top:100%;right:20px;border:6px solid transparent;border-top-color:#111}
-    .dbot-panel{position:fixed;right:20px;bottom:70px;width:340px;height:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 120px);
-      background:#fff;border-radius:14px;box-shadow:0 24px 80px rgba(2,6,23,0.35);display:none;flex-direction:column;overflow:hidden;border:1px solid #eef2f7;z-index:999999;
-      font:14px/1.4 system-ui,-apple-system,sans-serif;transform-origin:bottom right;transition:transform .18s ease,opacity .18s ease}
-    .dbot-panel.open{display:flex}
-    .dbot-panel.open{transform:translateY(0);opacity:1}
-    .dbot-panel{transform:translateY(6px);opacity:0}
-    .dbot-header{padding:10px 12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .dbot-header-inner{display:flex;align-items:center;gap:10px}
-    .dbot-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#06b6d4);display:inline-block;flex:0 0 32px;box-shadow:0 6px 18px rgba(2,6,23,0.18)}
-    .dbot-title{font-weight:700;font-size:13px}
-    .dbot-actions{display:flex;gap:8px;align-items:center}
-    .dbot-hbtn{background:#fff;color:#111;border:1px solid rgba(255,255,255,0.35);border-radius:10px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px}
-    .dbot-hbtn:disabled{opacity:.5;cursor:not-allowed}
-    .dbot-clear{padding:3px 6px;font-size:12px;background-color:#16a34a;}
-    .dbot-close{background:transparent;color:#fff;border:none;font-size:18px;cursor:pointer;line-height:1}
-    .dbot-messages{flex:1;padding:12px;overflow-y:auto;gap:8px;display:flex;flex-direction:column;background:#fafafa}
-    .dbot-msg{padding:10px 12px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
-    .dbot-msg.user{background:#111;color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
-    .dbot-msg.bot{background:#fff;color:#111;align-self:flex-start;border:1px solid #e6e6e6;border-bottom-left-radius:6px}
-    .dbot-msg.typing{opacity:.9;font-style:italic;color:#666}
-    .dbot-msg.typing::after{content:"";display:inline-block;margin-left:8px;width:18px;height:8px;vertical-align:middle}
-    .dbot-msg.typing span{display:inline-block}
-    .dbot-msg.typing .dots::after{content:".";animation:dots .9s steps(3,end) infinite}
+    
+    /* --- WIDGET CARD --- */
+    .widget-card{width:380px;height:600px;max-height:calc(100vh - 100px);max-width:calc(100vw - 40px);background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);opacity:0;transform:translateY(20px) scale(0.95);pointer-events:none;transform-origin:bottom right;margin-bottom:0}
+    .widget-card.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+    
+    /* --- HEADER --- */
+    .header{background:#0d9488;padding:16px;display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0}
+    .header-left{display:flex;align-items:center;gap:12px}
+    .avatar{width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d9488;background-size:cover;background-position:center}
+    .bot-info h3{margin:0;font-size:16px;font-weight:700}
+    .bot-info span{font-size:12px;opacity:0.9}
+    .header-actions{display:flex;gap:8px}
+    .icon-btn{background:none;border:none;cursor:pointer;color:white;padding:6px;border-radius:50%;transition:background 0.2s;display:flex;align-items:center;justify-content:center}
+    .icon-btn:hover{background:rgba(255,255,255,0.2)}
+
+    /* --- CONTENT AREA --- */
+    .content-area{position:relative;flex:1;overflow:hidden;background:#f8fafc;display:flex}
+    .content-area.show-settings .view-chat{transform:translateX(-20%);filter:blur(2px)}
+    .content-area.show-settings .view-settings{transform:translateX(0)}
+
+    /* --- VIEW: CHAT --- */
+    .view-chat{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;transition:transform 0.3s ease,filter 0.3s ease;background:#f8fafc}
+    .chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+    .ai-disclaimer{font-size:11px;color:#64748b;background:#f1f5f9;padding:10px;border-radius:8px;margin-bottom:10px;line-height:1.4;border:1px solid #e2e8f0}
+    .message{max-width:85%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word}
+    .message.bot{background:white;color:#1e293b;border-bottom-left-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+    .message.user{background:#0d9488;color:white;align-self:flex-end;border-bottom-right-radius:4px}
+    .message.typing{font-style:italic;color:#666;opacity:0.8}
+    .message.typing::after{content:".";animation:dots 1s steps(3,end) infinite}
     @keyframes dots{0%{content:"."}33%{content:".."}66%{content:"..."}100%{content:"."}}
-    .dbot-msg a{color:inherit;text-decoration:underline}
-    .dbot-input{display:flex;padding:10px;gap:8px;border-top:1px solid #e5e7eb;background:#fff}
-    .dbot-input textarea{flex:1;resize:none;border:1px solid #d1d5db;border-radius:10px;padding:10px;min-height:44px;max-height:120px;font:inherit;outline:none;overflow-y:auto}
-    .dbot-input button{background:#111;color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
-    .dbot-launcher{transition:transform .12s ease,box-shadow .12s ease}
-    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
-    .dbot-note{font-size:11px;color:#666;padding:0 12px 10px;background:#fff}
+    .message a{color:inherit;text-decoration:underline}
+    
+    .chat-input-area{padding:16px;background:white;border-top:1px solid #e2e8f0;display:flex;gap:10px;align-items:flex-end}
+    .chat-input{flex:1;border:1px solid #cbd5e1;border-radius:20px;padding:10px 16px;outline:none;font-size:14px;font-family:inherit;resize:none;min-height:44px;max-height:120px}
+    .chat-input:focus{border-color:#0d9488}
+    .send-btn{background:#0d9488;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+    .send-btn:hover{background:#0f766e}
+    .send-btn:disabled{opacity:0.7;cursor:not-allowed}
+
+    /* --- VIEW: SETTINGS --- */
+    .view-settings{position:absolute;top:0;left:0;width:100%;height:100%;background:#f8fafc;z-index:10;transform:translateX(100%);transition:transform 0.3s ease;padding:30px;display:flex;flex-direction:column;box-sizing:border-box}
+    .settings-btn{display:flex;align-items:center;width:100%;background:white;border:1px solid #e2e8f0;padding:16px;margin-bottom:12px;border-radius:12px;font-weight:600;color:#334155;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.02);font-size:14px}
+    .settings-btn:hover{border-color:#0d9488;color:#0d9488;transform:translateY(-2px);box-shadow:0 4px 6px rgba(13, 148, 136, 0.1)}
+    .settings-btn.primary{background:#0d9488;color:white;border:none;justify-content:center;margin-top:auto}
+    .settings-btn.primary:hover{background:#0f766e;color:white}
+    .powered-by{text-align:center;font-size:10px;color:#94a3b8;margin-top:10px}
+
+    /* --- ACTIONS & MODAL --- */
     .dbot-msg-actions{display:flex;gap:8px;margin-top:8px}
-    .dbot-msg-action{background:#fff;border:1px solid #e6e6e6;padding:6px 8px;border-radius:8px;font-weight:700;cursor:pointer}
-    .dbot-msg-action.primary{background:#16a34a;color:#fff;border-color:transparent}
+    .dbot-msg-action{background:#fff;border:1px solid #e2e8f0;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;color:#0d9488;cursor:pointer;transition:all 0.2s}
+    .dbot-msg-action:hover{background:#f0fdfa;border-color:#0d9488}
+    .dbot-msg-action.primary{background:#0d9488;color:white;border-color:#0d9488}
+    .dbot-msg-action.primary:hover{background:#0f766e}
     .dbot-msg-action:disabled{opacity:.6;cursor:not-allowed}
     .dbot-feedback{display:flex;gap:6px;margin-top:6px;justify-content:flex-end;border-top:1px solid rgba(0,0,0,0.05);padding-top:4px}
     .dbot-feedback-btn{background:transparent;border:none;cursor:pointer;font-size:12px;padding:2px 4px;opacity:0.4;transition:all .2s;border-radius:4px}
@@ -83,35 +116,33 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     .dbot-modal-backdrop{position:fixed;right:20px;bottom:80px;width:360px;display:none;z-index:1000000;pointer-events:auto;display:none;align-items:flex-end;justify-content:flex-end}
     .dbot-modal{width:100%;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;border:1px solid #e5e7eb;transform:translateY(12px);transition:transform .18s ease,opacity .18s ease}
     .dbot-modal.open{transform:translateY(0)}
-    .dbot-modal-h{padding:12px 12px;background:#111;color:#fff;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+    .dbot-modal-h{padding:12px;background:#0d9488;color:#fff;font-weight:700;display:flex;justify-content:space-between;align-items:center}
     .dbot-modal-c{padding:12px;display:flex;flex-direction:column;gap:10px}
     .dbot-field{display:flex;flex-direction:column;gap:6px}
     .dbot-field label{font-size:12px;color:#444;font-weight:700}
-    .dbot-field input,.dbot-field textarea{border:1px solid #d1d5db;border-radius:10px;padding:10px;font:inherit;outline:none}
+    .dbot-field input,.dbot-field textarea{border:1px solid #d1d5db;border-radius:8px;padding:10px;font:inherit;outline:none}
     .dbot-modal-actions{display:flex;gap:8px;justify-content:flex-end}
-    .dbot-btn{border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer;border:1px solid #ddd;background:#fff}
-    .dbot-btn.primary{background:#111;color:#fff;border-color:#111}
-    :host{ --dbot-accent: #16a34a; }
-    .dbot-cta{display:block;padding:10px;border-radius:8px;text-align:center;background:var(--dbot-accent);color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(16,185,129,0.12)}
-    .dbot-btn.primary{background:var(--dbot-accent);color:#fff;border-color:var(--dbot-accent)}
+    .dbot-btn{border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;border:1px solid #ddd;background:#fff}
+    .dbot-btn.primary{background:#0d9488;color:#fff;border-color:#0d9488}
+    .dbot-close{background:transparent;border:none;color:white;font-size:20px;cursor:pointer}
+    
     .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     @media (max-width: 600px) {
-      .dbot-panel {
-        right:0; bottom:0; top:0; left:0;
-        width:100%; height:100%;
-        max-width:none; max-height:none;
-        border-radius:0;
-      }
+      .widget-card { right:0; bottom:0; top:0; left:0; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; }
     }
     @media (prefers-color-scheme: dark) {
-      .dbot-panel, .dbot-input, .dbot-note, .dbot-modal { background: #1f1f1f; color: #e5e5e5; border-color: #333; }
-      .dbot-messages { background: #121212; }
-      .dbot-msg.bot { background: #2d2d2d; color: #e5e5e5; border-color: #404040; }
-      .dbot-msg.user { background: var(--dbot-accent); color: #fff; }
-      .dbot-input textarea, .dbot-field input, .dbot-field textarea { background: #2d2d2d; color: #fff; border-color: #404040; }
-      .dbot-hbtn, .dbot-msg-action, .dbot-btn { background: #2d2d2d; color: #fff; border-color: #404040; }
-      .dbot-send-btn { background: var(--dbot-accent); }
+      .widget-card, .view-chat, .view-settings, .content-area { background: #1f1f1f; color: #e5e5e5; }
+      .header { background: #111; border-bottom: 1px solid #333; }
+      .message.bot { background: #2d2d2d; color: #e5e5e5; }
+      .chat-input-area { background: #1f1f1f; border-color: #333; }
+      .chat-input { background: #2d2d2d; color: #fff; border-color: #404040; }
+      .settings-btn { background: #2d2d2d; border-color: #404040; color: #e5e5e5; }
+      .ai-disclaimer { background: #2d2d2d; border-color: #333; color: #999; }
+      .dbot-modal { background: #1f1f1f; border-color: #333; }
+      .dbot-modal-h { background: #111; }
+      .dbot-field input, .dbot-field textarea { background: #2d2d2d; color: #fff; border-color: #404040; }
+      .dbot-btn { background: #2d2d2d; color: #fff; border-color: #404040; }
       .dbot-tooltip { background: #333; }
       .dbot-tooltip::after { border-top-color: #333; }
       .dbot-feedback-btn:hover { background: rgba(255,255,255,0.1); }
@@ -164,7 +195,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
   function saveHistory() {
     if (!clinicId) return;
     const history = [];
-    const msgs = ui.messages.querySelectorAll('.dbot-msg');
+    const msgs = ui.messages.querySelectorAll('.message');
     msgs.forEach(msg => {
       if (msg.classList.contains('typing')) return;
       const who = msg.classList.contains('user') ? 'user' : 'bot';
@@ -233,72 +264,77 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     tooltip.textContent = "New Message";
     launcher.appendChild(tooltip);
 
-    const panel = document.createElement("div");
-    panel.className = "dbot-panel";
+    // --- WIDGET CARD ---
+    const panel = document.createElement("div"); // "panel" var name kept for compatibility
+    panel.className = "widget-card";
 
+    // --- HEADER ---
     const header = document.createElement("div");
-    header.className = "dbot-header";
+    header.className = "header";
 
-    const title = document.createElement("div");
-    title.className = "dbot-title";
-    title.textContent = titleOverride || "Clinic Assistant";
+    const headerLeft = document.createElement("div");
+    headerLeft.className = "header-left";
 
-    const headerInner = document.createElement("div");
-    headerInner.className = "dbot-header-inner";
     const avatar = document.createElement("div");
-    avatar.className = "dbot-avatar";
+    avatar.className = "avatar";
+    avatar.textContent = "🤖";
     if (avatarOverride) {
       avatar.style.backgroundImage = `url(${avatarOverride})`;
-      avatar.style.backgroundSize = 'cover';
-      avatar.style.backgroundPosition = 'center';
+      avatar.textContent = "";
     }
 
-    const actions = document.createElement("div");
-    actions.className = "dbot-actions";
+    const botInfo = document.createElement("div");
+    botInfo.className = "bot-info";
+    const title = document.createElement("h3");
+    title.textContent = titleOverride || "DentalBot";
+    const status = document.createElement("span");
+    status.textContent = "Online";
+    botInfo.appendChild(title);
+    botInfo.appendChild(status);
 
-    const bookBtn = document.createElement("button");
-    bookBtn.type = "button";
-    bookBtn.className = "dbot-hbtn";
-    bookBtn.textContent = "Book appointment";
-    bookBtn.disabled = true;
-    // storage for booking url
-    bookBtn.dataset.bookingUrl = "";
+    headerLeft.appendChild(avatar);
+    headerLeft.appendChild(botInfo);
 
-    const leadBtn = document.createElement("button");
-    leadBtn.type = "button";
-    leadBtn.className = "dbot-hbtn";
-    leadBtn.textContent = "Request callback";
+    const headerActions = document.createElement("div");
+    headerActions.className = "header-actions";
 
-    const clearBtn = document.createElement("button");
-    clearBtn.type = "button";
-    clearBtn.className = "dbot-hbtn dbot-clear";
-    clearBtn.textContent = "Clear";
-    clearBtn.title = "Reset conversation";
+    const settingsBtn = document.createElement("button");
+    settingsBtn.className = "icon-btn";
+    settingsBtn.title = "Settings";
+    settingsBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
 
     const closeBtn = document.createElement("button");
-    closeBtn.type = "button";
-    closeBtn.className = "dbot-close";
-    closeBtn.textContent = "×";
-    closeBtn.setAttribute("aria-label", "Close");
+    closeBtn.className = "icon-btn";
+    closeBtn.title = "Minimize";
+    closeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
 
-    actions.appendChild(bookBtn);
-    actions.appendChild(leadBtn);
-    actions.appendChild(clearBtn);
-    headerInner.appendChild(avatar);
-    headerInner.appendChild(title);
-    header.appendChild(headerInner);
-    header.appendChild(actions);
-    header.appendChild(closeBtn);
+    headerActions.appendChild(settingsBtn);
+    headerActions.appendChild(closeBtn);
+    header.appendChild(headerLeft);
+    header.appendChild(headerActions);
+
+    // --- CONTENT AREA ---
+    const contentArea = document.createElement("div");
+    contentArea.className = "content-area";
+
+    // VIEW 1: CHAT
+    const viewChat = document.createElement("div");
+    viewChat.className = "view-chat";
 
     const messages = document.createElement("div");
-    messages.className = "dbot-messages";
+    messages.className = "chat-messages";
+    
+    const disclaimer = document.createElement("div");
+    disclaimer.className = "ai-disclaimer";
+    disclaimer.innerHTML = "<strong>Note:</strong> Some answers are AI-generated. Please do not share sensitive personal data.";
+    messages.appendChild(disclaimer);
 
     const inputWrap = document.createElement("div");
-    inputWrap.className = "dbot-input";
+    inputWrap.className = "chat-input-area";
 
     const textarea = document.createElement("textarea");
-    textarea.setAttribute("aria-label", "Chat input");
-    textarea.placeholder = "Type your question…";
+    textarea.className = "chat-input";
+    textarea.placeholder = "Ask a question...";
     textarea.addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = this.scrollHeight + 'px';
@@ -306,20 +342,57 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
 
     const sendBtn = document.createElement("button");
     sendBtn.type = "button";
-    sendBtn.textContent = "Send";
-    sendBtn.className = "dbot-send-btn";
+    sendBtn.innerHTML = "➤";
+    sendBtn.className = "send-btn";
 
     inputWrap.appendChild(textarea);
     inputWrap.appendChild(sendBtn);
 
-    const note = document.createElement("div");
-    note.className = "dbot-note";
-    note.textContent = "General information only. Not medical advice.";
+    viewChat.appendChild(messages);
+    viewChat.appendChild(inputWrap);
+
+    // VIEW 2: SETTINGS
+    const viewSettings = document.createElement("div");
+    viewSettings.className = "view-settings";
+    viewSettings.innerHTML = `<h2 style="margin:0 0 20px 0;color:#1e293b;font-size:1.25rem;">Settings</h2>`;
+
+    const restartBtn = document.createElement("button");
+    restartBtn.className = "settings-btn";
+    restartBtn.textContent = "🔄 Restart Conversation";
+
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "settings-btn";
+    clearBtn.textContent = "🗑️ Clear Chat History";
+
+    const backBtn = document.createElement("button");
+    backBtn.className = "settings-btn primary";
+    backBtn.textContent = "Back to Chat";
+
+    const poweredBy = document.createElement("div");
+    poweredBy.className = "powered-by";
+    poweredBy.innerHTML = "Powered by <strong>Lemon Techno</strong>";
+
+    viewSettings.appendChild(restartBtn);
+    viewSettings.appendChild(clearBtn);
+    viewSettings.appendChild(backBtn);
+    viewSettings.appendChild(poweredBy);
+
+    contentArea.appendChild(viewChat);
+    contentArea.appendChild(viewSettings);
 
     panel.appendChild(header);
-    panel.appendChild(messages);
-    panel.appendChild(inputWrap);
-    panel.appendChild(note);
+    panel.appendChild(contentArea);
+
+    // --- LOGIC WIRING ---
+    settingsBtn.onclick = () => contentArea.classList.add('show-settings');
+    backBtn.onclick = () => contentArea.classList.remove('show-settings');
+
+    // Hidden "Book" button logic storage (since UI changed)
+    const bookBtn = document.createElement("button"); // Virtual button for logic
+    bookBtn.dataset.bookingUrl = "";
+    
+    // Lead button logic (virtual)
+    const leadBtn = document.createElement("button");
 
     // Lead modal
     const backdrop = document.createElement("div");
@@ -373,7 +446,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, backdrop, title, avatar, tooltip };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, backdrop, title, avatar, tooltip };
   }
 
 
@@ -381,19 +454,14 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     // Special-case typing indicator to allow CSS animation
     if (String(text).trim() === "Typing…") {
       const tdiv = document.createElement("div");
-      tdiv.className = `dbot-msg bot typing`;
-      const span = document.createElement('span');
-      span.textContent = 'Typing';
-      const dots = document.createElement('span');
-      dots.className = 'dots';
-      tdiv.appendChild(span);
-      tdiv.appendChild(dots);
+      tdiv.className = `message typing`;
+      tdiv.textContent = "Typing";
       container.appendChild(tdiv);
       container.scrollTop = container.scrollHeight;
       return tdiv;
     }
     const div = document.createElement("div");
-    div.className = `dbot-msg ${who}`;
+    div.className = `message ${who}`;
     // Render message text with clickable links.
     // NOTE: this uses innerHTML to convert plain URLs into anchors.
     // The input originates from the clinic assistant / LLM; if you expect
@@ -526,7 +594,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     ui.launcher.classList.add('typing');
     // send-button spinner
     ui.sendBtn.dataset._orig = ui.sendBtn.textContent;
-    ui.sendBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Sending';
+    ui.sendBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
     ui.sendBtn.setAttribute('aria-busy','true');
     trackEvent('send', { clinic: clinicId });
     addMessage(ui.messages, text, "user");
@@ -552,7 +620,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
         });
 
         if (!res.ok) {
-          const typingErr = ui.messages.querySelector('.dbot-msg.bot.typing');
+          const typingErr = ui.messages.querySelector('.message.typing');
           if (typingErr) typingErr.remove();
           addMessage(ui.messages, `Server error ${res.status}`, "bot");
           trackEvent('error', { clinic: clinicId, status: res.status });
@@ -561,7 +629,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
           const dec = new TextDecoder();
           let buf = "";
           let acc = "";
-          const typingEl = ui.messages.querySelector('.dbot-msg.bot.typing');
+          const typingEl = ui.messages.querySelector('.message.typing');
           try {
             while (true) {
               const { value, done } = await reader.read();
@@ -610,12 +678,12 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
               } catch (e) {}
             }
 
-            const typingBubble = ui.messages.querySelector('.dbot-msg.bot.typing');
+            const typingBubble = ui.messages.querySelector('.message.typing');
             if (typingBubble) typingBubble.remove();
             addMessage(ui.messages, acc || `Error: empty reply`, "bot");
             trackEvent('reply', { clinic: clinicId });
           } catch (err) {
-            const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+            const typing = ui.messages.querySelector('.message.typing');
             if (typing) typing.remove();
             addMessage(ui.messages, "Network error. Please try again.", "bot");
             trackEvent('error', { clinic: clinicId, message: String(err) });
@@ -631,7 +699,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
         const data = await res.json();
 
         // remove typing bubble if present
-        const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+        const typing = ui.messages.querySelector('.message.typing');
         if (typing) typing.remove();
 
         // Hard-wire booking URL from response (if provided)
@@ -649,7 +717,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
         addMessage(ui.messages, data.reply || `Error ${res.status}`, "bot");
       }
     } catch (err) {
-      const typing = ui.messages.querySelector('.dbot-msg.bot.typing');
+      const typing = ui.messages.querySelector('.message.typing');
       if (typing) typing.remove();
       addMessage(ui.messages, "Network error. Please try again.", "bot");
       trackEvent('error', { clinic: clinicId, message: String(err) });
@@ -766,7 +834,8 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
         ui.tooltip.classList.remove('visible');
       }
       trackEvent('open', { clinic: clinicId });
-      if (ui.messages.childElementCount === 0) {
+      // Check if only disclaimer exists (child count 1)
+      if (ui.messages.querySelectorAll('.message').length === 0) {
         if (welcomeMessageOverride) {
           addMessage(ui.messages, welcomeMessageOverride, "bot");
         } else {
@@ -820,9 +889,13 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
 
   // lead modal controls
   ui.leadBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'header' }); } catch (e) {} ; openLeadModal(ui); };
-  ui.clearBtn.onclick = () => {
-    if (ui.messages.childElementCount > 0 && confirm("Start a new conversation?")) {
+  
+  const resetHandler = () => {
+    if (confirm("Start a new conversation?")) {
+      // Keep disclaimer
+      const disclaimer = ui.messages.querySelector('.ai-disclaimer');
       ui.messages.innerHTML = "";
+      if (disclaimer) ui.messages.appendChild(disclaimer);
       state.sessionId = `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       localStorage.setItem(`dbot_session_${clinicId}`, state.sessionId);
       localStorage.removeItem(`dbot_history_${clinicId}`);
@@ -830,6 +903,9 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
       trackEvent('clear_chat', { clinic: clinicId });
     }
   };
+  ui.clearBtn.onclick = resetHandler;
+  ui.restartBtn.onclick = resetHandler;
+
   ui.backdrop.addEventListener("click", (e) => {
     if (e.target === ui.backdrop) closeLeadModal(ui);
   });
@@ -858,7 +934,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
   fetchClinicPublic().then((c) => {
     if (!c) return;
     state.clinic = c;
-    ui.title.textContent = c.clinic_name || "Clinic Assistant";
+    ui.title.textContent = c.clinic_name || "DentalBot";
     if (c.booking_url) {
       ui.bookBtn.disabled = false;
       ui.bookBtn.dataset.bookingUrl = c.booking_url;
@@ -873,8 +949,7 @@ console.log("DentalBot Widget LIVE — v1.2.1", new Date().toISOString());
     // set avatar to clinic logo when available
     if (c.logo_url && ui.avatar && !avatarOverride) {
       ui.avatar.style.backgroundImage = `url(${c.logo_url})`;
-      ui.avatar.style.backgroundSize = 'cover';
-      ui.avatar.style.backgroundPosition = 'center';
+      ui.avatar.textContent = "";
     }
   });
 
