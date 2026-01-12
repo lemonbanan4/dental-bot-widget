@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -364,6 +364,10 @@ console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
     clearBtn.className = "settings-btn";
     clearBtn.textContent = "🗑️ Clear Chat History";
 
+    const downloadBtn = document.createElement("button");
+    downloadBtn.className = "settings-btn";
+    downloadBtn.textContent = "📥 Download Transcript";
+
     const backBtn = document.createElement("button");
     backBtn.className = "settings-btn primary";
     backBtn.textContent = "Back to Chat";
@@ -374,6 +378,7 @@ console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
 
     viewSettings.appendChild(restartBtn);
     viewSettings.appendChild(clearBtn);
+    viewSettings.appendChild(downloadBtn);
     viewSettings.appendChild(backBtn);
     viewSettings.appendChild(poweredBy);
 
@@ -446,7 +451,7 @@ console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, backdrop, title, avatar, tooltip };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, downloadBtn, backdrop, title, avatar, tooltip };
   }
 
 
@@ -905,6 +910,29 @@ console.log("DentalBot Widget LIVE — v1.2.2", new Date().toISOString());
   };
   ui.clearBtn.onclick = resetHandler;
   ui.restartBtn.onclick = resetHandler;
+
+  ui.downloadBtn.onclick = () => {
+    const msgs = ui.messages.querySelectorAll('.message');
+    if (msgs.length === 0) return;
+    let content = `Chat Transcript - ${new Date().toLocaleString()}\n\n`;
+    msgs.forEach(msg => {
+      if (msg.classList.contains('typing')) return;
+      const isUser = msg.classList.contains('user');
+      const clone = msg.cloneNode(true);
+      const artifacts = clone.querySelectorAll('.dbot-feedback, .dbot-msg-actions');
+      artifacts.forEach(el => el.remove());
+      const text = clone.innerText.trim();
+      if (text) content += `[${isUser ? 'You' : 'Assistant'}] ${text}\n\n`;
+    });
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `transcript-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    trackEvent('download_transcript', { clinic: clinicId });
+  };
 
   ui.backdrop.addEventListener("click", (e) => {
     if (e.target === ui.backdrop) closeLeadModal(ui);
