@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -36,7 +36,7 @@ console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
   const styles = `
     :host {
       display: flex;
-      flex-direction: column;
+      flex-direction: column-reverse;
       align-items: flex-end;
       position: fixed;
       bottom: 20px;
@@ -356,6 +356,10 @@ console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
     viewSettings.className = "view-settings";
     viewSettings.innerHTML = `<h2 style="margin:0 0 20px 0;color:#1e293b;font-size:1.25rem;">Settings</h2>`;
 
+    const langBtn = document.createElement("button");
+    langBtn.className = "settings-btn";
+    langBtn.textContent = "🌍 Language: English";
+
     const restartBtn = document.createElement("button");
     restartBtn.className = "settings-btn";
     restartBtn.textContent = "🔄 Restart Conversation";
@@ -376,6 +380,7 @@ console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
     poweredBy.className = "powered-by";
     poweredBy.innerHTML = "Powered by <strong>Lemon Techno</strong>";
 
+    viewSettings.appendChild(langBtn);
     viewSettings.appendChild(restartBtn);
     viewSettings.appendChild(clearBtn);
     viewSettings.appendChild(downloadBtn);
@@ -451,7 +456,7 @@ console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, downloadBtn, backdrop, title, avatar, tooltip };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, downloadBtn, langBtn, backdrop, title, avatar, tooltip };
   }
 
 
@@ -910,6 +915,12 @@ console.log("DentalBot Widget LIVE — v1.2.3", new Date().toISOString());
   };
   ui.clearBtn.onclick = resetHandler;
   ui.restartBtn.onclick = resetHandler;
+
+  ui.langBtn.onclick = () => {
+    const isEn = ui.langBtn.textContent.includes("English");
+    ui.langBtn.textContent = isEn ? "🌍 Language: Spanish" : "🌍 Language: English";
+    trackEvent('language_toggle', { clinic: clinicId, lang: isEn ? 'es' : 'en' });
+  };
 
   ui.downloadBtn.onclick = () => {
     const msgs = ui.messages.querySelectorAll('.message');
