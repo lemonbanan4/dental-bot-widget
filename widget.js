@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.7", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.9", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -964,7 +964,38 @@ console.log("DentalBot Widget LIVE — v1.2.7", new Date().toISOString());
       state.sessionId = `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       localStorage.setItem(`dbot_session_${clinicId}`, state.sessionId);
       localStorage.removeItem(`dbot_history_${clinicId}`);
-      addMessage(ui.messages, "Conversation cleared. How can I help you?", "bot");
+      
+      const lang = ui.langSelect.value;
+      const clearedMsgs = {
+        es: "Conversación borrada. ¿En qué puedo ayudarte?",
+        fr: "Conversation effacée. Comment puis-je vous aider ?",
+        de: "Konversation gelöscht. Wie kann ich Ihnen helfen?",
+        it: "Conversazione cancellata. Come posso aiutarti?",
+        pt: "Conversa limpa. Como posso ajudar?",
+        nl: "Gesprek gewist. Hoe kan ik u helpen?",
+        ru: "Разговор очищен. Чем могу помочь?",
+        ja: "会話がクリアされました。どのようなご用件でしょうか？",
+        zh: "对话已清除。我能为您做什么？",
+        ko: "대화가 지워졌습니다. 무엇을 도와드릴까요?",
+        ar: "تم مسح المحادثة. كيف يمكنني مساعدتك؟",
+        hi: "बातचीत साफ़ कर दी गई है। मैं आपकी कैसे मदद कर सकता हूँ?",
+        tr: "Konuşma temizlendi. Size nasıl yardımcı olabilirim?",
+        pl: "Konwersacja wyczyszczona. W czym mogę pomóc?",
+        sv: "Konversationen rensad. Hur kan jag hjälpa dig?",
+        da: "Samtale ryddet. Hvordan kan jeg hjælpe dig?",
+        fi: "Keskustelu tyhjennetty. Miten voin auttaa?",
+        no: "Samtalen er tømt. Hva kan jeg hjelpe deg med?",
+        cs: "Konverzace vymazána. Jak vám mohu pomoci?",
+        el: "Η συζήτηση εκκαθαρίστηκε. Πώς μπορώ να σας βοηθήσω;",
+        he: "השיחה נמחקה. איך אני יכול לעזור לך?",
+        id: "Percakapan dibersihkan. Ada yang bisa saya bantu?",
+        th: "ล้างการสนทนาแล้ว ฉันจะช่วยคุณได้อย่างไร?",
+        vi: "Đã xóa cuộc trò chuyện. Tôi có thể giúp gì cho bạn?",
+        hu: "Beszélgetés törölve. Miben segíthetek?",
+        ro: "Conversația a fost ștearsă. Cum vă pot ajuta?"
+      };
+      
+      addMessage(ui.messages, clearedMsgs[lang] || "Conversation cleared. How can I help you?", "bot");
       trackEvent('clear_chat', { clinic: clinicId });
     }
   };
