@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.2", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.3", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -669,6 +669,7 @@ console.log("DentalBot Widget LIVE — v1.3.2", new Date().toISOString());
 
     // typing indicator (more explanatory for users)
     addMessage(ui.messages, "Typing…", "bot");
+    startTypingSound();
 
     try {
       const payload = {
@@ -788,6 +789,7 @@ console.log("DentalBot Widget LIVE — v1.3.2", new Date().toISOString());
       addMessage(ui.messages, "Network error. Please try again.", "bot");
       trackEvent('error', { clinic: clinicId, message: String(err) });
     } finally {
+      stopTypingSound();
       state.sending = false;
       ui.sendBtn.disabled = false;
       ui.launcher.classList.remove('typing');
