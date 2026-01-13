@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.0", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -993,7 +993,38 @@ console.log("DentalBot Widget LIVE — v1.3.0", new Date().toISOString());
   ui.leadBtn.onclick = () => { try { trackEvent('cta_callback', { clinic: clinicId, source: 'header' }); } catch (e) {} ; openLeadModal(ui); };
   
   const resetHandler = () => {
-    if (confirm("Start a new conversation?")) {
+    const lang = ui.langSelect.value;
+    const confirmMsgs = {
+      en: "Start a new conversation?",
+      es: "¿Empezar una nueva conversación?",
+      fr: "Commencer une nouvelle conversation ?",
+      de: "Eine neue Konversation beginnen?",
+      it: "Iniziare una nuova conversazione?",
+      pt: "Iniciar uma nova conversa?",
+      nl: "Een nieuw gesprek beginnen?",
+      ru: "Начать новый разговор?",
+      ja: "新しい会話を始めますか？",
+      zh: "开始新对话？",
+      ko: "새 대화를 시작하시겠습니까?",
+      ar: "بدء محادثة جديدة؟",
+      hi: "नई बातचीत शुरू करें?",
+      tr: "Yeni bir konuşma başlatılsın mı?",
+      pl: "Rozpocząć nową rozmowę?",
+      sv: "Starta en ny konversation?",
+      da: "Start en ny samtale?",
+      fi: "Aloita uusi keskustelu?",
+      no: "Starte en ny samtale?",
+      cs: "Začít novou konverzaci?",
+      el: "Έναρξη νέας συζήτησης;",
+      he: "להתחיל שיחה חדשה?",
+      id: "Mulai percakapan baru?",
+      th: "เริ่มการสนทนาใหม่หรือไม่?",
+      vi: "Bắt đầu cuộc trò chuyện mới?",
+      hu: "Új beszélgetés indítása?",
+      ro: "Începeți o nouă conversație?"
+    };
+
+    if (confirm(confirmMsgs[lang] || "Start a new conversation?")) {
       // Keep disclaimer
       const disclaimer = ui.messages.querySelector('.ai-disclaimer');
       ui.messages.innerHTML = "";
@@ -1002,7 +1033,6 @@ console.log("DentalBot Widget LIVE — v1.3.0", new Date().toISOString());
       localStorage.setItem(`dbot_session_${clinicId}`, state.sessionId);
       localStorage.removeItem(`dbot_history_${clinicId}`);
       
-      const lang = ui.langSelect.value;
       const clearedMsgs = {
         es: "Conversación borrada. ¿En qué puedo ayudarte?",
         fr: "Conversation effacée. Comment puis-je vous aider ?",
