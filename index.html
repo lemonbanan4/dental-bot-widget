@@ -108,6 +108,13 @@
 
     h1 span {
       color: #0d9488; /* Teal brand color */
+      border-right: 0.1em solid #0d9488;
+      animation: blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #0d9488; }
     }
 
     p.subtitle {
@@ -302,7 +309,7 @@
       <div class="orb-core"></div>
     </div>
 
-    <h1>24/7 Patient <span>Engagement</span> & Booking Support</h1>
+    <h1>24/7 Patient <span id="typewriter">Engagement</span> & Booking Support</h1>
     <p class="subtitle">An AI patient assistant that drives bookings, answers questions instantly, and captures callback requests while you sleep.</p>
     
     <a id="try-it" href="#demo" class="btn btn-primary">Try Live Demo &rarr;</a>
@@ -493,6 +500,41 @@
       }, 100);
     }
   });
+
+  // Typewriter Effect
+  const textElement = document.getElementById('typewriter');
+  const words = ["Engagement", "Acquisition", "Retention", "Service"];
+  let wordIndex = 0;
+  let charIndex = words[0].length;
+  let isDeleting = false;
+
+  function type() {
+    const currentWord = words[wordIndex];
+    
+    if (isDeleting) {
+      charIndex--;
+      textElement.textContent = currentWord.substring(0, charIndex);
+    } else {
+      charIndex++;
+      textElement.textContent = currentWord.substring(0, charIndex);
+    }
+
+    let typeSpeed = isDeleting ? 50 : 100;
+
+    if (!isDeleting && charIndex === currentWord.length) {
+      isDeleting = true;
+      typeSpeed = 2000; // Pause at end
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+      typeSpeed = 500; // Pause before typing next
+    }
+
+    setTimeout(type, typeSpeed);
+  }
+  
+  // Start after a slight delay
+  setTimeout(type, 1000);
 })();
 </script>
 </html>
