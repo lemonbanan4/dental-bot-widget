@@ -187,6 +187,21 @@
       display: block;
     }
 
+    /* --- PRICING --- */
+    .pricing-section { margin: 60px 0; text-align: center; }
+    .pricing-section h2 { font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
+    .pricing-grid { display: grid; grid-template-columns: 1fr; gap: 24px; text-align: left; }
+    @media (min-width: 768px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+    .pricing-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; position: relative; transition: transform 0.2s; }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
+    .pricing-card.popular { border: 2px solid #0d9488; background: #f0fdfa; }
+    .pricing-card .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #0d9488; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pricing-card h3 { margin: 0 0 16px; font-size: 1.25rem; color: #334155; }
+    .pricing-card .price { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+    .pricing-card .price span { font-size: 1rem; color: #64748b; font-weight: 500; }
+    .features-list { list-style: none; padding: 0; margin: 0 0 32px; }
+    .features-list li { margin-bottom: 12px; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+
     /* --- FOOTER --- */
     .site-footer {
       margin-top: 40px;
@@ -248,6 +263,35 @@
         <span class="feature-icon">📉</span>
         <span class="feature-title">Reduce Workload</span>
         <span style="color:#64748b; font-size: 0.9rem;">Frees up your front desk from repetitive queries.</span>
+      </div>
+    </div>
+
+    <div class="pricing-section">
+      <h2>Simple, Transparent Pricing</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">$99<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ AI Chatbot</li>
+            <li>✅ Appointment Booking</li>
+            <li>✅ Email Notifications</li>
+            <li>❌ Custom Branding</li>
+          </ul>
+          <a href="mailto:info@lemontechno.org?subject=Starter Plan" class="btn btn-secondary" style="width:100%">Get Started</a>
+        </div>
+        <div class="pricing-card popular">
+          <div class="badge">Most Popular</div>
+          <h3>Growth</h3>
+          <div class="price">$199<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ Everything in Starter</li>
+            <li>✅ Custom Branding</li>
+            <li>✅ Priority Support</li>
+            <li>✅ Lead Dashboard</li>
+          </ul>
+          <a href="mailto:info@lemontechno.org?subject=Growth Plan" class="btn btn-primary" style="width:100%">Get Started</a>
+        </div>
       </div>
     </div>
 
