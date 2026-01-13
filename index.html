@@ -506,7 +506,7 @@
   const words = ["Engagement", "Acquisition", "Retention", "Service"];
   let wordIndex = 0;
   let charIndex = words[0].length;
-  let isDeleting = false;
+  let isDeleting = true;
 
   function type() {
     const currentWord = words[wordIndex];
@@ -534,7 +534,7 @@
   }
   
   // Start after a slight delay
-  setTimeout(type, 1000);
+  setTimeout(type, 2000);
 })();
 </script>
 </html>
