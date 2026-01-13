@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.6", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.7", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -404,10 +404,15 @@ console.log("DentalBot Widget LIVE — v1.2.6", new Date().toISOString());
       langSelect.appendChild(opt);
     });
     
-    // Auto-detect user language
+    // Auto-detect user language or load from storage
     try {
-      const userLang = (navigator.language || "en").split('-')[0].toLowerCase();
-      if (langs.some(l => l.code === userLang)) langSelect.value = userLang;
+      const savedLang = localStorage.getItem(`dbot_lang_${clinicId}`);
+      if (savedLang && langs.some(l => l.code === savedLang)) {
+        langSelect.value = savedLang;
+      } else {
+        const userLang = (navigator.language || "en").split('-')[0].toLowerCase();
+        if (langs.some(l => l.code === userLang)) langSelect.value = userLang;
+      }
     } catch (e) {}
 
     const restartBtn = document.createElement("button");
@@ -967,7 +972,9 @@ console.log("DentalBot Widget LIVE — v1.2.6", new Date().toISOString());
   ui.restartBtn.onclick = resetHandler;
 
   ui.langSelect.onchange = () => {
-    trackEvent('language_change', { clinic: clinicId, lang: ui.langSelect.value });
+    const newLang = ui.langSelect.value;
+    try { localStorage.setItem(`dbot_lang_${clinicId}`, newLang); } catch (e) {}
+    trackEvent('language_change', { clinic: clinicId, lang: newLang });
   };
 
   ui.downloadBtn.onclick = () => {
