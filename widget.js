@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.2", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -48,12 +48,13 @@ console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
     }
     .dbot-launcher{pointer-events:auto;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;position:relative}
-    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
+      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;position:relative;animation:dbot-pulse 3s infinite}
+    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16);animation:none}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
     .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:12px;background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:none;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
     .dbot-tooltip.visible{display:block;opacity:1;transform:translateY(0)}
     .dbot-tooltip::after{content:"";position:absolute;top:100%;right:20px;border:6px solid transparent;border-top-color:#111}
+    @keyframes dbot-pulse{0%{box-shadow:0 0 0 0 rgba(0,0,0,0.2)}70%{box-shadow:0 0 0 10px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
     
     /* --- WIDGET CARD --- */
     .widget-card{width:380px;height:600px;max-height:calc(100vh - 100px);max-width:calc(100vw - 40px);background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);opacity:0;transform:translateY(20px) scale(0.95);pointer-events:none;transform-origin:bottom right;margin-bottom:0}
@@ -433,7 +434,7 @@ console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
 
     const poweredBy = document.createElement("div");
     poweredBy.className = "powered-by";
-    poweredBy.innerHTML = "Powered by <strong>Lemon Techno</strong>";
+    poweredBy.innerHTML = "Powered by <a href=\"https://lemontechno.org\" target=\"_blank\" style=\"color:inherit;text-decoration:none;font-weight:700\">Lemon Techno</a>";
 
     viewSettings.appendChild(langSelect);
     viewSettings.appendChild(restartBtn);
@@ -806,12 +807,17 @@ console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
     // slide-in
     modal.classList.add('open');
     const nameEl = modal.querySelector(".dbot-name");
-    // Pre-fill name if previously saved
+    const phoneEl = modal.querySelector(".dbot-phone");
+    const emailEl = modal.querySelector(".dbot-email");
+    // Pre-fill fields if previously saved
     try {
       const savedName = localStorage.getItem(`dbot_lead_name_${clinicId}`);
-      if (nameEl && !nameEl.value && savedName) {
-        nameEl.value = savedName;
-      }
+      const savedPhone = localStorage.getItem(`dbot_lead_phone_${clinicId}`);
+      const savedEmail = localStorage.getItem(`dbot_lead_email_${clinicId}`);
+      
+      if (nameEl && !nameEl.value && savedName) nameEl.value = savedName;
+      if (phoneEl && !phoneEl.value && savedPhone) phoneEl.value = savedPhone;
+      if (emailEl && !emailEl.value && savedEmail) emailEl.value = savedEmail;
     } catch (e) {}
     try { if (nameEl) nameEl.focus({ preventScroll: true }); } catch (e) { if (nameEl) nameEl.focus(); }
   }
@@ -852,10 +858,12 @@ console.log("DentalBot Widget LIVE — v1.3.1", new Date().toISOString());
         return;
       }
 
-      // Save name for next time
-      if (name) {
-        try { localStorage.setItem(`dbot_lead_name_${clinicId}`, name); } catch (e) {}
-      }
+      // Save details for next time
+      try {
+        if (name) localStorage.setItem(`dbot_lead_name_${clinicId}`, name);
+        if (phone) localStorage.setItem(`dbot_lead_phone_${clinicId}`, phone);
+        if (email) localStorage.setItem(`dbot_lead_email_${clinicId}`, email);
+      } catch (e) {}
 
       status.textContent = "Sent! The clinic will contact you.";
       // Non-blocking chat update
