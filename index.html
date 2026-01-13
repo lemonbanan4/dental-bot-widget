@@ -50,6 +50,35 @@
       100% { transform: translate(0, 0) scale(1); }
     }
 
+    /* --- AI ORB ANIMATION --- */
+    .ai-orb {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+      transform-style: preserve-3d;
+      animation: orb-float 6s ease-in-out infinite;
+    }
+    .orb-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid rgba(13, 148, 136, 0.1);
+      border-top: 2px solid #0d9488;
+      border-bottom: 2px solid #0d9488;
+      box-shadow: 0 0 15px rgba(13, 148, 136, 0.1);
+    }
+    .orb-ring:nth-child(1) { animation: orb-spin-x 8s linear infinite; }
+    .orb-ring:nth-child(2) { animation: orb-spin-y 12s linear infinite; width: 70%; height: 70%; top: 15%; left: 15%; border-color: rgba(45, 212, 191, 0.2); border-left: 2px solid #2dd4bf; border-right: 2px solid #2dd4bf; }
+    .orb-ring:nth-child(3) { animation: orb-spin-z 10s linear infinite; width: 40%; height: 40%; top: 30%; left: 30%; border: 1px dashed #0f766e; }
+    .orb-core { position: absolute; width: 16%; height: 16%; top: 42%; left: 42%; background: #0d9488; border-radius: 50%; box-shadow: 0 0 20px #0d9488; animation: orb-pulse 2s ease-in-out infinite; }
+    @keyframes orb-spin-x { from { transform: rotateX(0deg) rotateY(0deg); } to { transform: rotateX(360deg) rotateY(360deg); } }
+    @keyframes orb-spin-y { from { transform: rotateY(0deg) rotateZ(0deg); } to { transform: rotateY(360deg) rotateZ(360deg); } }
+    @keyframes orb-spin-z { from { transform: rotateZ(0deg); } to { transform: rotateZ(360deg); } }
+    @keyframes orb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes orb-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } }
+
     /* --- MAIN GLASS CONTAINER --- */
     .main-card {
       position: relative;
@@ -266,6 +295,13 @@
 
   <div class="main-card">
     
+    <div class="ai-orb">
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-ring"></div>
+      <div class="orb-core"></div>
+    </div>
+
     <h1>24/7 Patient <span>Engagement</span> & Booking Support</h1>
     <p class="subtitle">An AI patient assistant that drives bookings, answers questions instantly, and captures callback requests while you sleep.</p>
     
