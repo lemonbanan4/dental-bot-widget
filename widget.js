@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.9", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.0", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -904,12 +904,49 @@ console.log("DentalBot Widget LIVE — v1.2.9", new Date().toISOString());
         if (welcomeMessageOverride) {
           addMessage(ui.messages, welcomeMessageOverride, "bot");
         } else {
-          const hour = new Date().getHours();
-          let greeting = "Welcome";
-          if (hour < 12) greeting = "Good morning";
-          else if (hour < 18) greeting = "Good afternoon";
-          else greeting = "Good evening";
-          addMessage(ui.messages, `${greeting}! I can help you find opening hours, services, prices or book an appointment. Ask me anything!`, "bot");
+          const lang = ui.langSelect.value;
+          const welcomeMsgs = {
+            en: "I can help you find opening hours, services, prices or book an appointment. Ask me anything!",
+            es: "¡Hola! Puedo ayudarte a encontrar horarios, servicios, precios o reservar una cita.",
+            fr: "Bonjour ! Je peux vous aider à trouver les horaires, services, prix ou prendre rendez-vous.",
+            de: "Hallo! Ich kann Ihnen helfen, Öffnungszeiten, Dienstleistungen und Preise zu finden oder einen Termin zu buchen.",
+            it: "Ciao! Posso aiutarti a trovare orari, servizi, prezzi o prenotare un appuntamento.",
+            pt: "Olá! Posso ajudar a encontrar horários, serviços, preços ou marcar uma consulta.",
+            nl: "Hallo! Ik kan u helpen met openingstijden, diensten, prijzen of het maken van een afspraak.",
+            ru: "Привет! Я могу помочь найти часы работы, услуги, цены или записаться на прием.",
+            ja: "こんにちは！営業時間、サービス、料金の確認や予約のお手伝いができます。",
+            zh: "您好！我可以帮您查询营业时间、服务项目、价格或预约。",
+            ko: "안녕하세요! 영업 시간, 서비스, 가격을 찾거나 예약을 도와드릴 수 있습니다.",
+            ar: "مرحبا! يمكنني مساعدتك في العثور على ساعات العمل والخدمات والأسعار أو حجز موعد.",
+            hi: "नमस्ते! मैं आपको खुलने का समय, सेवाएँ, कीमतें खोजने या अपॉइंटमेंट बुक करने में मदद कर सकता हूँ।",
+            tr: "Merhaba! Çalışma saatlerini, hizmetleri, fiyatları bulmanıza veya randevu almanıza yardımcı olabilirim.",
+            pl: "Cześć! Mogę pomóc znaleźć godziny otwarcia, usługi, ceny lub umówić wizytę.",
+            sv: "Hej! Jag kan hjälpa dig att hitta öppettider, tjänster, priser eller boka en tid.",
+            da: "Hej! Jeg kan hjælpe dig med at finde åbningstider, tjenester, priser eller booke en tid.",
+            fi: "Hei! Voin auttaa sinua löytämään aukioloajat, palvelut, hinnat tai varaamaan ajan.",
+            no: "Hei! Jeg kan hjelpe deg med å finne åpningstider, tjenester, priser eller bestille time.",
+            cs: "Ahoj! Mohu vám pomoci najít otevírací dobu, služby, ceny nebo rezervovat termín.",
+            el: "Γεια σας! Μπορώ να σας βοηθήσω να βρείτε ώρες λειτουργίας, υπηρεσίες, τιμές ή να κλείσετε ραντεβού.",
+            he: "שלום! אני יכול לעזור לך למצוא שעות פתיחה, שירותים, מחירים או לקבוע תור.",
+            id: "Halo! Saya dapat membantu Anda menemukan jam buka, layanan, harga, atau memesan janji temu.",
+            th: "สวัสดี! ฉันสามารถช่วยคุณค้นหาเวลาทำการ บริการ ราคา หรือจองนัดหมายได้",
+            vi: "Xin chào! Tôi có thể giúp bạn tìm giờ mở cửa, dịch vụ, giá cả hoặc đặt lịch hẹn.",
+            hu: "Szia! Segíthetek megtalálni a nyitvatartást, szolgáltatásokat, árakat vagy időpontot foglalni.",
+            ro: "Salut! Vă pot ajuta să găsiți programul, serviciile, prețurile sau să faceți o programare."
+          };
+
+          let msg = welcomeMsgs[lang];
+          if (lang === 'en') {
+             const hour = new Date().getHours();
+             let greeting = "Welcome";
+             if (hour < 12) greeting = "Good morning";
+             else if (hour < 18) greeting = "Good afternoon";
+             else greeting = "Good evening";
+             msg = `${greeting}! ${welcomeMsgs.en}`;
+          } else if (!msg) {
+             msg = `Welcome! ${welcomeMsgs.en}`;
+          }
+          addMessage(ui.messages, msg, "bot");
         }
       }
       try {
