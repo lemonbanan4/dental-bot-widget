@@ -202,6 +202,23 @@
     .features-list { list-style: none; padding: 0; margin: 0 0 32px; }
     .features-list li { margin-bottom: 12px; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
 
+    /* --- TESTIMONIALS --- */
+    .testimonials-section { margin: 60px 0; text-align: center; }
+    .testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 24px; text-align: left; }
+    @media (min-width: 768px) { .testimonials-grid { grid-template-columns: 1fr 1fr; } }
+    .testimonial-card { background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; font-style: italic; color: #475569; }
+    .testimonial-author { margin-top: 16px; font-weight: 600; color: #334155; font-style: normal; font-size: 0.9rem; }
+
+    /* --- FAQ --- */
+    .faq-section { margin: 60px 0; text-align: left; max-width: 700px; margin-left: auto; margin-right: auto; }
+    .faq-section h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
+    .faq-item { border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; padding-bottom: 16px; }
+    .faq-item summary { font-weight: 600; color: #334155; cursor: pointer; list-style: none; padding: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; font-size: 1.2rem; color: #94a3b8; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p { margin: 12px 0 0; color: #64748b; line-height: 1.6; }
+
     /* --- FOOTER --- */
     .site-footer {
       margin-top: 40px;
@@ -266,6 +283,20 @@
       </div>
     </div>
 
+    <div class="testimonials-section">
+      <h2 style="font-size: 2rem; margin-bottom: 40px; color: #0f172a;">Trusted by Dental Leaders</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          "Since installing DentalBot, our after-hours bookings have increased by 30%. It pays for itself in one day."
+          <div class="testimonial-author">— Dr. Sarah Jenkins, Smile City</div>
+        </div>
+        <div class="testimonial-card">
+          "The setup was incredibly easy. We pasted the code and it just worked. Our front desk loves the reduced call volume."
+          <div class="testimonial-author">— Mark Thompson, Practice Manager</div>
+        </div>
+      </div>
+    </div>
+
     <div class="pricing-section">
       <h2>Simple, Transparent Pricing</h2>
       <div class="pricing-grid">
@@ -293,6 +324,30 @@
           <a href="mailto:info@lemontechno.org?subject=Growth Plan" class="btn btn-primary" style="width:100%">Get Started</a>
         </div>
       </div>
+    </div>
+
+    <div class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+      
+      <details class="faq-item">
+        <summary>Do I need coding skills to install this?</summary>
+        <p>Not at all. You simply copy and paste one line of code into your website, similar to installing Google Analytics.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does it work on mobile?</summary>
+        <p>Yes, the widget is fully responsive and optimized for mobile devices, where over 60% of patients search for dentists.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I customize the branding?</summary>
+        <p>Absolutely. On the Growth plan, you can change the avatar, colors, and welcome message to match your clinic's brand identity.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is patient data secure?</summary>
+        <p>Yes. We prioritize data privacy and do not store sensitive health records. The bot is designed for general inquiries and booking coordination.</p>
+      </details>
     </div>
 
     <div class="contact-section">
