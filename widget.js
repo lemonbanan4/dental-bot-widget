@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.5", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.6", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -372,7 +372,30 @@ console.log("DentalBot Widget LIVE — v1.2.5", new Date().toISOString());
       { code: 'en', label: '🌍 Language: English' },
       { code: 'es', label: '🌍 Language: Spanish' },
       { code: 'fr', label: '🌍 Language: French' },
-      { code: 'de', label: '🌍 Language: German' }
+      { code: 'de', label: '🌍 Language: German' },
+      { code: 'it', label: '🌍 Language: Italian' },
+      { code: 'pt', label: '🌍 Language: Portuguese' },
+      { code: 'nl', label: '🌍 Language: Dutch' },
+      { code: 'ru', label: '🌍 Language: Russian' },
+      { code: 'ja', label: '🌍 Language: Japanese' },
+      { code: 'zh', label: '🌍 Language: Chinese' },
+      { code: 'ko', label: '🌍 Language: Korean' },
+      { code: 'ar', label: '🌍 Language: Arabic' },
+      { code: 'hi', label: '🌍 Language: Hindi' },
+      { code: 'tr', label: '🌍 Language: Turkish' },
+      { code: 'pl', label: '🌍 Language: Polish' },
+      { code: 'sv', label: '🌍 Language: Swedish' },
+      { code: 'da', label: '🌍 Language: Danish' },
+      { code: 'fi', label: '🌍 Language: Finnish' },
+      { code: 'no', label: '🌍 Language: Norwegian' },
+      { code: 'cs', label: '🌍 Language: Czech' },
+      { code: 'el', label: '🌍 Language: Greek' },
+      { code: 'he', label: '🌍 Language: Hebrew' },
+      { code: 'id', label: '🌍 Language: Indonesian' },
+      { code: 'th', label: '🌍 Language: Thai' },
+      { code: 'vi', label: '🌍 Language: Vietnamese' },
+      { code: 'hu', label: '🌍 Language: Hungarian' },
+      { code: 'ro', label: '🌍 Language: Romanian' }
     ];
     langs.forEach(l => {
       const opt = document.createElement("option");
@@ -380,6 +403,12 @@ console.log("DentalBot Widget LIVE — v1.2.5", new Date().toISOString());
       opt.textContent = l.label;
       langSelect.appendChild(opt);
     });
+    
+    // Auto-detect user language
+    try {
+      const userLang = (navigator.language || "en").split('-')[0].toLowerCase();
+      if (langs.some(l => l.code === userLang)) langSelect.value = userLang;
+    } catch (e) {}
 
     const restartBtn = document.createElement("button");
     restartBtn.className = "settings-btn";
