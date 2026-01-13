@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.2.5", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -48,7 +48,7 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
     }
     .dbot-launcher{pointer-events:auto;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease}
+      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;position:relative}
     .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16)}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
     .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:12px;background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:none;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
@@ -99,6 +99,16 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
     .settings-btn:hover{border-color:#0d9488;color:#0d9488;transform:translateY(-2px);box-shadow:0 4px 6px rgba(13, 148, 136, 0.1)}
     .settings-btn.primary{background:#0d9488;color:white;border:none;justify-content:center;margin-top:auto}
     .settings-btn.primary:hover{background:#0f766e;color:white}
+    select.settings-btn {
+      display: block;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23334155%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 10px;
+      padding-right: 40px;
+    }
     .powered-by{text-align:center;font-size:10px;color:#94a3b8;margin-top:10px}
 
     /* --- ACTIONS & MODAL --- */
@@ -356,9 +366,20 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
     viewSettings.className = "view-settings";
     viewSettings.innerHTML = `<h2 style="margin:0 0 20px 0;color:#1e293b;font-size:1.25rem;">Settings</h2>`;
 
-    const langBtn = document.createElement("button");
-    langBtn.className = "settings-btn";
-    langBtn.textContent = "🌍 Language: English";
+    const langSelect = document.createElement("select");
+    langSelect.className = "settings-btn";
+    const langs = [
+      { code: 'en', label: '🌍 Language: English' },
+      { code: 'es', label: '🌍 Language: Spanish' },
+      { code: 'fr', label: '🌍 Language: French' },
+      { code: 'de', label: '🌍 Language: German' }
+    ];
+    langs.forEach(l => {
+      const opt = document.createElement("option");
+      opt.value = l.code;
+      opt.textContent = l.label;
+      langSelect.appendChild(opt);
+    });
 
     const restartBtn = document.createElement("button");
     restartBtn.className = "settings-btn";
@@ -380,7 +401,7 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
     poweredBy.className = "powered-by";
     poweredBy.innerHTML = "Powered by <strong>Lemon Techno</strong>";
 
-    viewSettings.appendChild(langBtn);
+    viewSettings.appendChild(langSelect);
     viewSettings.appendChild(restartBtn);
     viewSettings.appendChild(clearBtn);
     viewSettings.appendChild(downloadBtn);
@@ -456,7 +477,7 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
     messages.setAttribute('role', 'log');
     messages.setAttribute('aria-live', 'polite');
 
-    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, downloadBtn, langBtn, backdrop, title, avatar, tooltip };
+    return { launcher, panel, messages, textarea, sendBtn, closeBtn, bookBtn, leadBtn, clearBtn, restartBtn, downloadBtn, langSelect, backdrop, title, avatar, tooltip };
   }
 
 
@@ -916,10 +937,8 @@ console.log("DentalBot Widget LIVE — v1.2.4", new Date().toISOString());
   ui.clearBtn.onclick = resetHandler;
   ui.restartBtn.onclick = resetHandler;
 
-  ui.langBtn.onclick = () => {
-    const isEn = ui.langBtn.textContent.includes("English");
-    ui.langBtn.textContent = isEn ? "🌍 Language: Spanish" : "🌍 Language: English";
-    trackEvent('language_toggle', { clinic: clinicId, lang: isEn ? 'es' : 'en' });
+  ui.langSelect.onchange = () => {
+    trackEvent('language_change', { clinic: clinicId, lang: ui.langSelect.value });
   };
 
   ui.downloadBtn.onclick = () => {
