@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.8", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.9", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -140,7 +140,9 @@ console.log("DentalBot Widget LIVE — v1.3.8", new Date().toISOString());
     .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);border-top-color:#fff;vertical-align:middle;margin-right:8px;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     @media (max-width: 600px) {
-      .widget-card { right:0; bottom:0; top:0; left:0; width:100%; height:100%; max-width:none; max-height:none; border-radius:16px; }
+      .widget-card { position:fixed; right:0; bottom:0; top:0; left:0; width:100%; height:100%; max-width:none; max-height:none; border-radius:16px; }
+      .dbot-modal-backdrop { right:0; left:0; bottom:0; width:100%; padding:10px; box-sizing:border-box; }
+      .dbot-modal { width:100%; }
     }
     @media (prefers-color-scheme: dark) {
       .widget-card, .view-chat, .view-settings, .content-area { background: #1f1f1f; color: #e5e5e5; }
