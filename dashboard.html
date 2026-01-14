@@ -108,7 +108,10 @@
         </div>
 
         <div class="card">
-          <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.25rem;">Recent Inquiries</h2>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 1.25rem;">Recent Inquiries</h2>
+            <button id="export-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Export CSV</button>
+          </div>
           <div class="table-container">
             <table id="leads-table">
               <thead>
@@ -150,6 +153,7 @@
 
 <script>
   const API_URL = "https://dental-bot-api.onrender.com";
+  let currentLeads = [];
 
   // --- STATE MANAGEMENT ---
   const loginView = document.getElementById('login-view');
@@ -212,6 +216,7 @@
       
       if (!res.ok) throw new Error("API not ready");
       const data = await res.json();
+      currentLeads = data;
       renderLeads(data);
 
     } catch (e) {
@@ -222,6 +227,7 @@
         { name: "Kyle Reese", phone: "555-0123", email: "kyle@future.com", message: "Emergency tooth ache.", date: new Date(Date.now() - 86400000).toISOString(), status: "contacted" },
         { name: "John Doe", phone: "555-0100", email: "john@doe.com", message: "Do you accept Delta Dental?", date: new Date(Date.now() - 172800000).toISOString(), status: "contacted" },
       ];
+      currentLeads = demoData;
       renderLeads(demoData);
     }
   }
@@ -287,6 +293,28 @@
     const orig = btn.textContent;
     btn.textContent = 'Saved! ✅';
     setTimeout(() => btn.textContent = orig, 2000);
+  });
+
+  document.getElementById('export-btn').addEventListener('click', () => {
+    if (!currentLeads.length) return;
+    const headers = ["Status", "Name", "Phone", "Email", "Message", "Date"];
+    const rows = currentLeads.map(l => [
+      l.status,
+      `"${(l.name || '').replace(/"/g, '""')}"`,
+      l.phone || '',
+      l.email || '',
+      `"${(l.message || '').replace(/"/g, '""')}"`,
+      l.date
+    ]);
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `leads_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 
   // Init
