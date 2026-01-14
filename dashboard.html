@@ -260,9 +260,12 @@
         <td style="max-width: 300px;">${lead.message || '-'}</td>
         <td style="white-space:nowrap; color:#94a3b8">${dateStr}</td>
         <td>
-          ${lead.status === 'new' 
-            ? `<button class="btn btn-outline" onclick="markContacted(${originalIndex})" style="padding:4px 8px; font-size:0.75rem">Mark Contacted</button>` 
-            : '<span style="color:#94a3b8; font-size:0.8rem">Done</span>'}
+          <div style="display:flex; gap:4px; align-items:center;">
+            ${lead.status === 'new' 
+              ? `<button class="btn btn-outline" onclick="markContacted(${originalIndex})" style="padding:4px 8px; font-size:0.75rem">Mark Contacted</button>` 
+              : '<span style="color:#94a3b8; font-size:0.8rem; margin-right:8px">Done</span>'}
+            <button class="btn btn-outline" onclick="deleteLead(${originalIndex})" style="padding:4px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444;" title="Delete">🗑️</button>
+          </div>
         </td>
       `;
       tbody.appendChild(tr);
@@ -272,6 +275,22 @@
   window.markContacted = function(index) {
     if (currentLeads[index]) {
       currentLeads[index].status = 'contacted';
+      const term = document.getElementById('search-input').value.toLowerCase();
+      if (term) {
+        const filtered = currentLeads.filter(l => 
+          (l.name && l.name.toLowerCase().includes(term)) || 
+          (l.email && l.email.toLowerCase().includes(term))
+        );
+        renderLeads(filtered);
+      } else {
+        renderLeads(currentLeads);
+      }
+    }
+  };
+
+  window.deleteLead = function(index) {
+    if (confirm('Are you sure you want to delete this lead?')) {
+      currentLeads.splice(index, 1);
       const term = document.getElementById('search-input').value.toLowerCase();
       if (term) {
         const filtered = currentLeads.filter(l => 
