@@ -110,7 +110,10 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
             <h2 style="margin: 0; font-size: 1.25rem;">Recent Inquiries</h2>
-            <div style="display:flex; gap:10px">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="date" id="date-start" class="input-field" style="padding: 6px 12px; font-size: 0.85rem; width: 130px;" title="Start Date">
+              <span style="color:#cbd5e1">–</span>
+              <input type="date" id="date-end" class="input-field" style="padding: 6px 12px; font-size: 0.85rem; width: 130px;" title="End Date">
               <input type="text" id="search-input" class="input-field" placeholder="Search name or email..." style="padding: 6px 12px; font-size: 0.85rem; width: 200px;">
               <button id="export-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Export CSV</button>
             </div>
@@ -272,35 +275,36 @@
     });
   }
 
+  function applyFilters() {
+    const term = document.getElementById('search-input').value.toLowerCase();
+    const startVal = document.getElementById('date-start').value;
+    const endVal = document.getElementById('date-end').value;
+    
+    const startDate = startVal ? new Date(startVal) : null;
+    const endDate = endVal ? new Date(endVal) : null;
+    if (endDate) endDate.setHours(23, 59, 59, 999); // Include the full end day
+
+    const filtered = currentLeads.filter(l => {
+      const d = new Date(l.date);
+      const matchesTerm = !term || (l.name && l.name.toLowerCase().includes(term)) || (l.email && l.email.toLowerCase().includes(term));
+      const matchesStart = !startDate || d >= startDate;
+      const matchesEnd = !endDate || d <= endDate;
+      return matchesTerm && matchesStart && matchesEnd;
+    });
+    renderLeads(filtered);
+  }
+
   window.markContacted = function(index) {
     if (currentLeads[index]) {
       currentLeads[index].status = 'contacted';
-      const term = document.getElementById('search-input').value.toLowerCase();
-      if (term) {
-        const filtered = currentLeads.filter(l => 
-          (l.name && l.name.toLowerCase().includes(term)) || 
-          (l.email && l.email.toLowerCase().includes(term))
-        );
-        renderLeads(filtered);
-      } else {
-        renderLeads(currentLeads);
-      }
+      applyFilters();
     }
   };
 
   window.deleteLead = function(index) {
     if (confirm('Are you sure you want to delete this lead?')) {
       currentLeads.splice(index, 1);
-      const term = document.getElementById('search-input').value.toLowerCase();
-      if (term) {
-        const filtered = currentLeads.filter(l => 
-          (l.name && l.name.toLowerCase().includes(term)) || 
-          (l.email && l.email.toLowerCase().includes(term))
-        );
-        renderLeads(filtered);
-      } else {
-        renderLeads(currentLeads);
-      }
+      applyFilters();
     }
   };
 
@@ -362,14 +366,9 @@
     document.body.removeChild(link);
   });
 
-  document.getElementById('search-input').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = currentLeads.filter(l => 
-      (l.name && l.name.toLowerCase().includes(term)) || 
-      (l.email && l.email.toLowerCase().includes(term))
-    );
-    renderLeads(filtered);
-  });
+  document.getElementById('search-input').addEventListener('input', applyFilters);
+  document.getElementById('date-start').addEventListener('change', applyFilters);
+  document.getElementById('date-end').addEventListener('change', applyFilters);
 
   // Init
   checkAuth();
