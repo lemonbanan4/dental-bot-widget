@@ -53,6 +53,18 @@
     .tab-btn.active { color: #0d9488; border-bottom-color: #0d9488; }
     .tab-btn:hover { color: #0f172a; }
 
+    /* --- PRINT --- */
+    @media print {
+      @page { margin: 1cm; }
+      .navbar, .tabs, .stats-grid, #login-view, #view-settings { display: none !important; }
+      body, .container, .card { background: white; margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; width: 100%; }
+      .card > div:first-child > div { display: none !important; } /* Hide filters */
+      th:last-child, td:last-child { display: none; } /* Hide Action column */
+      textarea { border: none; resize: none; overflow: visible; height: auto !important; }
+      table { border: 1px solid #e2e8f0; }
+      th, td { border: 1px solid #e2e8f0; }
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -116,6 +128,7 @@
               <input type="date" id="date-end" class="input-field" style="padding: 6px 12px; font-size: 0.85rem; width: 130px;" title="End Date">
               <input type="text" id="search-input" class="input-field" placeholder="Search name or email..." style="padding: 6px 12px; font-size: 0.85rem; width: 200px;">
               <button id="export-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Export CSV</button>
+              <button id="print-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Print</button>
             </div>
           </div>
           <div class="table-container">
@@ -396,6 +409,8 @@
   document.getElementById('search-input').addEventListener('input', applyFilters);
   document.getElementById('date-start').addEventListener('change', applyFilters);
   document.getElementById('date-end').addEventListener('change', applyFilters);
+
+  document.getElementById('print-btn').addEventListener('click', () => window.print());
 
   // Init
   checkAuth();
