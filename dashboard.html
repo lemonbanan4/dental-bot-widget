@@ -47,6 +47,12 @@
     .btn:hover { background: #0f766e; }
     .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #475569; width: auto; padding: 8px 16px; font-size: 0.9rem; }
 
+    /* --- TABS --- */
+    .tabs { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; }
+    .tab-btn { background: none; border: none; padding: 12px 0; font-size: 1rem; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 600; transition: all 0.2s; }
+    .tab-btn.active { color: #0d9488; border-bottom-color: #0d9488; }
+    .tab-btn:hover { color: #0f172a; }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -79,38 +85,64 @@
     </nav>
 
     <div class="container">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total Leads</div>
-          <div class="stat-value" id="stat-total">0</div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="leads">Leads</button>
+        <button class="tab-btn" data-tab="settings">Settings</button>
+      </div>
+
+      <!-- VIEW: LEADS -->
+      <div id="view-leads">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Leads</div>
+            <div class="stat-value" id="stat-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">This Week</div>
+            <div class="stat-value" id="stat-week">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Conversion Rate</div>
+            <div class="stat-value">12%</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">This Week</div>
-          <div class="stat-value" id="stat-week">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Conversion Rate</div>
-          <div class="stat-value">12%</div>
+
+        <div class="card">
+          <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.25rem;">Recent Inquiries</h2>
+          <div class="table-container">
+            <table id="leads-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Name</th>
+                  <th>Contact</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.25rem;">Recent Inquiries</h2>
-        <div class="table-container">
-          <table id="leads-table">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Name</th>
-                <th>Contact</th>
-                <th>Message</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Rows injected by JS -->
-            </tbody>
-          </table>
+      <!-- VIEW: SETTINGS -->
+      <div id="view-settings" class="hidden">
+        <div class="card" style="max-width: 600px;">
+          <h2 style="margin-top: 0; margin-bottom: 24px; font-size: 1.25rem;">Clinic Settings</h2>
+          <form id="settings-form">
+            <div class="input-group">
+              <label>Weekdays (Mon-Fri)</label>
+              <input type="text" id="hours-weekdays" class="input-field" placeholder="e.g. 9:00 AM - 6:00 PM">
+            </div>
+            <div class="input-group">
+              <label>Weekends</label>
+              <input type="text" id="hours-weekends" class="input-field" placeholder="e.g. 10:00 AM - 4:00 PM">
+            </div>
+            <button type="submit" class="btn" style="width: auto;">Save Changes</button>
+          </form>
         </div>
       </div>
     </div>
@@ -144,6 +176,7 @@
     dashView.classList.remove('hidden');
     document.getElementById('nav-clinic-name').textContent = clinicId;
     fetchLeads(clinicId);
+    loadSettings(clinicId);
   }
 
   // --- LOGIC ---
@@ -219,6 +252,42 @@
       tbody.appendChild(tr);
     });
   }
+
+  // --- TABS & SETTINGS ---
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      document.getElementById('view-leads').classList.toggle('hidden', tab !== 'leads');
+      document.getElementById('view-settings').classList.toggle('hidden', tab !== 'settings');
+    });
+  });
+
+  function loadSettings(clinicId) {
+    try {
+      const raw = localStorage.getItem(`dbot_settings_${clinicId}`);
+      if (raw) {
+        const data = JSON.parse(raw);
+        document.getElementById('hours-weekdays').value = data.weekdays || '';
+        document.getElementById('hours-weekends').value = data.weekends || '';
+      }
+    } catch(e) {}
+  }
+
+  document.getElementById('settings-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    const data = {
+      weekdays: document.getElementById('hours-weekdays').value,
+      weekends: document.getElementById('hours-weekends').value
+    };
+    localStorage.setItem(`dbot_settings_${clinicId}`, JSON.stringify(data));
+    const btn = e.target.querySelector('button');
+    const orig = btn.textContent;
+    btn.textContent = 'Saved! ✅';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
 
   // Init
   checkAuth();
