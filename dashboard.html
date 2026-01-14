@@ -254,14 +254,23 @@
     leads.forEach((lead) => {
       const tr = document.createElement('tr');
       const dateStr = new Date(lead.date).toLocaleDateString() + ' ' + new Date(lead.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      const badgeClass = lead.status === 'new' ? 'new' : 'contacted';
-      const badgeText = lead.status === 'new' ? 'New Lead' : 'Contacted';
       const originalIndex = currentLeads.indexOf(lead);
       const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
       const noteVal = notesStore[uniqueId] || '';
+      
+      // Dynamic style for select based on status
+      const statusBg = lead.status === 'new' ? '#dcfce7' : (lead.status === 'contacted' ? '#f1f5f9' : '#fff7ed');
+      const statusColor = lead.status === 'new' ? '#166534' : (lead.status === 'contacted' ? '#475569' : '#9a3412');
 
       tr.innerHTML = `
-        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+        <td>
+          <select onchange="updateStatus(${originalIndex}, this.value)" style="background:${statusBg}; color:${statusColor}; border:1px solid transparent; border-radius:4px; padding:4px 8px; font-size:0.75rem; font-weight:600; cursor:pointer; outline:none;">
+            <option value="new" ${lead.status === 'new' ? 'selected' : ''}>New Lead</option>
+            <option value="contacted" ${lead.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+            <option value="booked" ${lead.status === 'booked' ? 'selected' : ''}>Booked</option>
+            <option value="lost" ${lead.status === 'lost' ? 'selected' : ''}>Lost</option>
+          </select>
+        </td>
         <td><strong>${lead.name || 'Anonymous'}</strong></td>
         <td>
           <div>${lead.phone || '-'}</div>
@@ -274,12 +283,7 @@
         </td>
         <td style="white-space:nowrap; color:#94a3b8">${dateStr}</td>
         <td>
-          <div style="display:flex; gap:4px; align-items:center;">
-            ${lead.status === 'new' 
-              ? `<button class="btn btn-outline" onclick="markContacted(${originalIndex})" style="padding:4px 8px; font-size:0.75rem">Mark Contacted</button>` 
-              : '<span style="color:#94a3b8; font-size:0.8rem; margin-right:8px">Done</span>'}
-            <button class="btn btn-outline" onclick="deleteLead(${originalIndex})" style="padding:4px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444;" title="Delete">🗑️</button>
-          </div>
+          <button class="btn btn-outline" onclick="deleteLead(${originalIndex})" style="padding:4px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444;" title="Delete">🗑️</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -305,9 +309,9 @@
     renderLeads(filtered);
   }
 
-  window.markContacted = function(index) {
+  window.updateStatus = function(index, newStatus) {
     if (currentLeads[index]) {
-      currentLeads[index].status = 'contacted';
+      currentLeads[index].status = newStatus;
       applyFilters();
     }
   };
