@@ -121,6 +121,7 @@
                   <th>Contact</th>
                   <th>Message</th>
                   <th>Date</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,7 +240,7 @@
     document.getElementById('stat-total').textContent = leads.length;
     document.getElementById('stat-week').textContent = leads.filter(l => new Date(l.date) > new Date(Date.now() - 604800000)).length;
 
-    leads.forEach(lead => {
+    leads.forEach((lead, index) => {
       const tr = document.createElement('tr');
       const dateStr = new Date(lead.date).toLocaleDateString() + ' ' + new Date(lead.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const badgeClass = lead.status === 'new' ? 'new' : 'contacted';
@@ -254,10 +255,22 @@
         </td>
         <td style="max-width: 300px;">${lead.message || '-'}</td>
         <td style="white-space:nowrap; color:#94a3b8">${dateStr}</td>
+        <td>
+          ${lead.status === 'new' 
+            ? `<button class="btn btn-outline" onclick="markContacted(${index})" style="padding:4px 8px; font-size:0.75rem">Mark Contacted</button>` 
+            : '<span style="color:#94a3b8; font-size:0.8rem">Done</span>'}
+        </td>
       `;
       tbody.appendChild(tr);
     });
   }
+
+  window.markContacted = function(index) {
+    if (currentLeads[index]) {
+      currentLeads[index].status = 'contacted';
+      renderLeads(currentLeads);
+    }
+  };
 
   // --- TABS & SETTINGS ---
   document.querySelectorAll('.tab-btn').forEach(btn => {
