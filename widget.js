@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.10", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.11", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -436,7 +436,7 @@ console.log("DentalBot Widget LIVE — v1.3.10", new Date().toISOString());
 
     const poweredBy = document.createElement("div");
     poweredBy.className = "powered-by";
-    poweredBy.innerHTML = "Powered by <a href=\"https://widget.lemontechno.org\" target=\"_blank\" style=\"color:inherit;text-decoration:none;font-weight:700\">Lemon Techno</a>";
+    poweredBy.innerHTML = "Powered by <a href=\"https://lemontechno.org\" target=\"_blank\" style=\"color:inherit;text-decoration:none;font-weight:700\">Lemon Techno</a>";
 
     viewSettings.appendChild(langSelect);
     viewSettings.appendChild(restartBtn);
