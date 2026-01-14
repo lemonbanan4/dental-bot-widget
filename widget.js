@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.11", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.12", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
