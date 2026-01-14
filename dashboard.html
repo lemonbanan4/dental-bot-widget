@@ -126,6 +126,7 @@
                   <th>Name</th>
                   <th>Contact</th>
                   <th>Message</th>
+                  <th>Source</th>
                   <th>Notes</th>
                   <th>Date</th>
                   <th>Action</th>
@@ -231,9 +232,9 @@
       console.warn("Using demo data:", e);
       // DEMO DATA FALLBACK
       const demoData = [
-        { name: "Sarah Connor", phone: "555-0199", email: "sarah@example.com", message: "Need to reschedule my cleaning.", date: new Date().toISOString(), status: "new" },
-        { name: "Kyle Reese", phone: "555-0123", email: "kyle@future.com", message: "Emergency tooth ache.", date: new Date(Date.now() - 86400000).toISOString(), status: "contacted" },
-        { name: "John Doe", phone: "555-0100", email: "john@doe.com", message: "Do you accept Delta Dental?", date: new Date(Date.now() - 172800000).toISOString(), status: "contacted" },
+        { name: "Sarah Connor", phone: "555-0199", email: "sarah@example.com", message: "Need to reschedule my cleaning.", source: "Mobile", date: new Date().toISOString(), status: "new" },
+        { name: "Kyle Reese", phone: "555-0123", email: "kyle@future.com", message: "Emergency tooth ache.", source: "Desktop", date: new Date(Date.now() - 86400000).toISOString(), status: "contacted" },
+        { name: "John Doe", phone: "555-0100", email: "john@doe.com", message: "Do you accept Delta Dental?", source: "Mobile", date: new Date(Date.now() - 172800000).toISOString(), status: "contacted" },
       ];
       currentLeads = demoData;
       renderLeads(demoData);
@@ -267,6 +268,7 @@
           <div style="font-size:0.8em; color:#94a3b8">${lead.email || ''}</div>
         </td>
         <td style="max-width: 300px;">${lead.message || '-'}</td>
+        <td><span class="badge" style="background:#f8fafc; border:1px solid #e2e8f0; color:#64748b; font-weight:500;">${lead.source || 'Web'}</span></td>
         <td>
           <textarea class="input-field" style="min-height:60px; font-size:0.85rem; padding:6px; width:100%; min-width:150px;" placeholder="Add note..." onchange="saveLeadNote(${originalIndex}, this.value)">${noteVal}</textarea>
         </td>
@@ -366,13 +368,14 @@
 
   document.getElementById('export-btn').addEventListener('click', () => {
     if (!currentLeads.length) return;
-    const headers = ["Status", "Name", "Phone", "Email", "Message", "Date"];
+    const headers = ["Status", "Name", "Phone", "Email", "Message", "Source", "Date"];
     const rows = currentLeads.map(l => [
       l.status,
       `"${(l.name || '').replace(/"/g, '""')}"`,
       l.phone || '',
       l.email || '',
       `"${(l.message || '').replace(/"/g, '""')}"`,
+      l.source || 'Web',
       l.date
     ]);
     const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");

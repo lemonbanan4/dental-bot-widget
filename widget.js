@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.9", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.10", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -838,6 +838,7 @@ console.log("DentalBot Widget LIVE — v1.3.9", new Date().toISOString());
     const phone = ui.backdrop.querySelector(".dbot-phone").value.trim() || null;
     const email = ui.backdrop.querySelector(".dbot-email").value.trim() || null;
     const message = ui.backdrop.querySelector(".dbot-lead-msg").value.trim() || null;
+    const source = window.innerWidth <= 768 ? "Mobile" : "Desktop";
 
     const status = ui.backdrop.querySelector(".dbot-lead-status");
     status.textContent = "Sending…";
@@ -852,7 +853,8 @@ console.log("DentalBot Widget LIVE — v1.3.9", new Date().toISOString());
           name,
           phone,
           email,
-          message
+          message,
+          source
         })
       });
 
