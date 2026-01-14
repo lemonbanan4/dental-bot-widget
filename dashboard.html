@@ -126,6 +126,7 @@
                   <th>Name</th>
                   <th>Contact</th>
                   <th>Message</th>
+                  <th>Notes</th>
                   <th>Date</th>
                   <th>Action</th>
                 </tr>
@@ -246,12 +247,17 @@
     document.getElementById('stat-total').textContent = leads.length;
     document.getElementById('stat-week').textContent = leads.filter(l => new Date(l.date) > new Date(Date.now() - 604800000)).length;
 
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
+
     leads.forEach((lead) => {
       const tr = document.createElement('tr');
       const dateStr = new Date(lead.date).toLocaleDateString() + ' ' + new Date(lead.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const badgeClass = lead.status === 'new' ? 'new' : 'contacted';
       const badgeText = lead.status === 'new' ? 'New Lead' : 'Contacted';
       const originalIndex = currentLeads.indexOf(lead);
+      const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
+      const noteVal = notesStore[uniqueId] || '';
 
       tr.innerHTML = `
         <td><span class="badge ${badgeClass}">${badgeText}</span></td>
@@ -261,6 +267,9 @@
           <div style="font-size:0.8em; color:#94a3b8">${lead.email || ''}</div>
         </td>
         <td style="max-width: 300px;">${lead.message || '-'}</td>
+        <td>
+          <textarea class="input-field" style="min-height:60px; font-size:0.85rem; padding:6px; width:100%; min-width:150px;" placeholder="Add note..." onchange="saveLeadNote(${originalIndex}, this.value)">${noteVal}</textarea>
+        </td>
         <td style="white-space:nowrap; color:#94a3b8">${dateStr}</td>
         <td>
           <div style="display:flex; gap:4px; align-items:center;">
@@ -306,6 +315,17 @@
       currentLeads.splice(index, 1);
       applyFilters();
     }
+  };
+
+  window.saveLeadNote = function(index, value) {
+    const lead = currentLeads[index];
+    if (!lead) return;
+    const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    const storeKey = `dbot_notes_${clinicId}`;
+    const notes = JSON.parse(localStorage.getItem(storeKey) || '{}');
+    notes[uniqueId] = value;
+    localStorage.setItem(storeKey, JSON.stringify(notes));
   };
 
   // --- TABS & SETTINGS ---
