@@ -129,6 +129,7 @@
               <input type="text" id="search-input" class="input-field" placeholder="Search name or email..." style="padding: 6px 12px; font-size: 0.85rem; width: 200px;">
               <button id="export-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Export CSV</button>
               <button id="print-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Print</button>
+              <button id="refresh-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;" title="Refresh Data">🔄</button>
             </div>
           </div>
           <div class="table-container">
@@ -411,6 +412,11 @@
   document.getElementById('date-end').addEventListener('change', applyFilters);
 
   document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+  document.getElementById('refresh-btn').addEventListener('click', () => {
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    if (clinicId) fetchLeads(clinicId);
+  });
 
   // Init
   checkAuth();
