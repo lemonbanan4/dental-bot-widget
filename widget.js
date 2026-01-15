@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.16", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.17", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -51,9 +51,10 @@ console.log("DentalBot Widget LIVE — v1.3.16", new Date().toISOString());
       display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;position:relative;animation:dbot-pulse 3s infinite}
     .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16);animation:none}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
-    .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:12px;background:#111;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);display:none;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
-    .dbot-tooltip.visible{display:block;opacity:1;transform:translateY(0)}
-    .dbot-tooltip::after{content:"";position:absolute;top:100%;right:20px;border:6px solid transparent;border-top-color:#111}
+    .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:16px;display:none;flex-direction:row;align-items:flex-end;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1))}
+    .dbot-tooltip.visible{display:flex;opacity:1;transform:translateY(0)}
+    .dbot-tooltip-text{background:#fff;color:#1e293b;padding:10px 14px;border-radius:12px;border-bottom-right-radius:2px;font-size:13px;font-weight:600;white-space:nowrap}
+    .dbot-tooltip-avatar{width:42px;height:42px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
     @keyframes dbot-pulse{0%{box-shadow:0 0 0 0 rgba(0,0,0,0.2)}70%{box-shadow:0 0 0 10px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
     
     /* --- WIDGET CARD --- */
@@ -308,7 +309,17 @@ console.log("DentalBot Widget LIVE — v1.3.16", new Date().toISOString());
 
     const tooltip = document.createElement("div");
     tooltip.className = "dbot-tooltip";
-    tooltip.textContent = "New Message";
+    
+    const ttText = document.createElement("div");
+    ttText.className = "dbot-tooltip-text";
+    ttText.textContent = "Hi! 👋 Need help?";
+    
+    const ttAvatar = document.createElement("div");
+    ttAvatar.className = "dbot-tooltip-avatar";
+    ttAvatar.textContent = "👩‍⚕️";
+    
+    tooltip.appendChild(ttText);
+    tooltip.appendChild(ttAvatar);
     launcher.appendChild(tooltip);
 
     // --- WIDGET CARD ---
