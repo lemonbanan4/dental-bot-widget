@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.12", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.13", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -183,6 +183,40 @@ console.log("DentalBot Widget LIVE — v1.3.12", new Date().toISOString());
       }
     } catch (e) {
       /* ignore */
+    }
+  }
+
+  let typingTimer = null;
+  let audioCtx = null;
+
+  function startTypingSound() {
+    if (!enableSound) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      if (typingTimer) clearInterval(typingTimer);
+      typingTimer = setInterval(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(600 + Math.random() * 200, audioCtx.currentTime);
+        osc.type = 'triangle';
+        gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      }, 120);
+    } catch (e) {}
+  }
+
+  function stopTypingSound() {
+    if (typingTimer) {
+      clearInterval(typingTimer);
+      typingTimer = null;
     }
   }
 
