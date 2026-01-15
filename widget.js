@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.18", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.19", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -10,7 +10,11 @@ console.log("DentalBot Widget LIVE — v1.3.18", new Date().toISOString());
     return;
   }
   let _root = null;
-  const script = document.currentScript;
+  let script = document.currentScript;
+  if (!script) {
+    // Fallback: find script by data attributes if currentScript is null (common in some async loaders)
+    script = document.querySelector('script[data-clinic][data-api]');
+  }
   const apiUrl = (script?.dataset?.api || "").replace(/\/$/, "");
   const clinicId = (script?.dataset?.clinic || "").trim();
   const analyticsUrl = (script?.dataset?.analytics || "").trim();
