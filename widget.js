@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.14", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.15", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -682,8 +682,8 @@ console.log("DentalBot Widget LIVE — v1.3.14", new Date().toISOString());
     }
   }
 
-  async function sendChat(ui, state) {
-    const text = ui.textarea.value.trim();
+  async function sendChat(ui, state, textOverride = null) {
+    const text = textOverride || ui.textarea.value.trim();
     if (!text || state.sending) return;
     // enforce a reasonable length to avoid accidental huge messages
     if (text.length > 2000) {
@@ -827,7 +827,14 @@ console.log("DentalBot Widget LIVE — v1.3.14", new Date().toISOString());
       console.error("DentalBot Widget Error:", err);
       const typing = ui.messages.querySelector('.message.typing');
       if (typing) typing.remove();
-      addMessage(ui.messages, "Network error. Please try again.", "bot");
+      
+      const errDiv = addMessage(ui.messages, "Network error. ", "bot");
+      const retryBtn = document.createElement('button');
+      retryBtn.textContent = "Try Again";
+      retryBtn.style.cssText = "background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;padding:0;font:inherit;margin-left:4px;";
+      retryBtn.onclick = () => sendChat(ui, state, text);
+      errDiv.appendChild(retryBtn);
+      
       trackEvent('error', { clinic: clinicId, message: String(err) });
     } finally {
       stopTypingSound();
