@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.13", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.14", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -799,6 +799,10 @@ console.log("DentalBot Widget LIVE — v1.3.13", new Date().toISOString());
           body: JSON.stringify(payload),
         });
 
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+
         const data = await res.json();
 
         // remove typing bubble if present
@@ -820,6 +824,7 @@ console.log("DentalBot Widget LIVE — v1.3.13", new Date().toISOString());
         addMessage(ui.messages, data.reply || `Error ${res.status}`, "bot");
       }
     } catch (err) {
+      console.error("DentalBot Widget Error:", err);
       const typing = ui.messages.querySelector('.message.typing');
       if (typing) typing.remove();
       addMessage(ui.messages, "Network error. Please try again.", "bot");
