@@ -115,6 +115,10 @@
             <div class="stat-value" id="stat-week">0</div>
           </div>
           <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="stat-revenue">$0</div>
+          </div>
+          <div class="stat-card">
             <div class="stat-label">Conversion Rate</div>
             <div class="stat-value">12%</div>
           </div>
@@ -263,10 +267,18 @@
     
     document.getElementById('stat-total').textContent = leads.length;
     document.getElementById('stat-week').textContent = leads.filter(l => new Date(l.date) > new Date(Date.now() - 604800000)).length;
-
+    
     const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
     const valuesStore = JSON.parse(localStorage.getItem(`dbot_values_${clinicId}`) || '{}');
+    const totalRevenue = leads.reduce((sum, lead) => {
+      const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
+      const valStr = valuesStore[uniqueId] || '0';
+      const val = parseFloat(valStr.replace(/[^0-9.]/g, '')) || 0;
+      return sum + val;
+    }, 0);
+    document.getElementById('stat-revenue').textContent = '$' + totalRevenue.toLocaleString();
+
+    const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
 
     leads.forEach((lead) => {
       const tr = document.createElement('tr');
@@ -364,6 +376,7 @@
     const values = JSON.parse(localStorage.getItem(storeKey) || '{}');
     values[uniqueId] = value;
     localStorage.setItem(storeKey, JSON.stringify(values));
+    applyFilters();
   };
 
   // --- TABS & SETTINGS ---
