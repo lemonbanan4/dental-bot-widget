@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.19", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.20", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -1227,15 +1227,4 @@ console.log("DentalBot Widget LIVE — v1.3.19", new Date().toISOString());
     setTimeout(openPanel, 1000);
   }
 
-  // Auto-open on scroll to bottom
-  if (autoOpenScroll) {
-    const onScroll = () => {
-      // Check if near bottom (within 50px)
-      if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50) {
-        openPanel();
-        window.removeEventListener('scroll', onScroll);
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
 })();

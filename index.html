@@ -10,7 +10,6 @@
   <style>
     /* --- RESET & BASICS --- */
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     
     body {
       margin: 0;
@@ -229,6 +228,12 @@
     .btn-secondary:hover {
       border-color: #0d9488;
       background-color: #f0fdfa;
+    }
+
+    @keyframes border-pulse {
+      0% { border-color: #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+      50% { border-color: #0d9488; box-shadow: 0 0 20px rgba(13, 148, 136, 0.25); }
+      100% { border-color: #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     }
 
     .contact-section {
@@ -455,13 +460,13 @@
     <div style="margin: 80px 0; text-align: center;">
       <h2 style="font-size: 2rem; color: #0f172a; margin-bottom: 16px;">Start your free 14-day pilot</h2>
       <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 32px;">See how many patient conversations your website gets — risk free.</p>
-      <a href="#contact" class="btn btn-primary">👉 Start Free Trial</a>
+      <a href="#contact" id="btn-start-trial" class="btn btn-primary">👉 Start Free Trial</a>
     </div>
 
     <div id="contact" class="contact-section">
       <span class="contact-label">Partner with Us</span>
       <h2 style="margin: 0 0 32px 0; color: #0f172a; font-size: 2rem;">Ready to scale your agency?</h2>
-      <form id="agency-contact-form" style="max-width: 480px; margin: 0 auto; text-align: left; background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+      <form id="agency-contact-form" style="max-width: 480px; margin: 0 auto; text-align: left; background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); animation: border-pulse 3s infinite;">
         <div style="margin-bottom: 16px;">
           <label for="contact-name" style="display:block; margin-bottom: 8px; font-weight: 600; color: #334155; font-size: 0.9rem;">Name</label>
           <input type="text" id="contact-name" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; transition: border 0.2s;">
@@ -582,6 +587,34 @@
   
   // Start after a slight delay
   setTimeout(type, 2000);
+
+  // Slower Smooth Scroll for "Start Free Trial"
+  const trialBtn = document.getElementById('btn-start-trial');
+  if (trialBtn) {
+    trialBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetSection = document.querySelector(targetId);
+      if (!targetSection) return;
+
+      const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
+      const startPosition = window.pageYOffset;
+      const distance = targetPosition - startPosition;
+      const duration = 1500; // 1.5 seconds (slower than default)
+      let start = null;
+
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        // Ease-in-out quadratic function
+        const ease = progress < duration / 2 ? 2 * Math.pow(progress/duration, 2) : -1 + (4 - 2 * progress/duration) * progress/duration;
+        
+        window.scrollTo(0, startPosition + distance * (progress / duration < 1 ? ease : 1));
+        if (progress < duration) window.requestAnimationFrame(step);
+      }
+      window.requestAnimationFrame(step);
+    });
+  }
 
   // Agency Contact Form Handler
   const contactForm = document.getElementById('agency-contact-form');
