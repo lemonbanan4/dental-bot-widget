@@ -231,9 +231,9 @@
     }
 
     @keyframes border-pulse {
-      0% { border-color: #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-      50% { border-color: #0d9488; box-shadow: 0 0 20px rgba(13, 148, 136, 0.25); }
-      100% { border-color: #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+      0% { border-color: #e2e8f0; box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+      50% { border-color: #0d9488; box-shadow: 0 0 30px 5px rgba(13, 148, 136, 0.5); }
+      100% { border-color: #e2e8f0; box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
     }
 
     .contact-section {
@@ -494,6 +494,8 @@
     Based in EU • Secure infrastructure • Human support</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <script
     src="/widget.js"
     data-clinic="smile-city-001"
@@ -645,6 +647,13 @@
         });
         
         contactForm.innerHTML = '<div style="padding:40px;text-align:center;color:#0d9488;font-weight:600;font-size:1.2rem">Thanks! We will be in touch shortly.</div>';
+        
+        // Success Confetti
+        if (window.confetti) {
+          window.confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#0d9488', '#2dd4bf', '#ffffff'] });
+          setTimeout(() => window.confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } }), 200);
+          setTimeout(() => window.confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } }), 200);
+        }
       } catch (err) {
         btn.textContent = 'Error. Please try again.';
         btn.disabled = false;
