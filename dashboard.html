@@ -142,6 +142,7 @@
                   <th>Contact</th>
                   <th>Message</th>
                   <th>Source</th>
+                  <th>Value</th>
                   <th>Notes</th>
                   <th>Date</th>
                   <th>Action</th>
@@ -265,6 +266,7 @@
 
     const clinicId = localStorage.getItem('dbot_dash_clinic');
     const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
+    const valuesStore = JSON.parse(localStorage.getItem(`dbot_values_${clinicId}`) || '{}');
 
     leads.forEach((lead) => {
       const tr = document.createElement('tr');
@@ -272,6 +274,7 @@
       const originalIndex = currentLeads.indexOf(lead);
       const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
       const noteVal = notesStore[uniqueId] || '';
+      const valueVal = valuesStore[uniqueId] || '';
       
       // Dynamic style for select based on status
       const statusBg = lead.status === 'new' ? '#dcfce7' : (lead.status === 'contacted' ? '#f1f5f9' : '#fff7ed');
@@ -293,6 +296,9 @@
         </td>
         <td style="max-width: 300px;">${lead.message || '-'}</td>
         <td><span class="badge" style="background:#f8fafc; border:1px solid #e2e8f0; color:#64748b; font-weight:500;">${lead.source || 'Web'}</span></td>
+        <td>
+          <input type="text" class="input-field" style="width:80px; font-size:0.85rem; padding:6px;" placeholder="$" value="${valueVal}" onchange="saveLeadValue(${originalIndex}, this.value)">
+        </td>
         <td>
           <textarea class="input-field" style="min-height:60px; font-size:0.85rem; padding:6px; width:100%; min-width:150px;" placeholder="Add note..." onchange="saveLeadNote(${originalIndex}, this.value)">${noteVal}</textarea>
         </td>
@@ -349,6 +355,17 @@
     localStorage.setItem(storeKey, JSON.stringify(notes));
   };
 
+  window.saveLeadValue = function(index, value) {
+    const lead = currentLeads[index];
+    if (!lead) return;
+    const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    const storeKey = `dbot_values_${clinicId}`;
+    const values = JSON.parse(localStorage.getItem(storeKey) || '{}');
+    values[uniqueId] = value;
+    localStorage.setItem(storeKey, JSON.stringify(values));
+  };
+
   // --- TABS & SETTINGS ---
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -387,16 +404,22 @@
 
   document.getElementById('export-btn').addEventListener('click', () => {
     if (!currentLeads.length) return;
-    const headers = ["Status", "Name", "Phone", "Email", "Message", "Source", "Date"];
-    const rows = currentLeads.map(l => [
-      l.status,
-      `"${(l.name || '').replace(/"/g, '""')}"`,
-      l.phone || '',
-      l.email || '',
-      `"${(l.message || '').replace(/"/g, '""')}"`,
-      l.source || 'Web',
-      l.date
-    ]);
+    const clinicId = localStorage.getItem('dbot_dash_clinic');
+    const valuesStore = JSON.parse(localStorage.getItem(`dbot_values_${clinicId}`) || '{}');
+    const headers = ["Status", "Name", "Phone", "Email", "Message", "Source", "Value", "Date"];
+    const rows = currentLeads.map(l => {
+      const uniqueId = l.id || (l.date + (l.email||'') + (l.phone||''));
+      return [
+        l.status,
+        `"${(l.name || '').replace(/"/g, '""')}"`,
+        l.phone || '',
+        l.email || '',
+        `"${(l.message || '').replace(/"/g, '""')}"`,
+        l.source || 'Web',
+        valuesStore[uniqueId] || '',
+        l.date
+      ];
+    });
     const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
