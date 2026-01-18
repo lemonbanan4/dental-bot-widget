@@ -249,7 +249,7 @@
     .pricing-section { margin: 60px 0; text-align: center; }
     .pricing-section h2 { font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
     .pricing-grid { display: grid; grid-template-columns: 1fr; gap: 24px; text-align: left; }
-    @media (min-width: 768px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 768px) { .pricing-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
     .pricing-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; position: relative; transition: transform 0.2s; }
     .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
     .pricing-card.popular { border: 2px solid #0d9488; background: #f0fdfa; }
@@ -413,6 +413,17 @@
           </ul>
           <a href="mailto:info@lemontechno.org?subject=Growth Plan" class="btn btn-primary" style="width:100%">Get Started</a>
         </div>
+        <div class="pricing-card">
+          <h3>🦷 Multi-Clinic / Agency</h3>
+          <div class="price" style="font-size: 2rem;">Custom<span> pricing</span></div>
+          <ul class="features-list">
+            <li>Multiple clinic websites</li>
+            <li>White-label option</li>
+            <li>Central dashboard</li>
+            <li>Revenue-share available</li>
+          </ul>
+          <a href="mailto:info@lemontechno.org?subject=Agency Inquiry" class="btn btn-secondary" style="width:100%">👉 Contact Sales</a>
+        </div>
       </div>
     </div>
 
@@ -438,6 +449,12 @@
         <summary>Is patient data secure?</summary>
         <p>Yes. We prioritize data privacy and do not store sensitive health records. The bot is designed for general inquiries and booking coordination.</p>
       </details>
+    </div>
+
+    <div style="margin: 80px 0; text-align: center;">
+      <h2 style="font-size: 2rem; color: #0f172a; margin-bottom: 16px;">Start your free 14-day pilot</h2>
+      <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 32px;">See how many patient conversations your website gets — risk free.</p>
+      <a href="#demo" class="btn btn-primary">👉 Start Free Trial</a>
     </div>
 
     <div class="contact-section">
@@ -467,6 +484,8 @@
     <a href="/terms.html">Terms of Service</a>
     <a href="/dashboard.html">Client Login</a>
     <p style="margin-top: 12px; opacity: 0.7;">&copy; 2023 Lemon Techno. All rights reserved.</p>
+    <p style="margin-top: 24px; font-size: 0.8rem; color: #94a3b8;">Built for dental clinics by independent developers<br>
+    Based in EU • Secure infrastructure • Human support</p>
   </footer>
 
   <script
