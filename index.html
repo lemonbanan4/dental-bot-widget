@@ -405,7 +405,7 @@
             <li>✅ Email Notifications</li>
             <li>❌ Custom Branding</li>
           </ul>
-          <a href="mailto:info@lemontechno.org?subject=Starter Plan" class="btn btn-secondary" style="width:100%">Get Started</a>
+          <a href="#contact" class="btn btn-secondary" style="width:100%">Get Started</a>
         </div>
         <div class="pricing-card popular">
           <div class="badge">Most Popular</div>
@@ -417,7 +417,7 @@
             <li>✅ Priority Support</li>
             <li>✅ Lead Dashboard</li>
           </ul>
-          <a href="mailto:info@lemontechno.org?subject=Growth Plan" class="btn btn-primary" style="width:100%">Get Started</a>
+          <a href="#contact" class="btn btn-primary" style="width:100%">Get Started</a>
         </div>
         <div class="pricing-card">
           <h3>🦷 Multi-Clinic / Agency</h3>
@@ -455,12 +455,6 @@
         <summary>Is patient data secure?</summary>
         <p>Yes. We prioritize data privacy and do not store sensitive health records. The bot is designed for general inquiries and booking coordination.</p>
       </details>
-    </div>
-
-    <div style="margin: 80px 0; text-align: center;">
-      <h2 style="font-size: 2rem; color: #0f172a; margin-bottom: 16px;">Start your free 14-day pilot</h2>
-      <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 32px;">See how many patient conversations your website gets — risk free.</p>
-      <a href="#contact" id="btn-start-trial" class="btn btn-primary">👉 Start Free Trial</a>
     </div>
 
     <div id="contact" class="contact-section">
@@ -590,10 +584,9 @@
   // Start after a slight delay
   setTimeout(type, 2000);
 
-  // Slower Smooth Scroll for "Start Free Trial"
-  const trialBtn = document.getElementById('btn-start-trial');
-  if (trialBtn) {
-    trialBtn.addEventListener('click', function(e) {
+  // Slower Smooth Scroll for "Get Started" buttons
+  document.querySelectorAll('a[href="#contact"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
       const targetId = this.getAttribute('href');
       const targetSection = document.querySelector(targetId);
@@ -616,7 +609,7 @@
       }
       window.requestAnimationFrame(step);
     });
-  }
+  });
 
   // Agency Contact Form Handler
   const contactForm = document.getElementById('agency-contact-form');
@@ -634,7 +627,7 @@
 
       try {
         // We treat the Agency itself as a "Clinic" so leads appear in the dashboard!
-        await fetch('https://dental-bot-api.onrender.com/leads', {
+        const dashboardReq = fetch('https://dental-bot-api.onrender.com/leads', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -645,6 +638,23 @@
             source: 'Agency Site'
           })
         });
+
+        // Also send to email via FormSubmit (requires one-time activation on first use)
+        const emailReq = fetch('https://formsubmit.co/ajax/info@lemontechno.org', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            message,
+            _subject: 'New Lead from LemonTechno.org'
+          })
+        });
+
+        await Promise.all([dashboardReq, emailReq]);
         
         contactForm.innerHTML = '<div style="padding:40px;text-align:center;color:#0d9488;font-weight:600;font-size:1.2rem">Thanks! We will be in touch shortly.</div>';
         
