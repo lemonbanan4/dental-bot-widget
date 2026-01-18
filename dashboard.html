@@ -67,6 +67,15 @@
     }
 
     .hidden { display: none !important; }
+
+    /* --- CHARTS --- */
+    .chart-wrapper { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (min-width: 768px) { .chart-wrapper { grid-template-columns: 2fr 1fr; } }
+    .chart-container { display: flex; align-items: center; gap: 24px; justify-content: center; height: 100%; }
+    .pie-chart { width: 120px; height: 120px; border-radius: 50%; background: #e2e8f0; flex-shrink: 0; transition: background 0.3s; }
+    .chart-legend { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+    .legend-item { display: flex; align-items: center; gap: 8px; color: #475569; }
+    .legend-color { width: 12px; height: 12px; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -121,6 +130,16 @@
           <div class="stat-card">
             <div class="stat-label">Conversion Rate</div>
             <div class="stat-value">12%</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+          <h2 style="margin: 0 0 20px 0; font-size: 1.1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Lead Source Distribution</h2>
+          <div class="chart-container">
+            <div id="source-chart" class="pie-chart"></div>
+            <div id="source-legend" class="chart-legend">
+              <!-- Legend injected by JS -->
+            </div>
           </div>
         </div>
 
@@ -277,6 +296,45 @@
       return sum + val;
     }, 0);
     document.getElementById('stat-revenue').textContent = '$' + totalRevenue.toLocaleString();
+
+    // --- CHART LOGIC ---
+    const sources = {};
+    leads.forEach(l => {
+      const s = l.source || 'Unknown';
+      sources[s] = (sources[s] || 0) + 1;
+    });
+    
+    const total = leads.length;
+    let gradientStr = [];
+    let currentDeg = 0;
+    const colors = ['#0d9488', '#3b82f6', '#f59e0b', '#ec4899', '#64748b']; // Teal, Blue, Amber, Pink, Slate
+    let colorIdx = 0;
+    const legendHtml = [];
+
+    Object.entries(sources).forEach(([source, count]) => {
+      const percent = count / total;
+      const deg = percent * 360;
+      const color = colors[colorIdx % colors.length];
+      
+      gradientStr.push(`${color} ${currentDeg}deg ${currentDeg + deg}deg`);
+      legendHtml.push(`
+        <div class="legend-item">
+          <div class="legend-color" style="background:${color}"></div>
+          <span>${source} (${Math.round(percent * 100)}%)</span>
+        </div>
+      `);
+      
+      currentDeg += deg;
+      colorIdx++;
+    });
+
+    const chartEl = document.getElementById('source-chart');
+    if (total > 0) {
+      chartEl.style.background = `conic-gradient(${gradientStr.join(', ')})`;
+    } else {
+      chartEl.style.background = '#e2e8f0';
+    }
+    document.getElementById('source-legend').innerHTML = legendHtml.join('');
 
     const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
 
