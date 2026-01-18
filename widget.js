@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.21", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.22", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -50,23 +50,23 @@ console.log("DentalBot Widget LIVE — v1.3.21", new Date().toISOString());
       gap: 16px;
       pointer-events: none;
     }
-    .dbot-launcher{pointer-events:auto;background:linear-gradient(135deg, #1e293b, #0f172a);color:#fff;border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:12px 16px;
+    .dbot-launcher{pointer-events:auto;background:#111;color:#fff;border:none;border-radius:999px;padding:12px 16px;
       font:600 14px/1.2 system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      display:flex;align-items:center;justify-content:center;transition:all .2s cubic-bezier(0.25, 1, 0.5, 1);position:relative;animation:dbot-pulse 3s infinite}
-    .dbot-launcher:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 20px 40px -8px rgba(0,0,0,0.3);animation:none}
+      display:flex;align-items:center;justify-content:center;transition:transform .12s ease,box-shadow .12s ease;position:relative;animation:dbot-pulse 3s infinite}
+    .dbot-launcher:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(2,6,23,0.16);animation:none}
     .dbot-launcher.typing::after{content:".";animation:dots 1s steps(3,end) infinite;margin-left:2px}
     .dbot-tooltip{position:absolute;bottom:100%;right:0;margin-bottom:16px;display:none;flex-direction:row;align-items:flex-end;gap:8px;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1))}
     .dbot-tooltip.visible{display:flex;opacity:1;transform:translateY(0)}
-    .dbot-tooltip-text{background:#fff;color:#1e293b;padding:12px 16px;border-radius:16px;border-bottom-right-radius:4px;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.02)}
-    .dbot-tooltip-avatar{width:48px;height:48px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 12px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.02)}
+    .dbot-tooltip-text{background:#fff;color:#1e293b;padding:10px 14px;border-radius:12px;border-bottom-right-radius:2px;font-size:13px;font-weight:600;white-space:nowrap}
+    .dbot-tooltip-avatar{width:42px;height:42px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
     @keyframes dbot-pulse{0%{box-shadow:0 0 0 0 rgba(0,0,0,0.2)}70%{box-shadow:0 0 0 10px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
     
     /* --- WIDGET CARD --- */
-    .widget-card{width:380px;height:600px;max-height:calc(100vh - 100px);max-width:calc(100vw - 40px);background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25), 0 0 1px rgba(0,0,0,0.1);display:flex;flex-direction:column;overflow:hidden;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);opacity:0;transform:translateY(20px) scale(0.96);pointer-events:none;transform-origin:bottom right;margin-bottom:0;border:1px solid rgba(255,255,255,0.8)}
+    .widget-card{width:380px;height:600px;max-height:calc(100vh - 100px);max-width:calc(100vw - 40px);background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);opacity:0;transform:translateY(20px) scale(0.95);pointer-events:none;transform-origin:bottom right;margin-bottom:0}
     .widget-card.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
     
     /* --- HEADER --- */
-    .header{background:linear-gradient(135deg, #0d9488, #0f766e);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0;box-shadow:0 4px 12px rgba(13, 148, 136, 0.15);z-index:10}
+    .header{background:#0d9488;padding:16px;display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0}
     .header-left{display:flex;align-items:center;gap:12px}
     .avatar{width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d9488;background-size:cover;background-position:center}
     .bot-info h3{margin:0;font-size:16px;font-weight:700}
@@ -85,18 +85,18 @@ console.log("DentalBot Widget LIVE — v1.3.21", new Date().toISOString());
     .chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
     .ai-disclaimer{font-size:11px;color:#64748b;background:#f1f5f9;padding:10px;border-radius:8px;margin-bottom:10px;line-height:1.4;border:1px solid #e2e8f0}
     .message{max-width:85%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word}
-    .message.bot{background:#fff;color:#334155;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #f1f5f9}
-    .message.user{background:linear-gradient(135deg, #0d9488, #0f766e);color:white;align-self:flex-end;border-bottom-right-radius:4px;box-shadow:0 4px 12px rgba(13, 148, 136, 0.2)}
+    .message.bot{background:white;color:#1e293b;border-bottom-left-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+    .message.user{background:#0d9488;color:white;align-self:flex-end;border-bottom-right-radius:4px}
     .message.typing{font-style:italic;color:#666;opacity:0.8}
     .message.typing::after{content:".";animation:dots 1s steps(3,end) infinite}
     @keyframes dots{0%{content:"."}33%{content:".."}66%{content:"..."}100%{content:"."}}
     .message a{color:inherit;text-decoration:underline}
     
-    .chat-input-area{padding:16px 20px;background:white;border-top:1px solid #f1f5f9;display:flex;gap:12px;align-items:flex-end}
-    .chat-input{flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:12px 18px;outline:none;font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:120px;transition:all 0.2s ease;box-shadow:inset 0 2px 4px rgba(0,0,0,0.02)}
-    .chat-input:focus{background:#fff;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13, 148, 136, 0.1)}
-    .send-btn{background:linear-gradient(135deg, #0d9488, #0f766e);color:white;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;box-shadow:0 4px 12px rgba(13, 148, 136, 0.25)}
-    .send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(13, 148, 136, 0.35)}
+    .chat-input-area{padding:16px;background:white;border-top:1px solid #e2e8f0;display:flex;gap:10px;align-items:flex-end}
+    .chat-input{flex:1;border:1px solid #cbd5e1;border-radius:20px;padding:10px 16px;outline:none;font-size:14px;font-family:inherit;resize:none;min-height:44px;max-height:120px}
+    .chat-input:focus{border-color:#0d9488}
+    .send-btn{background:#0d9488;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s}
+    .send-btn:hover{background:#0f766e}
     .send-btn:disabled{opacity:0.7;cursor:not-allowed}
 
     /* --- VIEW: SETTINGS --- */
