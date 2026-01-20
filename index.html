@@ -541,6 +541,7 @@
           </div>
         </div>
         <a href="#how-it-works" class="nav-link">How it Works</a>
+        <a href="/dashboard.html" class="nav-link">Login</a>
       </div>
       <button class="btn btn-primary trigger-modal" style="padding: 10px 20px; font-size: 0.9rem;">Get Started</button>
     </div>
@@ -955,17 +956,28 @@
   });
 
   // Handle Modal Form
-  document.getElementById('modal-form').addEventListener('submit', (e) => {
+  document.getElementById('modal-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button');
     const originalText = btn.textContent;
-    btn.textContent = 'Requesting...';
+    btn.textContent = 'Sending...';
     
-    // Simulate API call
-    setTimeout(() => {
+    const name = document.getElementById('m-name').value;
+    const email = document.getElementById('m-email').value;
+
+    try {
+      await fetch('https://formsubmit.co/ajax/info@lemontechno.org', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, _subject: 'New Demo Request (Main Page)' })
+      });
+      
       btn.textContent = 'Request Sent! ✅';
       setTimeout(() => closeDemoModal(), 1500);
-    }, 1000);
+    } catch (err) {
+      btn.textContent = 'Error. Try again.';
+      setTimeout(() => btn.textContent = originalText, 2000);
+    }
   });
 
   // Slower Smooth Scroll for "Get Started" buttons

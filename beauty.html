@@ -191,11 +191,22 @@
     window.closeDemoModal = function() { modal.classList.remove('open'); setTimeout(() => { modal.style.display = 'none'; }, 300); };
     document.querySelectorAll('.trigger-modal').forEach(btn => { btn.addEventListener('click', (e) => { e.preventDefault(); openDemoModal(); }); });
     modal.addEventListener('click', (e) => { if (e.target === modal) closeDemoModal(); });
-    document.getElementById('modal-form').addEventListener('submit', (e) => {
+    document.getElementById('modal-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = e.target.querySelector('button');
-      btn.textContent = 'Requesting...';
-      setTimeout(() => { btn.textContent = 'Request Sent! ✅'; setTimeout(() => closeDemoModal(), 1500); }, 1000);
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...';
+      const inputs = e.target.querySelectorAll('input, select');
+      const data = { _subject: 'New Aesthetics Demo Request' };
+      inputs.forEach(i => data[i.placeholder || 'field'] = i.value);
+      try {
+        await fetch('https://formsubmit.co/ajax/info@lemontechno.org', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) });
+        btn.textContent = 'Request Sent! ✅';
+        setTimeout(() => closeDemoModal(), 1500);
+      } catch (err) {
+        btn.textContent = 'Error. Try again.';
+        setTimeout(() => btn.textContent = originalText, 2000);
+      }
     });
   </script>
 

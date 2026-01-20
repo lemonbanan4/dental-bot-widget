@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.23", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -322,6 +322,12 @@ console.log("DentalBot Widget LIVE — v1.3.23", new Date().toISOString());
     const ttAvatar = document.createElement("div");
     ttAvatar.className = "dbot-tooltip-avatar";
     ttAvatar.textContent = "👩‍⚕️";
+    if (avatarOverride) {
+      ttAvatar.textContent = "";
+      ttAvatar.style.backgroundImage = `url(${avatarOverride})`;
+      ttAvatar.style.backgroundSize = "cover";
+      ttAvatar.style.backgroundPosition = "center";
+    }
     
     tooltip.appendChild(ttText);
     tooltip.appendChild(ttAvatar);
