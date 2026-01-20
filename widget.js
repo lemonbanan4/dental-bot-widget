@@ -1274,6 +1274,12 @@ console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
       return;
     }
 
+    if (c.custom_css && _root && _root.shadowRoot) {
+       const style = document.createElement('style');
+       style.textContent = c.custom_css;
+       _root.shadowRoot.appendChild(style);
+    }
+
     state.clinic = c;
     // Only overwrite title if it wasn't manually set in HTML
     if (!titleOverride) {

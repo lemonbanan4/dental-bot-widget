@@ -448,6 +448,7 @@
       if(tabName === 'settings') {
           fetchSystemStatus();
           loadMaintenanceStatus();
+          loadCustomCSS();
       }
       if(tabName === 'logs') loadLogs();
     }
@@ -539,6 +540,30 @@
         alert("Failed to update maintenance mode");
         document.getElementById('maintenance-toggle').checked = !enabled;
       }
+    }
+
+    async function loadCustomCSS() {
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        const res = await fetch(`${API_URL}/admin/css/${clinicId}?key=${currentKey}`);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('custom-css-editor').value = data.css;
+        }
+      } catch(e) {}
+    }
+
+    async function saveCustomCSS() {
+      const clinicId = document.getElementById('agent-select').value;
+      const css = document.getElementById('custom-css-editor').value;
+      try {
+        await fetch(`${API_URL}/admin/css`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clinic_id: clinicId, css: css, secret_key: currentKey })
+        });
+        alert("CSS Saved!");
+      } catch(e) { alert("Error saving CSS"); }
     }
 
     async function updateAccessKey() {
