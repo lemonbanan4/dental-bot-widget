@@ -119,6 +119,7 @@
       <label>Access Key</label>
       <input type="password" id="access-key" placeholder="Enter admin key (lemon-secret)">
       <button class="btn" onclick="login()">Access Dashboard</button>
+      <div id="login-error" class="error-msg"></div>
     </div>
 
     <div id="dashboard-panel" class="hidden">
@@ -334,6 +335,7 @@
 
     function login() {
       const key = document.getElementById('access-key').value;
+      document.getElementById('login-error').textContent = "";
       if(key) {
         currentKey = key;
         document.getElementById('login-panel').classList.add('hidden');
@@ -343,6 +345,8 @@
         liveVisitorInterval = setInterval(fetchLiveVisitors, 5000); // Poll every 5 seconds
         fetchLiveVisitors(); // Initial call
         setInterval(checkTypingStatus, 2000); // Poll typing status
+      } else {
+        document.getElementById('login-error').textContent = "Please enter a key.";
       }
     }
 
@@ -697,13 +701,17 @@
       
       try {
         const res = await fetch(`${API_URL}/admin/prompt/${clinicId}?key=${currentKey}`);
-        if(!res.ok) throw new Error("Unauthorized or Error");
+        if(!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            if (res.status === 401) handleAuthError();
+            throw new Error(err.detail || `Status ${res.status}`);
+        }
         const data = await res.json();
         editor.value = data.prompt;
         editor.disabled = false;
         status.textContent = "";
       } catch(e) {
-        status.textContent = "Error loading prompt. Check your key.";
+        status.textContent = `Error: ${e.message}`;
         status.style.color = "red";
       }
     }
@@ -721,12 +729,16 @@
           body: JSON.stringify({ clinic_id: clinicId, prompt: prompt, secret_key: currentKey })
         });
         
-        if(!res.ok) throw new Error("Failed to save");
+        if(!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            if (res.status === 401) handleAuthError();
+            throw new Error(err.detail || "Failed to save");
+        }
         status.textContent = "Saved successfully! ✅";
         status.style.color = "#0d9488";
         setTimeout(() => status.textContent = "", 3000);
       } catch(e) {
-        status.textContent = "Error saving prompt.";
+        status.textContent = `Error: ${e.message}`;
         status.style.color = "red";
       }
     }
@@ -746,15 +758,25 @@
           body: JSON.stringify({ clinic_id: clinicId, prompt: "", secret_key: currentKey })
         });
         
-        if(!res.ok) throw new Error("Failed");
+        if(!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            if (res.status === 401) handleAuthError();
+            throw new Error(err.detail || "Failed");
+        }
         const data = await res.json();
         editor.value = data.prompt;
         status.textContent = "Reset to default! ✅";
         setTimeout(() => status.textContent = "", 3000);
       } catch(e) {
-        status.textContent = "Error resetting.";
+        status.textContent = `Error: ${e.message}`;
         status.style.color = "red";
       }
+    }
+
+    function handleAuthError() {
+        document.getElementById('dashboard-panel').classList.add('hidden');
+        document.getElementById('login-panel').classList.remove('hidden');
+        document.getElementById('login-error').textContent = "Invalid Access Key. Please try again.";
     }
 
     function renderHistory(sessions, filter = '') {
