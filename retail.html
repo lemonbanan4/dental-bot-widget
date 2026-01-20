@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Retail AI Assistant | Lemon Techno</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>">
+  <style>
+    body { margin: 0; font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+    .navbar { position: fixed; top: 0; width: 100%; padding: 20px 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 100; }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .nav-logo { font-weight: 800; font-size: 1.25rem; color: #0f172a; text-decoration: none; }
+    .btn { display: inline-flex; padding: 12px 24px; border-radius: 50px; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; font-size: 1rem; }
+    .btn-primary { background-color: #0d9488; color: white; }
+    .btn-primary:hover { background-color: #0f766e; transform: translateY(-2px); }
+    
+    .hero { padding: 160px 0 80px; text-align: center; background: radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.1) 0%, transparent 70%); }
+    h1 { font-size: 3.5rem; font-weight: 800; color: #0f172a; margin-bottom: 24px; line-height: 1.1; }
+    .subtitle { font-size: 1.25rem; color: #64748b; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; margin: 80px 0; }
+    .card { background: white; padding: 32px; border-radius: 24px; border: 1px solid #e2e8f0; transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); border-color: #ec4899; }
+    .icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+    h3 { font-size: 1.5rem; margin: 0 0 12px; color: #0f172a; }
+    p { color: #64748b; line-height: 1.6; }
+
+    /* Pricing & Comparison Styles */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 40px; }
+    .pricing-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; text-align: left; transition: transform 0.2s; }
+    .pricing-card:hover { transform: translateY(-4px); border-color: #ec4899; }
+    .pricing-card.popular { border: 2px solid #ec4899; background: #fdf2f8; position: relative; }
+    .pricing-card .price { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+    .pricing-card .price span { font-size: 1rem; color: #64748b; font-weight: 500; }
+    .features-list { list-style: none; padding: 0; margin: 0 0 32px; }
+    .features-list li { margin-bottom: 12px; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-card { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 24px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
+    .modal-overlay.open .modal-card { transform: translateY(0); }
+    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/index.html" class="nav-logo">🍋 Lemon Techno</a>
+      <a href="/index.html" style="color: #64748b; text-decoration: none; font-weight: 500;">&larr; Back to Platform</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="container">
+      <div style="display:inline-block; background:#fdf2f8; color:#ec4899; padding:6px 16px; border-radius:99px; font-weight:600; margin-bottom:24px; border:1px solid #fbcfe8;">Retail Edition</div>
+      <h1>The 24/7 AI Sales Associate <br>for E-commerce</h1>
+      <p class="subtitle">Turn visitors into buyers. Recommend products, track orders, and handle returns automatically.</p>
+      <button class="btn btn-primary trigger-modal" style="background:#ec4899;">Request Retail Demo</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <span class="icon">📦</span>
+        <h3>Order Tracking</h3>
+        <p>Instantly answers "Where is my order?" by connecting to Shopify, WooCommerce, or Magento.</p>
+      </div>
+      <div class="card">
+        <span class="icon">👗</span>
+        <h3>Product Advisor</h3>
+        <p>Acts as a personal shopper. Recommends items based on customer preferences and inventory.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔄</span>
+        <h3>Automated Returns</h3>
+        <p>Guides customers through your return policy and generates labels without human intervention.</p>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div style="margin: 100px 0; text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 40px; color: #0f172a;">AI vs. Standard Support</h2>
+      <div style="overflow-x: auto; max-width: 900px; margin: 0 auto;">
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+              <th style="padding: 20px; text-align: left; color: #64748b; font-size: 0.9rem; text-transform: uppercase;">Feature</th>
+              <th style="padding: 20px; text-align: center; color: #64748b; font-size: 0.9rem; text-transform: uppercase;">Static FAQ / Chatbot</th>
+              <th style="padding: 20px; text-align: center; color: #ec4899; font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">RetailBot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Personalization</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">None</td>
+              <td style="padding: 20px; text-align: center; color: #0f172a; font-weight: 600;">Knows Order History</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Sales Ability</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">Passive</td>
+              <td style="padding: 20px; text-align: center; color: #0f172a; font-weight: 600;">Active Upselling</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Setup</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">Manual Flow Building</td>
+              <td style="padding: 20px; text-align: center; color: #ec4899; font-weight: 800;">Pre-trained on Retail</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div style="margin: 100px 0; text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 16px; color: #0f172a;">Retail Pricing</h2>
+      <p style="color: #64748b; margin-bottom: 40px;">Scale your support as you scale your sales.</p>
+      
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">€49<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ 24/7 Sales Assistant</li>
+            <li>✅ Basic Order Status</li>
+            <li>✅ FAQ Handling</li>
+            <li>👉 Best for boutiques</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%; background:white; color:#ec4899; border:1px solid #e2e8f0;">Get Started</button>
+        </div>
+        <div class="pricing-card popular">
+          <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#ec4899; color:white; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">MOST POPULAR</div>
+          <h3>Growth</h3>
+          <div class="price">€89<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ <strong>Shopify/Woo Integration</strong></li>
+            <li>✅ Product Recommendations</li>
+            <li>✅ Abandoned Cart Recovery</li>
+            <li>👉 Best for growing brands</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%; background:#ec4899;">Get Started</button>
+        </div>
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <div class="price">Custom</div>
+          <ul class="features-list">
+            <li>✅ Multi-brand Support</li>
+            <li>✅ Custom ERP Integration</li>
+            <li>✅ Dedicated Success Manager</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%; background:white; color:#ec4899; border:1px solid #e2e8f0;">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REQUEST DEMO MODAL -->
+  <div id="demo-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeDemoModal()">&times;</button>
+      <h2 style="margin-top:0; color:#0f172a;">Request Retail Demo</h2>
+      <p style="color:#64748b; margin-bottom:24px;">See how RetailBot boosts your conversion rate.</p>
+      
+      <form id="modal-form">
+        <div style="margin-bottom:16px;">
+          <input type="text" placeholder="Store Name" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <input type="email" placeholder="Work Email" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:24px;">
+          <select style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; box-sizing:border-box; background:white;">
+            <option value="" disabled selected>Platform</option>
+            <option value="shopify">Shopify</option>
+            <option value="woo">WooCommerce</option>
+            <option value="magento">Magento</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; background:#ec4899;">Request Demo</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('demo-modal');
+    window.openDemoModal = function() { modal.style.display = 'flex'; modal.offsetHeight; modal.classList.add('open'); };
+    window.closeDemoModal = function() { modal.classList.remove('open'); setTimeout(() => { modal.style.display = 'none'; }, 300); };
+    document.querySelectorAll('.trigger-modal').forEach(btn => { btn.addEventListener('click', (e) => { e.preventDefault(); openDemoModal(); }); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeDemoModal(); });
+    document.getElementById('modal-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.textContent = 'Requesting...';
+      setTimeout(() => { btn.textContent = 'Request Sent! ✅'; setTimeout(() => closeDemoModal(), 1500); }, 1000);
+    });
+  </script>
+</body>
+</html>

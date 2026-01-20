@@ -38,6 +38,16 @@
     .modal-card { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 24px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
     .modal-overlay.open .modal-card { transform: translateY(0); }
     .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+
+    /* Pricing & Comparison Styles */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 40px; }
+    .pricing-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; text-align: left; transition: transform 0.2s; }
+    .pricing-card:hover { transform: translateY(-4px); border-color: #0d9488; }
+    .pricing-card.popular { border: 2px solid #0d9488; background: #f0fdfa; position: relative; }
+    .pricing-card .price { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+    .pricing-card .price span { font-size: 1rem; color: #64748b; font-weight: 500; }
+    .features-list { list-style: none; padding: 0; margin: 0 0 32px; }
+    .features-list li { margin-bottom: 12px; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
   </style>
 </head>
 <body>
@@ -74,6 +84,89 @@
         <span class="icon">🛡️</span>
         <h3>HIPAA Compliant</h3>
         <p>Built with security first. We sign BAAs and ensure all patient data is encrypted in transit and at rest.</p>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div style="margin: 100px 0; text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 40px; color: #0f172a;">AI vs. Human Receptionist</h2>
+      <div style="overflow-x: auto; max-width: 900px; margin: 0 auto;">
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+              <th style="padding: 20px; text-align: left; color: #64748b; font-size: 0.9rem; text-transform: uppercase;">Feature</th>
+              <th style="padding: 20px; text-align: center; color: #64748b; font-size: 0.9rem; text-transform: uppercase;">Human Receptionist</th>
+              <th style="padding: 20px; text-align: center; color: #0d9488; font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">DentalBot</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Availability</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">40 hours / week</td>
+              <td style="padding: 20px; text-align: center; color: #0f172a; font-weight: 600;">168 hours / week (24/7)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Concurrent Patients</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">1 at a time</td>
+              <td style="padding: 20px; text-align: center; color: #0f172a; font-weight: 600;">Unlimited</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Response Time</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">Minutes to Hours</td>
+              <td style="padding: 20px; text-align: center; color: #0f172a; font-weight: 600;">Instant</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 20px; text-align: left; font-weight: 600; color: #334155;">Cost</td>
+              <td style="padding: 20px; text-align: center; color: #64748b;">€30k+ / year</td>
+              <td style="padding: 20px; text-align: center; color: #0d9488; font-weight: 800;">From €49 / month</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div style="margin: 100px 0; text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 16px; color: #0f172a;">Simple Dental Pricing</h2>
+      <p style="color: #64748b; margin-bottom: 40px;">Choose the plan that fits your practice size.</p>
+      
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">€49<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ 24/7 Booking Assistant</li>
+            <li>✅ Answers FAQs (Price, Parking)</li>
+            <li>✅ Basic Triage</li>
+            <li>✅ Email Support</li>
+            <li>👉 Best for solo practitioners</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%; background:white; color:#0d9488; border:1px solid #e2e8f0;">Get Started</button>
+        </div>
+        <div class="pricing-card popular">
+          <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#0d9488; color:white; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">MOST POPULAR</div>
+          <h3>Growth</h3>
+          <div class="price">€89<span>/mo</span></div>
+          <ul class="features-list">
+            <li>✅ <strong>EHR Integration</strong> (Dentrix/Eagle)</li>
+            <li>✅ Custom Branding & Avatar</li>
+            <li>✅ Advanced Emergency Triage</li>
+            <li>✅ Priority Support</li>
+            <li>👉 Best for busy clinics</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%;">Get Started</button>
+        </div>
+        <div class="pricing-card">
+          <h3>DSO / Enterprise</h3>
+          <div class="price">Custom</div>
+          <ul class="features-list">
+            <li>✅ Multi-location Dashboard</li>
+            <li>✅ Centralized Analytics</li>
+            <li>✅ Dedicated Success Manager</li>
+            <li>✅ API Access</li>
+          </ul>
+          <button class="btn btn-primary trigger-modal" style="width:100%; background:white; color:#0d9488; border:1px solid #e2e8f0;">Contact Sales</button>
+        </div>
       </div>
     </div>
 
