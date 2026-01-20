@@ -191,6 +191,7 @@
             <div style="display:flex; align-items:center; gap:12px;">
                <input type="date" id="date-start" class="date-input" onchange="renderLeads()" title="Start Date">
                <input type="date" id="date-end" class="date-input" onchange="renderLeads()" title="End Date">
+               <button id="bulk-delete-btn" class="btn hidden" onclick="bulkDeleteLeads()" style="padding:6px 12px; font-size:0.8rem; background:#ef4444;">Delete Selected</button>
                <input type="search" id="leads-search" oninput="renderLeads()" placeholder="Search leads..." style="padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; width: 200px;">
                <button class="btn" onclick="exportLeadsCSV()" style="padding:6px 12px; font-size:0.8rem;">⬇️ CSV</button>
                <label style="font-size:0.9rem; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none;">
@@ -379,6 +380,10 @@
       const searchTerm = document.getElementById('leads-search') ? document.getElementById('leads-search').value.toLowerCase() : '';
       const startDate = document.getElementById('date-start').value;
       const endDate = document.getElementById('date-end').value;
+      
+      // Reset bulk delete button state
+      const bulkBtn = document.getElementById('bulk-delete-btn');
+      if(bulkBtn) bulkBtn.classList.add('hidden');
 
       let displayLeads = window.currentLeads || [];
       
@@ -411,7 +416,7 @@
       }
 
       let html = `<table class="leads-table">
-        <thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Message</th><th>Notes</th><th>Source</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th style="width:40px"><input type="checkbox" id="select-all-leads" onchange="toggleSelectAllLeads()"></th><th>Date</th><th>Name</th><th>Contact</th><th>Message</th><th>Notes</th><th>Source</th><th>Status</th><th></th></tr></thead>
         <tbody>`;
       
       // Pagination Logic
@@ -435,6 +440,7 @@
           const rowClass = (l.status === 'Closed') ? 'class="read-row"' : '';
           
           html += `<tr ${rowClass}>
+            <td><input type="checkbox" class="lead-checkbox" value="${l.id}" onchange="updateBulkDeleteVisibility()"></td>
             <td>${date}</td>
             <td>${l.name || '-'}</td>
             <td>${l.phone || ''}<br>
@@ -457,6 +463,44 @@
       });
       html += "</tbody></table>";
       container.innerHTML = html;
+    }
+
+    function toggleSelectAllLeads() {
+      const checked = document.getElementById('select-all-leads').checked;
+      document.querySelectorAll('.lead-checkbox').forEach(cb => cb.checked = checked);
+      updateBulkDeleteVisibility();
+    }
+
+    function updateBulkDeleteVisibility() {
+      const count = document.querySelectorAll('.lead-checkbox:checked').length;
+      const btn = document.getElementById('bulk-delete-btn');
+      if (count > 0) {
+        btn.classList.remove('hidden');
+        btn.textContent = `Delete (${count})`;
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+
+    async function bulkDeleteLeads() {
+      const selected = Array.from(document.querySelectorAll('.lead-checkbox:checked')).map(cb => cb.value);
+      if (selected.length === 0) return;
+      
+      if (!confirm(`Delete ${selected.length} leads permanently?`)) return;
+      
+      const clinicId = document.getElementById('agent-select').value;
+      const btn = document.getElementById('bulk-delete-btn');
+      btn.textContent = "Deleting...";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/leads/${clinicId}/bulk_delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lead_ids: selected, secret_key: currentKey })
+        });
+        if (res.ok) loadLeads();
+        else alert("Failed to delete leads.");
+      } catch (e) { alert("Error connecting to server."); }
     }
 
     async function loadLeads(silent = false) {
