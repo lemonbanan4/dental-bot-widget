@@ -269,7 +269,10 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
             <h2 style="margin:0; font-size:1.5rem;">System Logs</h2>
-            <button class="btn" onclick="loadLogs()">↻ Refresh</button>
+            <div>
+              <button class="btn" onclick="clearLogs()" style="padding:6px 12px; font-size:0.8rem; background:#ef4444; margin-right:8px;">Clear Logs</button>
+              <button class="btn" onclick="loadLogs()">↻ Refresh</button>
+            </div>
           </div>
           <div id="logs-list" style="font-family:monospace; font-size:0.9rem; max-height:600px; overflow-y:auto;"></div>
         </div>
@@ -831,6 +834,17 @@
         container.innerHTML = html;
       } catch(e) {
         container.innerHTML = "<div style='color:red;text-align:center;padding:20px;'>Error loading logs.</div>";
+      }
+    }
+
+    async function clearLogs() {
+      if(!confirm("Clear all system logs?")) return;
+      try {
+        const res = await fetch(`${API_URL}/admin/logs?key=${currentKey}`, { method: 'DELETE' });
+        if(res.ok) loadLogs();
+        else alert("Failed to clear logs.");
+      } catch(e) {
+        alert("Error connecting to server.");
       }
     }
 
