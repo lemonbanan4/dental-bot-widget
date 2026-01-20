@@ -328,6 +328,19 @@
     let activeChatSession = null;
     let currentPage = 1;
     const itemsPerPage = 10;
+
+    // Check API connection on load
+    fetch(API_URL)
+      .then(res => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(data => {
+        console.log("API Connected:", data);
+        if (data.service !== "DentalBot API") console.warn("Warning: Unexpected API response. Ensure root main.py is running.");
+      })
+      .catch(e => console.error("API Connection Failed:", e));
+
     window.currentLeads = [];
     window.currentSessions = {}; // Global store for sessions
 
@@ -945,7 +958,10 @@
         if(!res.ok) {
             const err = await res.json().catch(() => ({}));
             if (res.status === 401) handleAuthError();
-            throw new Error(err.detail || `Status ${res.status}`);
+            if (res.status === 404 && err.detail === "Not Found") {
+                throw new Error("Backend endpoint missing. Please redeploy main.py.");
+            }
+            throw new Error(err.detail || `Error ${res.status}`);
         }
         const data = await res.json();
         editor.value = data.prompt;
