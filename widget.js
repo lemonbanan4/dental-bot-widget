@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -825,7 +825,12 @@ console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
         });
 
         if (!res.ok) {
-          throw new Error(`Server error: ${res.status}`);
+          let detail = "";
+          try {
+             const errData = await res.json();
+             detail = errData.detail || JSON.stringify(errData);
+          } catch(e) {}
+          throw new Error(`Server error ${res.status}: ${detail}`);
         }
 
         const data = await res.json();
@@ -976,6 +981,27 @@ console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
   // Load history before initializing state or opening panel
   loadHistory();
 
+  // Heartbeat function to track live visitors
+  async function sendHeartbeat() {
+    if (!apiUrl || !clinicId || !state.sessionId) return;
+    try {
+        const res = await fetch(`${apiUrl}/heartbeat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                clinic_id: clinicId,
+                session_id: state.sessionId
+            }),
+            keepalive: true // Important for when tab is closed
+        });
+        const data = await res.json();
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(msg => addMessage(ui.messages, msg, 'bot'));
+            if (enableSound) playSound();
+        }
+    } catch(e) { /* fail silently */ }
+  }
+
   const state = { sessionId: getSessionKey(), sending: false, clinic: null, unreadCount: 0 };
 
   // open/close helpers
@@ -1066,6 +1092,25 @@ console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
     window.DentalBot.close = closePanel;
     window.DentalBot.toggle = togglePanel;
   } catch (e) {}
+
+  // Start heartbeat
+  setInterval(sendHeartbeat, 5000); // Poll faster (5s) for live chat feel
+  // Send one immediately on load
+  setTimeout(sendHeartbeat, 1000);
+
+  // Typing indicator
+  let lastTyping = 0;
+  ui.textarea.addEventListener('input', () => {
+      const now = Date.now();
+      if (now - lastTyping > 2000) {
+          lastTyping = now;
+          fetch(`${apiUrl}/typing`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ clinic_id: clinicId, session_id: state.sessionId })
+          }).catch(()=>{});
+      }
+  });
 
   // send
   ui.sendBtn.onclick = () => sendChat(ui, state);
@@ -1213,7 +1258,10 @@ console.log("DentalBot Widget LIVE — v1.3.24", new Date().toISOString());
   fetchClinicPublic().then((c) => {
     if (!c) return;
     state.clinic = c;
-    ui.title.textContent = c.clinic_name || "Live Support";
+    // Only overwrite title if it wasn't manually set in HTML
+    if (!titleOverride) {
+      ui.title.textContent = c.clinic_name || "Live Support";
+    }
     if (c.booking_url) {
       ui.bookBtn.disabled = false;
       ui.bookBtn.dataset.bookingUrl = c.booking_url;

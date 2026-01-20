@@ -2,519 +2,980 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Clinic Dashboard | Lemon Techno</title>
+  <title>Agent Dashboard | Lemon Techno</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍋</text></svg>">
-  <link rel="canonical" href="https://lemontechno.org/dashboard.html" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #f1f5f9;
-      color: #1e293b;
-      min-height: 100vh;
-    }
-
-    /* --- LAYOUT --- */
-    .navbar { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-weight: 800; font-size: 1.25rem; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-
-    /* --- CARDS --- */
-    .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 24px; margin-bottom: 24px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
-    .stat-label { color: #64748b; font-size: 0.875rem; font-weight: 500; margin-bottom: 8px; }
-    .stat-value { color: #0f172a; font-size: 2rem; font-weight: 800; }
-
-    /* --- TABLE --- */
-    .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-    th { text-align: left; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    td { padding: 16px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-    tr:last-child td { border-bottom: none; }
-    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
-    .badge.new { background: #dcfce7; color: #166534; }
-    .badge.contacted { background: #f1f5f9; color: #475569; }
-
-    /* --- LOGIN FORM --- */
-    .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f0fdfa, #ffffff); }
-    .login-card { width: 100%; max-width: 400px; text-align: center; }
-    .input-group { margin-bottom: 16px; text-align: left; }
-    .input-group label { display: block; margin-bottom: 6px; font-size: 0.9rem; font-weight: 500; color: #334155; }
-    .input-field { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-    .btn { background: #0d9488; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
+    body { margin: 0; font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    .card { background: white; padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    h1 { color: #0f172a; margin-bottom: 24px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; font-family: inherit; }
+    textarea { min-height: 200px; line-height: 1.5; resize: vertical; }
+    .btn { background: #0d9488; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
     .btn:hover { background: #0f766e; }
-    .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #475569; width: auto; padding: 8px 16px; font-size: 0.9rem; }
+    .hidden { display: none; }
+    #status { margin-top: 16px; font-weight: 500; min-height: 24px; }
+    .nav { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
+    .nav a { color: #64748b; text-decoration: none; margin-right: 20px; font-weight: 500; }
+    .nav a:hover { color: #0d9488; }
+    .header-stats { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+    .stat-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .live-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; animation: pulse-green 2s infinite; }
+    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
 
-    /* --- TABS --- */
-    .tabs { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; }
-    .tab-btn { background: none; border: none; padding: 12px 0; font-size: 1rem; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 600; transition: all 0.2s; }
+    /* Tabs */
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
+    .tab-btn { background: none; border: none; padding: 12px 20px; font-size: 1rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn:hover { color: #0d9488; }
     .tab-btn.active { color: #0d9488; border-bottom-color: #0d9488; }
-    .tab-btn:hover { color: #0f172a; }
+    .tab-content.hidden { display: none; }
+    
+    /* Leads Table */
+    .leads-table { width: 100%; border-collapse: collapse; }
+    .leads-table th, .leads-table td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .leads-table th { color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
+    .lead-source { font-size: 0.8rem; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #475569; }
+    .copy-btn { background:none; border:none; cursor:pointer; font-size:0.9rem; padding:2px; opacity:0.6; transition:transform 0.1s; }
+    .copy-btn:hover { opacity:1; transform:scale(1.1); }
+    .action-btn { background:none; border:none; cursor:pointer; font-size:0.8rem; font-weight:600; margin-right:8px; }
+    .action-btn:hover { text-decoration:underline; }
+    .read-row { opacity: 0.6; background: #f8fafc; }
+    .note-input { width: 100%; height: 60px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; font-family: inherit; resize: vertical; background: transparent; transition: background 0.2s, border-color 0.2s; }
+    .note-input:focus { background: white; border-color: #0d9488; outline: none; }
+    .status-select { padding: 4px 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.85rem; background-color: white; cursor: pointer; }
+    .status-select:focus { border-color: #0d9488; outline: none; }
 
-    /* --- PRINT --- */
-    @media print {
-      @page { margin: 1cm; }
-      .navbar, .tabs, .stats-grid, #login-view, #view-settings { display: none !important; }
-      body, .container, .card { background: white; margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; width: 100%; }
-      .card > div:first-child > div { display: none !important; } /* Hide filters */
-      th:last-child, td:last-child { display: none; } /* Hide Action column */
-      textarea { border: none; resize: none; overflow: visible; height: auto !important; }
-      table { border: 1px solid #e2e8f0; }
-      th, td { border: 1px solid #e2e8f0; }
-    }
+    
+    /* Layout */
+    .dashboard-layout { display: flex; gap: 24px; align-items: flex-start; }
+    .editor-column { flex: 2; }
+    .history-column { flex: 1; }
+    @media (max-width: 768px) { .dashboard-layout { flex-direction: column; } }
 
-    .hidden { display: none !important; }
+    /* History List */
+    .history-list { max-height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .session-item { border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+    .session-item:hover { background: #f1f5f9; }
+    .session-time { font-weight: 600; font-size: 0.9rem; color: #334155; }
+    .session-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .delete-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0 4px; opacity: 0.4; transition: opacity 0.2s; }
+    .delete-btn:hover { opacity: 1; }
+    .session-preview { font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
+    
+    /* Chat Modal */
+    .chat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .chat-modal { background: white; width: 90%; max-width: 500px; height: 80vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+    .chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
+    .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; line-height: 1.5; }
+    .msg.user { background: #e2e8f0; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .msg.assistant { background: #0d9488; color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+    .minimize-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748b; margin-right: 4px; line-height: 1; vertical-align: middle; }
+    .minimize-btn:hover { color: #0f172a; }
 
-    /* --- CHARTS --- */
-    .chart-wrapper { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
-    @media (min-width: 768px) { .chart-wrapper { grid-template-columns: 2fr 1fr; } }
-    .chart-container { display: flex; align-items: center; gap: 24px; justify-content: center; height: 100%; }
-    .pie-chart { width: 120px; height: 120px; border-radius: 50%; background: #e2e8f0; flex-shrink: 0; transition: background 0.3s; }
-    .chart-legend { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
-    .legend-item { display: flex; align-items: center; gap: 8px; color: #475569; }
-    .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+    /* Minimized Chat State */
+    .chat-overlay.minimized { background: transparent; pointer-events: none; align-items: flex-end; justify-content: flex-end; padding: 0 20px 0 0; bottom: 0; top: auto; height: auto; }
+    .chat-overlay.minimized .chat-modal { width: 320px; height: auto; pointer-events: auto; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); border: 1px solid #cbd5e1; border-bottom: none; border-radius: 12px 12px 0 0; }
+    .chat-overlay.minimized .chat-body, .chat-overlay.minimized .chat-footer { display: none; }
+    .chat-overlay.minimized .chat-header { border-bottom: none; cursor: pointer; background: #f1f5f9; border-radius: 12px 12px 0 0; }
+
+    /* Dark Mode */
+    body.dark-mode { background: #0f172a; color: #e2e8f0; }
+    body.dark-mode .card { background: #1e293b; border-color: #334155; }
+    body.dark-mode label { color: #cbd5e1; }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0f172a; border-color: #334155; color: #fff; }
+    body.dark-mode .session-item:hover { background: #334155; }
+    body.dark-mode .session-time { color: #cbd5e1; }
+    body.dark-mode .session-preview { color: #94a3b8; }
+    body.dark-mode .leads-table th { color: #94a3b8; border-bottom-color: #334155; }
+    body.dark-mode .leads-table td { border-bottom-color: #334155; }
+    body.dark-mode .lead-source { background: #334155; color: #cbd5e1; }
+    body.dark-mode h1, body.dark-mode h2 { color: #fff; }
+    body.dark-mode .nav a { color: #94a3b8; }
+    body.dark-mode .nav a:hover { color: #2dd4bf; }
+    body.dark-mode .chat-modal { background: #1e293b; color: #fff; }
+    body.dark-mode .chat-header { border-bottom-color: #334155; }
+    body.dark-mode .chat-body { background: #0f172a; }
+    body.dark-mode .msg.user { background: #334155; color: #fff; }
+    body.dark-mode .read-row { background: rgba(255,255,255,0.03); }
+    body.dark-mode .note-input { border-color: #334155; color: #e2e8f0; }
+    body.dark-mode .note-input:focus { background: #1e293b; border-color: #2dd4bf; }
+    body.dark-mode .status-select { background-color: #1e293b; border-color: #334155; color: white; }
   </style>
 </head>
 <body>
-
-  <!-- LOGIN VIEW -->
-  <div id="login-view" class="login-wrapper">
-    <div class="card login-card">
-      <div style="font-size: 3rem; margin-bottom: 10px;">🍋</div>
-      <h1 style="margin: 0 0 24px 0; font-size: 1.5rem;">Clinic Login</h1>
-      <form id="login-form">
-        <div class="input-group">
-          <label>Clinic ID</label>
-          <input type="text" id="clinic-id" class="input-field" placeholder="e.g. smile-city-001" required>
-        </div>
-        <div class="input-group">
-          <label>Access Key</label>
-          <input type="password" id="api-key" class="input-field" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn">Access Dashboard</button>
-      </form>
+  <div class="container">
+    <div class="nav">
+      <a href="/index.html">&larr; Back to Site</a>
+      <button class="btn" onclick="toggleDarkMode()" style="padding:8px 16px; font-size:0.9rem; background:transparent; border:1px solid currentColor; color:inherit;">🌙 Dark Mode</button>
     </div>
-  </div>
 
-  <!-- DASHBOARD VIEW -->
-  <div id="dashboard-view" class="hidden">
-    <nav class="navbar">
-      <div class="brand"><span>🍋</span> <span id="nav-clinic-name">Clinic Dashboard</span></div>
-      <button id="logout-btn" class="btn btn-outline">Log Out</button>
-    </nav>
+    <div id="login-panel" class="card">
+      <h1>Admin Login</h1>
+      <label>Access Key</label>
+      <input type="password" id="access-key" placeholder="Enter admin key (lemon-secret)">
+      <button class="btn" onclick="login()">Access Dashboard</button>
+    </div>
 
-    <div class="container">
+    <div id="dashboard-panel" class="hidden">
+      <h1>Dashboard</h1>
+
+      <div class="header-stats">
+        <div class="stat-item">
+            <div class="live-dot"></div>
+            <span id="live-visitors-count">0</span> Live Visitors
+        </div>
+      </div>
+
+      <!-- Tabs -->
       <div class="tabs">
-        <button class="tab-btn active" data-tab="leads">Leads</button>
-        <button class="tab-btn" data-tab="settings">Settings</button>
+        <button class="tab-btn active" onclick="showTab('editor')">Agent Editor</button>
+        <button class="tab-btn" onclick="showTab('leads')">Leads</button>
       </div>
+      
+      <!-- Editor Tab -->
+      <div id="tab-editor" class="tab-content">
+        <h2 style="font-size: 1.5rem; margin-bottom: 20px;">Agent Personality Editor</h2>
+        <div class="dashboard-layout">
+          <!-- Left: Editor -->
+          <div class="editor-column">
+            <div class="card">
+              <label>Select Agent</label>
+              <select id="agent-select" onchange="refreshData()">
+                <option value="lemon-main">Lisa (Main Site)</option>
+                <option value="dental-demo">Sarah (Dental)</option>
+                <option value="retail-demo">Emily (Retail)</option>
+                <option value="beauty-demo">Chloe (Beauty)</option>
+                <option value="realestate-demo">Jessica (Real Estate)</option>
+                <option value="support-demo">Anna (Support)</option>
+              </select>
 
-      <!-- VIEW: LEADS -->
-      <div id="view-leads">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Total Leads</div>
-            <div class="stat-value" id="stat-total">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">This Week</div>
-            <div class="stat-value" id="stat-week">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Revenue</div>
-            <div class="stat-value" id="stat-revenue">$0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Conversion Rate</div>
-            <div class="stat-value">12%</div>
-          </div>
-        </div>
+              <label>System Prompt (Personality & Instructions)</label>
+              <textarea id="prompt-editor" placeholder="Loading prompt..."></textarea>
 
-        <div class="card" style="margin-bottom: 24px;">
-          <h2 style="margin: 0 0 20px 0; font-size: 1.1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Lead Source Distribution</h2>
-          <div class="chart-container">
-            <div id="source-chart" class="pie-chart"></div>
-            <div id="source-legend" class="chart-legend">
-              <!-- Legend injected by JS -->
+              <div style="display:flex; gap:12px; align-items:center;">
+                <button class="btn" onclick="savePrompt()">Save Changes</button>
+                <button class="btn" onclick="openTestChat()" style="background:#3b82f6;">💬 Test Chat</button>
+                <button class="btn" onclick="resetPrompt()" style="background:#64748b;">↺ Reset</button>
+              </div>
+              <div id="status"></div>
+            </div>
+          </div>
+
+          <!-- Right: History -->
+          <div class="history-column">
+            <div class="card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h2 style="margin:0; font-size:1.2rem;">History</h2>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn" onclick="downloadCSV()" style="padding:6px 12px; font-size:0.8rem;" title="Export CSV">⬇️ CSV</button>
+                  <button class="btn" onclick="loadHistory()" style="padding:6px 12px; font-size:0.8rem;" title="Refresh">↻</button>
+                </div>
+              </div>
+              <input type="search" id="history-search" oninput="handleSearch()" placeholder="Search conversations..." style="width: 100%; margin-bottom: 16px;">
+              <div id="history-list" class="history-list"></div>
             </div>
           </div>
         </div>
+      </div>
 
+      <!-- Leads Tab -->
+      <div id="tab-leads" class="tab-content hidden">
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <h2 style="margin: 0; font-size: 1.25rem;">Recent Inquiries</h2>
-            <div style="display:flex; gap:10px; align-items:center;">
-              <input type="date" id="date-start" class="input-field" style="padding: 6px 12px; font-size: 0.85rem; width: 130px;" title="Start Date">
-              <span style="color:#cbd5e1">–</span>
-              <input type="date" id="date-end" class="input-field" style="padding: 6px 12px; font-size: 0.85rem; width: 130px;" title="End Date">
-              <input type="text" id="search-input" class="input-field" placeholder="Search name or email..." style="padding: 6px 12px; font-size: 0.85rem; width: 200px;">
-              <button id="export-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Export CSV</button>
-              <button id="print-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;">Print</button>
-              <button id="refresh-btn" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 12px;" title="Refresh Data">🔄</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="margin:0; font-size:1.5rem;">Captured Leads</h2>
+            <div style="display:flex; align-items:center; gap:12px;">
+               <input type="date" id="date-start" class="date-input" onchange="renderLeads()" title="Start Date">
+               <input type="date" id="date-end" class="date-input" onchange="renderLeads()" title="End Date">
+               <input type="search" id="leads-search" oninput="renderLeads()" placeholder="Search leads..." style="padding:6px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.9rem; width: 200px;">
+               <button class="btn" onclick="exportLeadsCSV()" style="padding:6px 12px; font-size:0.8rem;">⬇️ CSV</button>
+               <label style="font-size:0.9rem; display:flex; align-items:center; gap:6px; cursor:pointer; user-select:none;">
+                 <input type="checkbox" id="filter-unread" onchange="renderLeads()"> Filter New
+               </label>
+               <button class="btn" onclick="loadLeads()">↻ Refresh</button>
             </div>
           </div>
-          <div class="table-container">
-            <table id="leads-table">
-              <thead>
-                <tr>
-                  <th>Status</th>
-                  <th>Name</th>
-                  <th>Contact</th>
-                  <th>Message</th>
-                  <th>Source</th>
-                  <th>Value</th>
-                  <th>Notes</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Rows injected by JS -->
-              </tbody>
-            </table>
+          
+          <!-- Chart Section -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid #e2e8f0;">
+            <div style="height:200px; position:relative; display:flex; align-items:center; justify-content:center;">
+              <canvas id="sourceChart"></canvas>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
+               <div id="total-leads-display" style="font-size:3rem; font-weight:800; color:#0f172a;">0</div>
+               <div style="color:#64748b; font-weight:600;">Total Leads</div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- VIEW: SETTINGS -->
-      <div id="view-settings" class="hidden">
-        <div class="card" style="max-width: 600px;">
-          <h2 style="margin-top: 0; margin-bottom: 24px; font-size: 1.25rem;">Clinic Settings</h2>
-          <form id="settings-form">
-            <div class="input-group">
-              <label>Weekdays (Mon-Fri)</label>
-              <input type="text" id="hours-weekdays" class="input-field" placeholder="e.g. 9:00 AM - 6:00 PM">
-            </div>
-            <div class="input-group">
-              <label>Weekends</label>
-              <input type="text" id="hours-weekends" class="input-field" placeholder="e.g. 10:00 AM - 4:00 PM">
-            </div>
-            <button type="submit" class="btn" style="width: auto;">Save Changes</button>
-          </form>
+          <div id="leads-list"></div>
+          <div id="leads-pagination" class="pagination hidden">
+            <button class="btn" onclick="changePage(-1)" style="padding:6px 12px; font-size:0.8rem;">&larr; Prev</button>
+            <span id="page-info" class="page-info">Page 1</span>
+            <button class="btn" onclick="changePage(1)" style="padding:6px 12px; font-size:0.8rem;">Next &rarr;</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-<script>
-  const API_URL = "https://dental-bot-api.onrender.com";
-  let currentLeads = [];
-
-  // --- STATE MANAGEMENT ---
-  const loginView = document.getElementById('login-view');
-  const dashView = document.getElementById('dashboard-view');
-  const loginForm = document.getElementById('login-form');
-  const logoutBtn = document.getElementById('logout-btn');
-
-  function checkAuth() {
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    if (clinicId) {
-      showDashboard(clinicId);
-    } else {
-      showLogin();
-    }
-  }
-
-  function showLogin() {
-    loginView.classList.remove('hidden');
-    dashView.classList.add('hidden');
-  }
-
-  function showDashboard(clinicId) {
-    loginView.classList.add('hidden');
-    dashView.classList.remove('hidden');
-    document.getElementById('nav-clinic-name').textContent = clinicId;
-    fetchLeads(clinicId);
-    loadSettings(clinicId);
-  }
-
-  // --- LOGIC ---
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const clinicId = document.getElementById('clinic-id').value;
-    const apiKey = document.getElementById('api-key').value;
-    
-    // In a real app, verify credentials with API here.
-    // For now, we just save locally and proceed.
-    localStorage.setItem('dbot_dash_clinic', clinicId);
-    localStorage.setItem('dbot_dash_key', apiKey);
-    showDashboard(clinicId);
-  });
-
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('dbot_dash_clinic');
-    localStorage.removeItem('dbot_dash_key');
-    showLogin();
-  });
-
-  async function fetchLeads(clinicId) {
-    const tbody = document.querySelector('#leads-table tbody');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Loading leads...</td></tr>';
-
-    try {
-      // Attempt to fetch from API (Assuming an endpoint exists)
-      // If this fails, we fall back to DEMO data so you can see the UI.
-      const key = localStorage.getItem('dbot_dash_key');
-      const res = await fetch(`${API_URL}/admin/leads?clinic_id=${clinicId}`, {
-        headers: { 'Authorization': key }
-      });
-      
-      if (!res.ok) throw new Error("API not ready");
-      const data = await res.json();
-      currentLeads = data;
-      renderLeads(data);
-
-    } catch (e) {
-      console.warn("Using demo data:", e);
-      // DEMO DATA FALLBACK
-      const demoData = [
-        { name: "Sarah Connor", phone: "555-0199", email: "sarah@example.com", message: "Need to reschedule my cleaning.", source: "Mobile", date: new Date().toISOString(), status: "new" },
-        { name: "Kyle Reese", phone: "555-0123", email: "kyle@future.com", message: "Emergency tooth ache.", source: "Desktop", date: new Date(Date.now() - 86400000).toISOString(), status: "contacted" },
-        { name: "John Doe", phone: "555-0100", email: "john@doe.com", message: "Do you accept Delta Dental?", source: "Mobile", date: new Date(Date.now() - 172800000).toISOString(), status: "contacted" },
-      ];
-      currentLeads = demoData;
-      renderLeads(demoData);
-    }
-  }
-
-  function renderLeads(leads) {
-    const tbody = document.querySelector('#leads-table tbody');
-    tbody.innerHTML = '';
-    
-    document.getElementById('stat-total').textContent = leads.length;
-    document.getElementById('stat-week').textContent = leads.filter(l => new Date(l.date) > new Date(Date.now() - 604800000)).length;
-    
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const valuesStore = JSON.parse(localStorage.getItem(`dbot_values_${clinicId}`) || '{}');
-    const totalRevenue = leads.reduce((sum, lead) => {
-      const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
-      const valStr = valuesStore[uniqueId] || '0';
-      const val = parseFloat(valStr.replace(/[^0-9.]/g, '')) || 0;
-      return sum + val;
-    }, 0);
-    document.getElementById('stat-revenue').textContent = '$' + totalRevenue.toLocaleString();
-
-    // --- CHART LOGIC ---
-    const sources = {};
-    leads.forEach(l => {
-      const s = l.source || 'Unknown';
-      sources[s] = (sources[s] || 0) + 1;
-    });
-    
-    const total = leads.length;
-    let gradientStr = [];
-    let currentDeg = 0;
-    const colors = ['#0d9488', '#3b82f6', '#f59e0b', '#ec4899', '#64748b']; // Teal, Blue, Amber, Pink, Slate
-    let colorIdx = 0;
-    const legendHtml = [];
-
-    Object.entries(sources).forEach(([source, count]) => {
-      const percent = count / total;
-      const deg = percent * 360;
-      const color = colors[colorIdx % colors.length];
-      
-      gradientStr.push(`${color} ${currentDeg}deg ${currentDeg + deg}deg`);
-      legendHtml.push(`
-        <div class="legend-item">
-          <div class="legend-color" style="background:${color}"></div>
-          <span>${source} (${Math.round(percent * 100)}%)</span>
+  
+  <!-- Chat Viewer Modal -->
+  <div id="chat-overlay" class="chat-overlay hidden" onclick="if(event.target===this) closeChat()">
+    <div class="chat-modal">
+      <div class="chat-header" onclick="if(document.getElementById('chat-overlay').classList.contains('minimized')) toggleMinimizeChat()">
+        <span id="chat-session-id">Session Details</span>
+        <div>
+          <button class="minimize-btn" onclick="event.stopPropagation(); toggleMinimizeChat()" title="Minimize">−</button>
+          <button class="close-btn" onclick="closeChat()" title="Close">&times;</button>
         </div>
-      `);
+      </div>
+      <div id="chat-body" class="chat-body"></div>
+    </div>
+  </div>
+
+  <!-- Test Chat Modal -->
+  <div id="test-chat-overlay" class="chat-overlay hidden">
+    <div class="chat-modal">
+      <div class="chat-header">
+        <span id="test-chat-title">Test Agent</span>
+        <button class="close-btn" onclick="closeTestChat()">&times;</button>
+      </div>
+      <div id="test-chat-body" class="chat-body"></div>
+      <div style="padding:16px; border-top:1px solid #e2e8f0; display:flex; gap:10px;">
+        <input type="text" id="test-chat-input" placeholder="Type a message..." style="flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px; outline:none;" onkeydown="if(event.key==='Enter') sendTestMessage()">
+        <button class="btn" onclick="sendTestMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://dental-bot-api.onrender.com";
+    let currentKey = "";
+    let liveVisitorInterval = null;
+    let testSessionId = "";
+    let notificationsEnabled = false;
+    let leadPollInterval = null;
+    let lastLeadCount = -1;
+    let sourceChartInstance = null;
+    let activeChatSession = null;
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    window.currentLeads = [];
+    window.currentSessions = {}; // Global store for sessions
+
+    // Init Dark Mode
+    if (localStorage.getItem('dashboard_theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('dashboard_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+
+    function toggleNotifications() {
+      notificationsEnabled = !notificationsEnabled;
+      const btn = document.getElementById('notify-btn');
+      btn.textContent = notificationsEnabled ? "🔔 Notifications: On" : "🔕 Notifications: Off";
+      btn.style.borderColor = notificationsEnabled ? "#0d9488" : "currentColor";
+      btn.style.color = notificationsEnabled ? "#0d9488" : "inherit";
       
-      currentDeg += deg;
-      colorIdx++;
-    });
-
-    const chartEl = document.getElementById('source-chart');
-    if (total > 0) {
-      chartEl.style.background = `conic-gradient(${gradientStr.join(', ')})`;
-    } else {
-      chartEl.style.background = '#e2e8f0';
-    }
-    document.getElementById('source-legend').innerHTML = legendHtml.join('');
-
-    const notesStore = JSON.parse(localStorage.getItem(`dbot_notes_${clinicId}`) || '{}');
-
-    leads.forEach((lead) => {
-      const tr = document.createElement('tr');
-      const dateStr = new Date(lead.date).toLocaleDateString() + ' ' + new Date(lead.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      const originalIndex = currentLeads.indexOf(lead);
-      const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
-      const noteVal = notesStore[uniqueId] || '';
-      const valueVal = valuesStore[uniqueId] || '';
-      
-      // Dynamic style for select based on status
-      const statusBg = lead.status === 'new' ? '#dcfce7' : (lead.status === 'contacted' ? '#f1f5f9' : '#fff7ed');
-      const statusColor = lead.status === 'new' ? '#166534' : (lead.status === 'contacted' ? '#475569' : '#9a3412');
-
-      tr.innerHTML = `
-        <td>
-          <select onchange="updateStatus(${originalIndex}, this.value)" style="background:${statusBg}; color:${statusColor}; border:1px solid transparent; border-radius:4px; padding:4px 8px; font-size:0.75rem; font-weight:600; cursor:pointer; outline:none;">
-            <option value="new" ${lead.status === 'new' ? 'selected' : ''}>New Lead</option>
-            <option value="contacted" ${lead.status === 'contacted' ? 'selected' : ''}>Contacted</option>
-            <option value="booked" ${lead.status === 'booked' ? 'selected' : ''}>Booked</option>
-            <option value="lost" ${lead.status === 'lost' ? 'selected' : ''}>Lost</option>
-          </select>
-        </td>
-        <td><strong>${lead.name || 'Anonymous'}</strong></td>
-        <td>
-          <div>${lead.phone || '-'}</div>
-          <div style="font-size:0.8em; color:#94a3b8">${lead.email || ''}</div>
-        </td>
-        <td style="max-width: 300px;">${lead.message || '-'}</td>
-        <td><span class="badge" style="background:#f8fafc; border:1px solid #e2e8f0; color:#64748b; font-weight:500;">${lead.source || 'Web'}</span></td>
-        <td>
-          <input type="text" class="input-field" style="width:80px; font-size:0.85rem; padding:6px;" placeholder="$" value="${valueVal}" onchange="saveLeadValue(${originalIndex}, this.value)">
-        </td>
-        <td>
-          <textarea class="input-field" style="min-height:60px; font-size:0.85rem; padding:6px; width:100%; min-width:150px;" placeholder="Add note..." onchange="saveLeadNote(${originalIndex}, this.value)">${noteVal}</textarea>
-        </td>
-        <td style="white-space:nowrap; color:#94a3b8">${dateStr}</td>
-        <td>
-          <button class="btn btn-outline" onclick="deleteLead(${originalIndex})" style="padding:4px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444;" title="Delete">🗑️</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function applyFilters() {
-    const term = document.getElementById('search-input').value.toLowerCase();
-    const startVal = document.getElementById('date-start').value;
-    const endVal = document.getElementById('date-end').value;
-    
-    const startDate = startVal ? new Date(startVal) : null;
-    const endDate = endVal ? new Date(endVal) : null;
-    if (endDate) endDate.setHours(23, 59, 59, 999); // Include the full end day
-
-    const filtered = currentLeads.filter(l => {
-      const d = new Date(l.date);
-      const matchesTerm = !term || (l.name && l.name.toLowerCase().includes(term)) || (l.email && l.email.toLowerCase().includes(term));
-      const matchesStart = !startDate || d >= startDate;
-      const matchesEnd = !endDate || d <= endDate;
-      return matchesTerm && matchesStart && matchesEnd;
-    });
-    renderLeads(filtered);
-  }
-
-  window.updateStatus = function(index, newStatus) {
-    if (currentLeads[index]) {
-      currentLeads[index].status = newStatus;
-      applyFilters();
-    }
-  };
-
-  window.deleteLead = function(index) {
-    if (confirm('Are you sure you want to delete this lead?')) {
-      currentLeads.splice(index, 1);
-      applyFilters();
-    }
-  };
-
-  window.saveLeadNote = function(index, value) {
-    const lead = currentLeads[index];
-    if (!lead) return;
-    const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const storeKey = `dbot_notes_${clinicId}`;
-    const notes = JSON.parse(localStorage.getItem(storeKey) || '{}');
-    notes[uniqueId] = value;
-    localStorage.setItem(storeKey, JSON.stringify(notes));
-  };
-
-  window.saveLeadValue = function(index, value) {
-    const lead = currentLeads[index];
-    if (!lead) return;
-    const uniqueId = lead.id || (lead.date + (lead.email||'') + (lead.phone||''));
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const storeKey = `dbot_values_${clinicId}`;
-    const values = JSON.parse(localStorage.getItem(storeKey) || '{}');
-    values[uniqueId] = value;
-    localStorage.setItem(storeKey, JSON.stringify(values));
-    applyFilters();
-  };
-
-  // --- TABS & SETTINGS ---
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab = btn.dataset.tab;
-      document.getElementById('view-leads').classList.toggle('hidden', tab !== 'leads');
-      document.getElementById('view-settings').classList.toggle('hidden', tab !== 'settings');
-    });
-  });
-
-  function loadSettings(clinicId) {
-    try {
-      const raw = localStorage.getItem(`dbot_settings_${clinicId}`);
-      if (raw) {
-        const data = JSON.parse(raw);
-        document.getElementById('hours-weekdays').value = data.weekdays || '';
-        document.getElementById('hours-weekends').value = data.weekends || '';
+      if (notificationsEnabled) {
+        // Request permission if needed (though usually needs user gesture which this click is)
+        if (leadPollInterval) clearInterval(leadPollInterval);
+        leadPollInterval = setInterval(() => loadLeads(true), 10000); // Poll every 10s
+        loadLeads(true); // Immediate check
+      } else {
+        if (leadPollInterval) clearInterval(leadPollInterval);
+        leadPollInterval = null;
       }
-    } catch(e) {}
-  }
+    }
 
-  document.getElementById('settings-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const data = {
-      weekdays: document.getElementById('hours-weekdays').value,
-      weekends: document.getElementById('hours-weekends').value
-    };
-    localStorage.setItem(`dbot_settings_${clinicId}`, JSON.stringify(data));
-    const btn = e.target.querySelector('button');
-    const orig = btn.textContent;
-    btn.textContent = 'Saved! ✅';
-    setTimeout(() => btn.textContent = orig, 2000);
-  });
+    function playNotificationSound() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    }
 
-  document.getElementById('export-btn').addEventListener('click', () => {
-    if (!currentLeads.length) return;
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    const valuesStore = JSON.parse(localStorage.getItem(`dbot_values_${clinicId}`) || '{}');
-    const headers = ["Status", "Name", "Phone", "Email", "Message", "Source", "Value", "Date"];
-    const rows = currentLeads.map(l => {
-      const uniqueId = l.id || (l.date + (l.email||'') + (l.phone||''));
-      return [
-        l.status,
-        `"${(l.name || '').replace(/"/g, '""')}"`,
-        l.phone || '',
-        l.email || '',
-        `"${(l.message || '').replace(/"/g, '""')}"`,
-        l.source || 'Web',
-        valuesStore[uniqueId] || '',
-        l.date
-      ];
-    });
-    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `leads_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
+    function login() {
+      const key = document.getElementById('access-key').value;
+      if(key) {
+        currentKey = key;
+        document.getElementById('login-panel').classList.add('hidden');
+        document.getElementById('dashboard-panel').classList.remove('hidden');
+        refreshData();
+        if (liveVisitorInterval) clearInterval(liveVisitorInterval);
+        liveVisitorInterval = setInterval(fetchLiveVisitors, 5000); // Poll every 5 seconds
+        fetchLiveVisitors(); // Initial call
+        setInterval(checkTypingStatus, 2000); // Poll typing status
+      }
+    }
 
-  document.getElementById('search-input').addEventListener('input', applyFilters);
-  document.getElementById('date-start').addEventListener('change', applyFilters);
-  document.getElementById('date-end').addEventListener('change', applyFilters);
+    function refreshData() {
+      loadPrompt();
+      loadHistory();
+      if (!document.getElementById('tab-leads').classList.contains('hidden')) {
+        loadLeads();
+      }
+    }
 
-  document.getElementById('print-btn').addEventListener('click', () => window.print());
+    async function fetchLiveVisitors() {
+        const counter = document.getElementById('live-visitors-count');
+        if (!counter) return;
+        try {
+            const res = await fetch(`${API_URL}/admin/live_visitors?key=${currentKey}`);
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            counter.textContent = data.live_visitors || 0;
+        } catch (e) {
+            counter.textContent = '–'; // Indicate error
+        }
+    }
 
-  document.getElementById('refresh-btn').addEventListener('click', () => {
-    const clinicId = localStorage.getItem('dbot_dash_clinic');
-    if (clinicId) fetchLeads(clinicId);
-  });
+    async function checkTypingStatus() {
+        const clinicId = document.getElementById('agent-select').value;
+        try {
+            const res = await fetch(`${API_URL}/admin/typing_status/${clinicId}?key=${currentKey}`);
+            if (!res.ok) return;
+            const data = await res.json();
+            const typingSessions = data.typing_sessions || [];
+            
+            // Update active chat if open
+            const indicator = document.getElementById('typing-indicator');
+            if (activeChatSession && indicator) {
+                indicator.textContent = typingSessions.includes(activeChatSession) ? "User is typing..." : "";
+            }
+        } catch(e) {}
+    }
 
-  // Init
-  checkAuth();
-</script>
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
+      if(tabName === 'leads') loadLeads();
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderLeads();
+    }
+
+    function renderLeads() {
+      const container = document.getElementById('leads-list');
+      const filterUnread = document.getElementById('filter-unread').checked;
+      const searchTerm = document.getElementById('leads-search') ? document.getElementById('leads-search').value.toLowerCase() : '';
+      const startDate = document.getElementById('date-start').value;
+      const endDate = document.getElementById('date-end').value;
+
+      let displayLeads = window.currentLeads || [];
+      
+      if (filterUnread) {
+        displayLeads = displayLeads.filter(l => (!l.status || l.status === 'New'));
+      }
+
+      if (searchTerm) {
+        displayLeads = displayLeads.filter(l => 
+            (l.name && l.name.toLowerCase().includes(searchTerm)) || 
+            (l.email && l.email.toLowerCase().includes(searchTerm)) ||
+            (l.phone && l.phone.toLowerCase().includes(searchTerm)) ||
+            (l.message && l.message.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      if (startDate) {
+        displayLeads = displayLeads.filter(l => l.timestamp >= startDate);
+      }
+      if (endDate) {
+        // Add 1 day to include the end date fully
+        const end = new Date(endDate);
+        end.setDate(end.getDate() + 1);
+        displayLeads = displayLeads.filter(l => new Date(l.timestamp) < end);
+      }
+      
+      if(displayLeads.length === 0) {
+        container.innerHTML = "<div style='color:#94a3b8;text-align:center;padding:20px;'>No leads found.</div>";
+        return;
+      }
+
+      let html = `<table class="leads-table">
+        <thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Message</th><th>Notes</th><th>Source</th><th>Status</th><th></th></tr></thead>
+        <tbody>`;
+      
+      // Pagination Logic
+      const totalPages = Math.ceil(displayLeads.length / itemsPerPage);
+      if (currentPage < 1) currentPage = 1;
+      if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+      
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const paginatedLeads = displayLeads.slice(startIdx, startIdx + itemsPerPage);
+
+      const pagDiv = document.getElementById('leads-pagination');
+      if (totalPages > 1) {
+        pagDiv.classList.remove('hidden');
+        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+      } else {
+        pagDiv.classList.add('hidden');
+      }
+
+      paginatedLeads.forEach(l => {
+          const date = new Date(l.timestamp).toLocaleString();
+          const rowClass = (l.status === 'Closed') ? 'class="read-row"' : '';
+          
+          html += `<tr ${rowClass}>
+            <td>${date}</td>
+            <td>${l.name || '-'}</td>
+            <td>${l.phone || ''}<br>
+              <div style="display:flex;align-items:center;gap:6px">${l.email || ''} ${l.email ? `<button class="copy-btn" onclick="copyToClipboard('${l.email}')" title="Copy Email">📋</button>` : ''}</div>
+            </td>
+            <td>${l.message || '-'}</td>
+            <td style="min-width:200px"><textarea class="note-input" placeholder="Internal notes..." onblur="saveLeadNote('${l.id}', this.value)">${l.note || ''}</textarea></td>
+            <td><span class="lead-source">${l.source || 'Widget'}</span></td>
+            <td>
+              <select class="status-select" onchange="updateLeadStatus('${l.id}', this.value)">
+                <option value="New" ${(!l.status || l.status === 'New') ? 'selected' : ''}>New</option>
+                <option value="Contacted" ${l.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                <option value="Closed" ${l.status === 'Closed' ? 'selected' : ''}>Closed</option>
+              </select>
+            </td>
+            <td style="text-align:right; white-space:nowrap;">
+               <button class="delete-btn" onclick="deleteLead('${l.id}')" title="Delete">🗑️</button>
+            </td>
+          </tr>`;
+      });
+      html += "</tbody></table>";
+      container.innerHTML = html;
+    }
+
+    async function loadLeads(silent = false) {
+      const clinicId = document.getElementById('agent-select').value;
+      const container = document.getElementById('leads-list');
+      if (!silent) container.innerHTML = "<div style='color:#64748b;text-align:center;padding:20px;'>Loading...</div>";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/leads/${clinicId}?key=${currentKey}`);
+        if(!res.ok) throw new Error("Error");
+        const leads = await res.json();
+        window.currentLeads = leads;
+        currentPage = 1; // Reset to first page on reload
+        
+        // Update Stats & Chart
+        updateLeadStats(leads);
+
+        // Notifications
+        if (notificationsEnabled && leads.length > lastLeadCount && lastLeadCount !== -1) {
+            playNotificationSound();
+        }
+        lastLeadCount = leads.length;
+        
+        renderLeads();
+      } catch(e) {
+        container.innerHTML = "<div style='color:red;text-align:center;padding:20px;'>Error loading leads.</div>";
+      }
+    }
+
+    async function saveLeadNote(leadId, note) {
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        await fetch(`${API_URL}/admin/leads/${clinicId}/${leadId}/note?key=${currentKey}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: note })
+        });
+      } catch(e) {
+        console.error("Failed to save note", e);
+      }
+    }
+
+    function updateLeadStats(leads) {
+        document.getElementById('total-leads-display').textContent = leads.length;
+        
+        const mobileCount = leads.filter(l => (l.source || '').toLowerCase().includes('mobile')).length;
+        const desktopCount = leads.length - mobileCount;
+
+        const ctx = document.getElementById('sourceChart').getContext('2d');
+        
+        if (sourceChartInstance) {
+            sourceChartInstance.data.datasets[0].data = [mobileCount, desktopCount];
+            sourceChartInstance.update();
+        } else {
+            sourceChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Mobile', 'Desktop'],
+                    datasets: [{
+                        data: [mobileCount, desktopCount],
+                        backgroundColor: ['#0d9488', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+        }
+    }
+
+    async function updateLeadStatus(leadId, newStatus) {
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        await fetch(`${API_URL}/admin/leads/${clinicId}/${leadId}/status?key=${currentKey}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        
+        // Update local state and re-render to reflect changes (e.g. row styling)
+        const lead = window.currentLeads.find(l => l.id === leadId);
+        if (lead) {
+            lead.status = newStatus;
+            renderLeads();
+        }
+      } catch(e) {
+        console.error("Failed to update status", e);
+      }
+    }
+
+    function exportLeadsCSV() {
+      if (!window.currentLeads || window.currentLeads.length === 0) {
+        alert("No leads to export.");
+        return;
+      }
+      let csv = "Date,Name,Phone,Email,Message,Status,Notes,Source\n";
+      window.currentLeads.forEach(l => {
+        const cleanMsg = (l.message || "").replace(/"/g, '""').replace(/\n/g, ' ');
+        const cleanNote = (l.note || "").replace(/"/g, '""').replace(/\n/g, ' ');
+        csv += `"${l.timestamp}","${l.name||''}","${l.phone||''}","${l.email||''}","${cleanMsg}","${l.status||'New'}","${cleanNote}","${l.source||''}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `leads_export_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+    }
+
+    async function deleteLead(leadId) {
+      if(!confirm("Delete this lead permanently?")) return;
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        const res = await fetch(`${API_URL}/admin/leads/${clinicId}/${leadId}?key=${currentKey}`, { method: 'DELETE' });
+        if(res.ok) loadLeads();
+        else alert("Failed to delete lead.");
+      } catch(e) {
+        alert("Error connecting to server.");
+      }
+    }
+
+    async function loadPrompt() {
+      const clinicId = document.getElementById('agent-select').value;
+      const status = document.getElementById('status');
+      const editor = document.getElementById('prompt-editor');
+      
+      status.textContent = "Loading...";
+      status.style.color = "#64748b";
+      editor.disabled = true;
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/prompt/${clinicId}?key=${currentKey}`);
+        if(!res.ok) throw new Error("Unauthorized or Error");
+        const data = await res.json();
+        editor.value = data.prompt;
+        editor.disabled = false;
+        status.textContent = "";
+      } catch(e) {
+        status.textContent = "Error loading prompt. Check your key.";
+        status.style.color = "red";
+      }
+    }
+
+    async function savePrompt() {
+      const clinicId = document.getElementById('agent-select').value;
+      const prompt = document.getElementById('prompt-editor').value;
+      const status = document.getElementById('status');
+      status.textContent = "Saving...";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/prompt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clinic_id: clinicId, prompt: prompt, secret_key: currentKey })
+        });
+        
+        if(!res.ok) throw new Error("Failed to save");
+        status.textContent = "Saved successfully! ✅";
+        status.style.color = "#0d9488";
+        setTimeout(() => status.textContent = "", 3000);
+      } catch(e) {
+        status.textContent = "Error saving prompt.";
+        status.style.color = "red";
+      }
+    }
+
+    async function resetPrompt() {
+      if(!confirm("Are you sure you want to reset this agent to its default personality?")) return;
+      const clinicId = document.getElementById('agent-select').value;
+      const status = document.getElementById('status');
+      const editor = document.getElementById('prompt-editor');
+      
+      status.textContent = "Resetting...";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/prompt/reset`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clinic_id: clinicId, prompt: "", secret_key: currentKey })
+        });
+        
+        if(!res.ok) throw new Error("Failed");
+        const data = await res.json();
+        editor.value = data.prompt;
+        status.textContent = "Reset to default! ✅";
+        setTimeout(() => status.textContent = "", 3000);
+      } catch(e) {
+        status.textContent = "Error resetting.";
+        status.style.color = "red";
+      }
+    }
+
+    function renderHistory(sessions, filter = '') {
+      const container = document.getElementById('history-list');
+      container.innerHTML = "";
+      const lowerCaseFilter = filter.toLowerCase().trim();
+
+      let sessionIds = Object.keys(sessions);
+
+      if (lowerCaseFilter) {
+          sessionIds = sessionIds.filter(sid => 
+              sessions[sid].messages.some(msg => 
+                  msg.content.toLowerCase().includes(lowerCaseFilter)
+              )
+          );
+      }
+      
+      if (sessionIds.length === 0) {
+          container.innerHTML = `<div style='color:#94a3b8;text-align:center'>${filter ? 'No matching conversations.' : 'No conversations yet.'}</div>`;
+          return;
+      }
+
+      sessionIds.sort((a, b) => {
+         const msgsA = sessions[a].messages;
+         const msgsB = sessions[b].messages;
+         const lastA = msgsA[msgsA.length-1]?.timestamp || "";
+         const lastB = msgsB[msgsB.length-1]?.timestamp || "";
+         return lastB.localeCompare(lastA);
+      });
+
+      sessionIds.forEach(sid => {
+         const data = sessions[sid];
+         const msgs = data.messages;
+         const lastMsg = msgs[msgs.length-1];
+         const time = new Date(lastMsg.timestamp).toLocaleString();
+         
+         const tagsHtml = (data.tags || []).map(t => 
+           `<span class="tag">${t} <span class="tag-remove" onclick="event.stopPropagation(); removeTag('${sid}', '${t}')">&times;</span></span>`
+         ).join('');
+         
+         const div = document.createElement('div');
+         div.className = 'session-item';
+         div.innerHTML = `
+           <div class="session-header-row">
+             <div class="session-time">${time} <span class="sentiment-badge ${data.sentiment}">${data.sentiment}</span></div>
+             <div>
+                <button class="delete-btn" onclick="event.stopPropagation(); blockIP('${data.ip}')" title="Block IP: ${data.ip}">🚫</button>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteSession('${sid}')" title="Delete">🗑️</button>
+             </div>
+           </div>
+           <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;">
+             ${tagsHtml} 
+             <button class="add-tag-btn" onclick="event.stopPropagation(); addTag('${sid}')">+ Tag</button>
+           </div>
+           <div class="session-preview">${msgs.length} msgs • ${lastMsg.content}</div>`;
+         div.onclick = () => openChat(sid, msgs);
+         container.appendChild(div);
+      });
+    }
+
+    async function addTag(sid) {
+      const tag = prompt("Enter tag name (e.g. Sale, Support):");
+      if (!tag) return;
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        await fetch(`${API_URL}/admin/history/${clinicId}/${sid}/tags`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tag: tag, secret_key: currentKey })
+        });
+        loadHistory();
+      } catch(e) { alert("Error adding tag"); }
+    }
+
+    async function removeTag(sid, tag) {
+      if(!confirm(`Remove tag "${tag}"?`)) return;
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        await fetch(`${API_URL}/admin/history/${clinicId}/${sid}/tags/${tag}?key=${currentKey}`, {
+          method: 'DELETE'
+        });
+        loadHistory();
+      } catch(e) { alert("Error removing tag"); }
+    }
+
+    async function blockIP(ip) {
+      if (!ip || ip === 'Unknown') {
+        alert("Cannot block unknown IP");
+        return;
+      }
+      if (!confirm(`Are you sure you want to block IP: ${ip}? This will prevent them from chatting.`)) return;
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/block_ip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip: ip, secret_key: currentKey })
+        });
+        if (res.ok) {
+          alert(`IP ${ip} blocked successfully.`);
+        } else {
+          alert("Failed to block IP.");
+        }
+      } catch (e) {
+        alert("Error connecting to server.");
+      }
+    }
+
+    async function loadHistory() {
+      const clinicId = document.getElementById('agent-select').value;
+      const container = document.getElementById('history-list');
+      container.innerHTML = "<div style='color:#94a3b8;text-align:center'>Loading...</div>";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/history/${clinicId}?key=${currentKey}`);
+        if(!res.ok) throw new Error("Error");
+        const sessions = await res.json();
+        window.currentSessions = sessions;
+        
+        const currentFilter = document.getElementById('history-search').value || '';
+        renderHistory(sessions, currentFilter);
+        
+      } catch(e) {
+        container.innerHTML = "<div style='color:red;text-align:center'>Failed to load history.</div>";
+      }
+    }
+
+    function handleSearch() {
+      const filter = document.getElementById('history-search').value;
+      renderHistory(window.currentSessions, filter);
+    }
+
+    async function deleteSession(sid) {
+      if(!confirm("Are you sure you want to delete this conversation?")) return;
+      const clinicId = document.getElementById('agent-select').value;
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/history/${clinicId}/${sid}?key=${currentKey}`, { method: 'DELETE' });
+        if(res.ok) {
+          delete window.currentSessions[sid]; // Remove from local copy
+          handleSearch(); // Re-render the list with the current filter
+        } else {
+          alert("Failed to delete session.");
+        }
+      } catch(e) {
+        alert("Error connecting to server.");
+      }
+    }
+
+    function downloadCSV() {
+      if (!window.currentSessions || Object.keys(window.currentSessions).length === 0) {
+        alert("No history to export.");
+        return;
+      }
+      let csv = "Session ID,Timestamp,Role,Message\n";
+      Object.entries(window.currentSessions).forEach(([sid, data]) => {
+        const msgs = data.messages;
+        msgs.forEach(m => {
+          const cleanContent = m.content.replace(/"/g, '""').replace(/\n/g, ' ');
+          csv += `"${sid}","${m.timestamp}","${m.role}","${cleanContent}"\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `chat_history_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function openChat(sid, msgs) {
+      activeChatSession = sid;
+      document.getElementById('chat-overlay').classList.remove('hidden');
+      document.getElementById('chat-overlay').classList.remove('minimized');
+      document.getElementById('chat-session-id').textContent = `Session: ${sid.substring(0,8)}...`;
+      const body = document.getElementById('chat-body');
+      body.innerHTML = "";
+      
+      // Inject Footer if not exists
+      let footer = document.querySelector('.chat-modal .chat-footer');
+      if (!footer) {
+          footer = document.createElement('div');
+          footer.className = 'chat-footer';
+          footer.innerHTML = `
+            <div id="typing-indicator" style="font-size:0.8rem;color:#0d9488;height:20px;font-weight:600;margin-bottom:4px;"></div>
+            <div class="quick-replies">
+               <button class="qr-btn" onclick="sendReply('Hello! How can I help you today?')">👋 Hello</button>
+               <button class="qr-btn" onclick="sendReply('Could you please provide your email?')">📧 Ask Email</button>
+               <button class="qr-btn" onclick="sendReply('We are open Mon-Fri, 9am-5pm.')">🕒 Hours</button>
+               <button class="qr-btn" onclick="sendReply('One moment, let me check that.')">✋ Hold on</button>
+            </div>
+            <div class="chat-input-row">
+               <input type="text" id="admin-reply-input" placeholder="Type a reply..." style="flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px; outline:none;" onkeydown="if(event.key==='Enter') sendAdminReply()">
+               <button class="btn" onclick="sendAdminReply()">Send</button>
+            </div>`;
+          document.querySelector('.chat-modal').appendChild(footer);
+      }
+
+      msgs.forEach(m => {
+        const d = document.createElement('div');
+        d.className = `msg ${m.role}`;
+        d.textContent = m.content;
+        body.appendChild(d);
+      });
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function closeChat() {
+      activeChatSession = null;
+      document.getElementById('chat-overlay').classList.add('hidden');
+    }
+
+    function toggleMinimizeChat() {
+      const overlay = document.getElementById('chat-overlay');
+      overlay.classList.toggle('minimized');
+      const btn = overlay.querySelector('.minimize-btn');
+      btn.textContent = overlay.classList.contains('minimized') ? '□' : '−';
+    }
+
+    function sendReply(text) {
+        document.getElementById('admin-reply-input').value = text;
+        sendAdminReply();
+    }
+
+    async function sendAdminReply() {
+        const input = document.getElementById('admin-reply-input');
+        const text = input.value.trim();
+        if (!text || !activeChatSession) return;
+        
+        const clinicId = document.getElementById('agent-select').value;
+        
+        // Optimistic UI update
+        const body = document.getElementById('chat-body');
+        const d = document.createElement('div');
+        d.className = 'msg assistant';
+        d.textContent = text;
+        body.appendChild(d);
+        body.scrollTop = body.scrollHeight;
+        input.value = "";
+
+        try {
+            await fetch(`${API_URL}/admin/message`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clinic_id: clinicId,
+                    session_id: activeChatSession,
+                    message: text,
+                    secret_key: currentKey
+                })
+            });
+            // Refresh history to sync state
+            loadHistory(); 
+        } catch(e) {
+            alert("Failed to send message");
+        }
+    }
+
+    function openTestChat() {
+      const clinicId = document.getElementById('agent-select').value;
+      document.getElementById('test-chat-overlay').classList.remove('hidden');
+      document.getElementById('test-chat-title').textContent = `Testing: ${clinicId}`;
+      const body = document.getElementById('test-chat-body');
+      body.innerHTML = '<div style="color:#94a3b8;text-align:center;margin-top:20px;font-size:0.9rem">Start chatting to test the current agent settings.<br>(Note: Save changes before testing)</div>';
+      testSessionId = `test-${Date.now()}`;
+      setTimeout(() => document.getElementById('test-chat-input').focus(), 100);
+    }
+
+    function closeTestChat() {
+      document.getElementById('test-chat-overlay').classList.add('hidden');
+    }
+
+    async function sendTestMessage() {
+      const input = document.getElementById('test-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      const clinicId = document.getElementById('agent-select').value;
+      const body = document.getElementById('test-chat-body');
+      
+      // Remove welcome/empty message if present
+      if (body.firstChild && body.firstChild.style.textAlign === 'center') body.innerHTML = "";
+
+      const uDiv = document.createElement('div');
+      uDiv.className = 'msg user';
+      uDiv.textContent = text;
+      body.appendChild(uDiv);
+      input.value = "";
+      body.scrollTop = body.scrollHeight;
+
+      const lDiv = document.createElement('div');
+      lDiv.className = 'msg assistant';
+      lDiv.textContent = "...";
+      body.appendChild(lDiv);
+      body.scrollTop = body.scrollHeight;
+
+      try {
+        const res = await fetch(`${API_URL}/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            clinic_id: clinicId,
+            message: text,
+            session_id: testSessionId
+          })
+        });
+        
+        const data = await res.json();
+        lDiv.textContent = data.reply || "Error: No reply";
+      } catch (e) {
+        lDiv.textContent = "Error connecting to bot.";
+        lDiv.style.backgroundColor = "#ef4444";
+        lDiv.style.color = "white";
+      }
+      body.scrollTop = body.scrollHeight;
+    }
+  </script>
 </body>
 </html>
