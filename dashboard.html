@@ -243,13 +243,6 @@
   </div>
   
   <!-- Chat Viewer Modal -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Chat Viewer Modal -->
   <div id="chat-overlay" class="chat-overlay hidden" onclick="if(event.target===this) closeChat()">
     <div class="chat-modal">
       <div class="chat-header" onclick="if(document.getElementById('chat-overlay').classList.contains('minimized')) toggleMinimizeChat()">
@@ -264,7 +257,7 @@
   </div>
 
   <!-- Test Chat Modal -->
-  <div id="test-chat-overlay" class="chat-overlay hidden">
+  <div id="test-chat-overlay" class="chat-overlay hidden" onclick="if(event.target===this) closeTestChat()">
     <div class="chat-modal">
       <div class="chat-header">
         <span id="test-chat-title">Test Agent</span>
@@ -1067,6 +1060,14 @@
             session_id: testSessionId
           })
         });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            lDiv.textContent = `Error ${res.status}: ${errData.detail || "Unknown error"}`;
+            lDiv.style.backgroundColor = "#ef4444";
+            lDiv.style.color = "white";
+            return;
+        }
         
         const data = await res.json();
         lDiv.textContent = data.reply || "Error: No reply";
