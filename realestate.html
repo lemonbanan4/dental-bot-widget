@@ -43,6 +43,17 @@
     .modal-card { background: white; width: 90%; max-width: 500px; padding: 40px; border-radius: 24px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
     .modal-overlay.open .modal-card { transform: translateY(0); }
     .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
+
+    /* Carousel Styles */
+    .carousel-container { overflow-x: auto; padding: 20px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .carousel-track { display: flex; gap: 24px; padding: 0 20px; width: max-content; }
+    .carousel-card { scroll-snap-align: center; background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; width: 320px; flex-shrink: 0; transition: transform 0.2s; }
+    .carousel-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+    .cs-image { height: 200px; background-size: cover; background-position: center; background-color: #e2e8f0; }
+    .cs-content { padding: 24px; }
+    .cs-content h3 { margin: 0 0 12px; font-size: 1.1rem; color: #0f172a; }
+    .cs-content p { margin: 0 0 16px; color: #64748b; font-style: italic; font-size: 0.95rem; line-height: 1.5; }
+    .cs-author { font-weight: 600; color: #3b82f6; font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -112,6 +123,44 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- CASE STUDIES CAROUSEL -->
+    <div style="margin: 100px 0; background: #f8fafc;">
+      <div class="container">
+        <h2 style="text-align: center; font-size: 2rem; margin-bottom: 40px; color: #0f172a;">Success Stories</h2>
+        <div class="carousel-container">
+          <div class="carousel-track">
+            <!-- Case Study 1 -->
+            <div class="carousel-card">
+              <div class="cs-image" style="background-image: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80');"></div>
+              <div class="cs-content">
+                <h3>Sold in 4 Days</h3>
+                <p>"The AI agent qualified 50 leads over the weekend. We booked 12 tours instantly and sold the property by Tuesday."</p>
+                <div class="cs-author">— Sarah J., Luxury Estates</div>
+              </div>
+            </div>
+            <!-- Case Study 2 -->
+            <div class="carousel-card">
+              <div class="cs-image" style="background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80');"></div>
+              <div class="cs-content">
+                <h3>Zero Missed Leads</h3>
+                <p>"I used to lose leads while sleeping. Now AgentBot chats with them at 2 AM and puts them on my calendar."</p>
+                <div class="cs-author">— Mike T., Urban Living</div>
+              </div>
+            </div>
+            <!-- Case Study 3 -->
+            <div class="carousel-card">
+              <div class="cs-image" style="background-image: url('https://images.unsplash.com/photo-1600596542815-2a4d9f0152ba?auto=format&fit=crop&w=800&q=80');"></div>
+              <div class="cs-content">
+                <h3>24/7 Open House</h3>
+                <p>"It's like having an open house running 24/7. The bot answers questions about HOA fees and schools perfectly."</p>
+                <div class="cs-author">— Elena R., Prime Realty</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -199,5 +248,13 @@
       setTimeout(() => { btn.textContent = 'Request Sent! ✅'; setTimeout(() => closeDemoModal(), 1500); }, 1000);
     });
   </script>
+
+  <script
+    src="/widget.js"
+    data-clinic="realestate-demo"
+    data-api="https://dental-bot-api.onrender.com"
+    data-welcome="Hello! I can help you schedule a viewing or answer questions about our properties."
+    data-sound="1"
+  ></script>
 </body>
 </html>
