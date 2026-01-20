@@ -114,6 +114,7 @@
     <div class="nav">
       <a href="/index.html">&larr; Back to Site</a>
       <button class="btn" onclick="toggleDarkMode()" style="padding:8px 16px; font-size:0.9rem; background:transparent; border:1px solid currentColor; color:inherit;">🌙 Dark Mode</button>
+      <div id="api-status" style="font-size:0.8rem; color: #64748b; margin-left: 20px;">Checking API...</div>
     </div>
 
     <div id="login-panel" class="card">
@@ -302,7 +303,7 @@
         <span id="test-chat-title">Test Agent</span>
         <div>
           <button class="btn" onclick="clearTestChat()" style="padding:4px 8px; font-size:0.7rem; margin-right:8px; background:#64748b;">Clear</button>
-          <button class="close-btn" onclick="closeTestChat()" type="button">&times;</button>
+          <button class="close-btn" onclick="document.getElementById('test-chat-overlay').classList.add('hidden')" type="button">&times;</button>
         </div>
       </div>
       <div id="test-chat-body" class="chat-body"></div>
@@ -336,10 +337,20 @@
         return res.json();
       })
       .then(data => {
-        console.log("API Connected:", data);
-        if (data.service !== "DentalBot API") console.warn("Warning: Unexpected API response. Ensure root main.py is running.");
+        const statusEl = document.getElementById('api-status');
+        if (data.service === "DentalBot API") {
+            statusEl.textContent = "🟢 API Connected";
+            statusEl.style.color = "#16a34a";
+        } else {
+            statusEl.textContent = "🔴 API Mismatch (Wrong Backend Version)";
+            statusEl.style.color = "#dc2626";
+            alert("Warning: The server is running an old version of the backend. Please update your Render Start Command to: 'uvicorn main:app --host 0.0.0.0 --port 10000'");
+        }
       })
-      .catch(e => console.error("API Connection Failed:", e));
+      .catch(e => {
+         document.getElementById('api-status').textContent = "🔴 API Unreachable";
+         console.error("API Connection Failed:", e);
+      });
 
     window.currentLeads = [];
     window.currentSessions = {}; // Global store for sessions
@@ -351,7 +362,7 @@
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
-      localStorage.setItem('dashboard_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      try { localStorage.setItem('dashboard_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch(e){}
     }
 
     function toggleNotifications() {
