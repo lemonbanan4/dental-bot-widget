@@ -137,6 +137,7 @@
         <button class="tab-btn active" onclick="showTab('editor')">Agent Editor</button>
         <button class="tab-btn" onclick="showTab('leads')">Leads</button>
         <button class="tab-btn" onclick="showTab('settings')">Settings</button>
+        <button class="tab-btn" onclick="showTab('logs')">System Logs</button>
       </div>
       
       <!-- Editor Tab -->
@@ -238,6 +239,17 @@
              <div style="margin-bottom:8px;"><strong>Memory:</strong> <span id="sys-memory">Loading...</span></div>
              <div><strong>CPU:</strong> <span id="sys-cpu">Loading...</span></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Logs Tab -->
+      <div id="tab-logs" class="tab-content hidden">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="margin:0; font-size:1.5rem;">System Logs</h2>
+            <button class="btn" onclick="loadLogs()">↻ Refresh</button>
+          </div>
+          <div id="logs-list" style="font-family:monospace; font-size:0.9rem; max-height:600px; overflow-y:auto;"></div>
         </div>
       </div>
     </div>
@@ -404,6 +416,7 @@
       document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
       if(tabName === 'leads') loadLeads();
       if(tabName === 'settings') fetchSystemStatus();
+      if(tabName === 'logs') loadLogs();
     }
 
     function changePage(delta) {
@@ -672,6 +685,36 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    async function loadLogs() {
+      const container = document.getElementById('logs-list');
+      container.innerHTML = "<div style='color:#64748b;text-align:center;padding:20px;'>Loading...</div>";
+      
+      try {
+        const res = await fetch(`${API_URL}/admin/logs?key=${currentKey}`);
+        if(!res.ok) throw new Error("Error");
+        const logs = await res.json();
+        
+        if(logs.length === 0) {
+          container.innerHTML = "<div style='color:#94a3b8;text-align:center;padding:20px;'>No logs found.</div>";
+          return;
+        }
+
+        let html = `<table class="leads-table">
+          <thead><tr><th>Time</th><th>Level</th><th>Message</th></tr></thead>
+          <tbody>`;
+        
+        logs.forEach(l => {
+          const date = new Date(l.timestamp).toLocaleString();
+          const color = l.level === 'ERROR' ? '#ef4444' : (l.level === 'WARNING' ? '#f59e0b' : '#10b981');
+          html += `<tr><td style="white-space:nowrap;color:#64748b;">${date}</td><td style="font-weight:bold;color:${color}">${l.level}</td><td>${l.message}</td></tr>`;
+        });
+        html += "</tbody></table>";
+        container.innerHTML = html;
+      } catch(e) {
+        container.innerHTML = "<div style='color:red;text-align:center;padding:20px;'>Error loading logs.</div>";
+      }
     }
 
     function copyToClipboard(text) {
