@@ -15,6 +15,8 @@
     .btn { display: inline-flex; padding: 12px 24px; border-radius: 50px; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; font-size: 1rem; }
     .btn-primary { background-color: #0d9488; color: white; }
     .btn-primary:hover { background-color: #0f766e; transform: translateY(-2px); }
+    .btn-secondary { background-color: white; color: #f59e0b; }
+    .btn-secondary:hover { background-color: #fffbeb; transform: translateY(-2px); }
     
     .hero { padding: 160px 0 80px; text-align: center; background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.1) 0%, transparent 70%); }
     h1 { font-size: 3.5rem; font-weight: 800; color: #0f172a; margin-bottom: 24px; line-height: 1.1; }
@@ -60,6 +62,7 @@
       <h1>The AI Helpdesk Agent <br>That Never Sleeps</h1>
       <p class="subtitle">Deflect 80% of support tickets. Answer common questions instantly and escalate complex issues to humans.</p>
       <button class="btn btn-primary trigger-modal" style="background:#f59e0b;">Request Demo</button>
+      <button class="btn btn-secondary" onclick="window.DentalBot.open()" style="margin-left:12px;">Live Chat</button>
     </div>
   </div>
 
