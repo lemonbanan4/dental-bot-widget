@@ -445,7 +445,10 @@
       document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
       if(tabName === 'leads') loadLeads();
       if(tabName === 'map') initMap();
-      if(tabName === 'settings') fetchSystemStatus();
+      if(tabName === 'settings') {
+          fetchSystemStatus();
+          loadMaintenanceStatus();
+      }
       if(tabName === 'logs') loadLogs();
     }
 
@@ -510,6 +513,32 @@
           }
         }
       } catch (e) { console.error("Map error:", e); }
+    }
+
+    async function loadMaintenanceStatus() {
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        const res = await fetch(`${API_URL}/admin/maintenance/${clinicId}?key=${currentKey}`);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('maintenance-toggle').checked = data.enabled;
+        }
+      } catch(e) {}
+    }
+
+    async function toggleMaintenanceMode() {
+      const clinicId = document.getElementById('agent-select').value;
+      const enabled = document.getElementById('maintenance-toggle').checked;
+      try {
+        await fetch(`${API_URL}/admin/maintenance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clinic_id: clinicId, enabled: enabled, secret_key: currentKey })
+        });
+      } catch(e) {
+        alert("Failed to update maintenance mode");
+        document.getElementById('maintenance-toggle').checked = !enabled;
+      }
     }
 
     async function updateAccessKey() {

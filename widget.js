@@ -1266,6 +1266,14 @@ console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
   // fetch clinic info for book button + title
   fetchClinicPublic().then((c) => {
     if (!c) return;
+    
+    if (c.maintenance_mode) {
+      console.log("DentalBot: Maintenance mode active. Widget disabled.");
+      if (ui.launcher) ui.launcher.style.display = 'none';
+      if (ui.panel) ui.panel.classList.remove('open');
+      return;
+    }
+
     state.clinic = c;
     // Only overwrite title if it wasn't manually set in HTML
     if (!titleOverride) {
