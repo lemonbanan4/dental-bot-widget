@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     body { margin: 0; font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; }
     .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
@@ -136,6 +138,7 @@
       <div class="tabs">
         <button class="tab-btn active" onclick="showTab('editor')">Agent Editor</button>
         <button class="tab-btn" onclick="showTab('leads')">Leads</button>
+        <button class="tab-btn" onclick="showTab('map')">Map</button>
         <button class="tab-btn" onclick="showTab('settings')">Settings</button>
         <button class="tab-btn" onclick="showTab('logs')">System Logs</button>
       </div>
@@ -224,6 +227,17 @@
         </div>
       </div>
 
+      <!-- Map Tab -->
+      <div id="tab-map" class="tab-content hidden">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h2 style="margin:0; font-size:1.5rem;">Visitor Map</h2>
+            <button class="btn" onclick="loadMapData()">↻ Refresh</button>
+          </div>
+          <div id="visitor-map" style="height: 500px; width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; z-index: 1;"></div>
+        </div>
+      </div>
+
       <!-- Settings Tab -->
       <div id="tab-settings" class="tab-content hidden">
         <div class="card" style="max-width: 500px;">
@@ -296,6 +310,8 @@
     let leadPollInterval = null;
     let lastLeadCount = -1;
     let sourceChartInstance = null;
+    let mapInstance = null;
+    let mapMarkers = [];
     let activeChatSession = null;
     let currentPage = 1;
     const itemsPerPage = 10;
@@ -415,6 +431,7 @@
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
       if(tabName === 'leads') loadLeads();
+      if(tabName === 'map') initMap();
       if(tabName === 'settings') fetchSystemStatus();
       if(tabName === 'logs') loadLogs();
     }
@@ -422,6 +439,64 @@
     function changePage(delta) {
       currentPage += delta;
       renderLeads();
+    }
+
+    function initMap() {
+      setTimeout(() => {
+        if (!mapInstance) {
+          mapInstance = L.map('visitor-map').setView([20, 0], 2);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(mapInstance);
+        }
+        mapInstance.invalidateSize();
+        loadMapData();
+      }, 100);
+    }
+
+    async function loadMapData() {
+      if (!mapInstance) return;
+      
+      // Clear existing markers
+      mapMarkers.forEach(m => mapInstance.removeLayer(m));
+      mapMarkers = [];
+
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        // Reuse leads endpoint to get IPs
+        const res = await fetch(`${API_URL}/admin/leads/${clinicId}?key=${currentKey}`);
+        if (!res.ok) return;
+        const leads = await res.json();
+        
+        // Group by IP to avoid duplicate markers/requests
+        const uniqueIPs = [...new Set(leads.map(l => l.ip).filter(ip => ip && ip !== 'Unknown'))];
+        
+        for (const ip of uniqueIPs) {
+          // Simple local cache
+          let lat, lon;
+          const cached = localStorage.getItem(`geo_${ip}`);
+          if (cached) {
+            [lat, lon] = JSON.parse(cached);
+          } else {
+            // Use a free geo-ip service (rate limits apply)
+            try {
+              const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+              const geoData = await geoRes.json();
+              if (geoData.latitude && geoData.longitude) {
+                lat = geoData.latitude;
+                lon = geoData.longitude;
+                localStorage.setItem(`geo_${ip}`, JSON.stringify([lat, lon]));
+              }
+            } catch (e) { continue; }
+          }
+
+          if (lat && lon) {
+            const marker = L.marker([lat, lon]).addTo(mapInstance)
+              .bindPopup(`<b>IP:</b> ${ip}<br><b>Leads:</b> ${leads.filter(l => l.ip === ip).length}`);
+            mapMarkers.push(marker);
+          }
+        }
+      } catch (e) { console.error("Map error:", e); }
     }
 
     async function updateAccessKey() {
