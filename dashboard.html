@@ -257,16 +257,16 @@
   </div>
 
   <!-- Test Chat Modal -->
-  <div id="test-chat-overlay" class="chat-overlay hidden" onclick="if(event.target===this) closeTestChat()">
+  <div id="test-chat-overlay" class="chat-overlay hidden" onclick="if(event.target===this) closeTestChat()" style="z-index: 1001;">
     <div class="chat-modal">
       <div class="chat-header">
         <span id="test-chat-title">Test Agent</span>
-        <button class="close-btn" onclick="closeTestChat()">&times;</button>
+        <button class="close-btn" onclick="closeTestChat()" type="button">&times;</button>
       </div>
       <div id="test-chat-body" class="chat-body"></div>
       <div style="padding:16px; border-top:1px solid #e2e8f0; display:flex; gap:10px;">
         <input type="text" id="test-chat-input" placeholder="Type a message..." style="flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:8px; outline:none;" onkeydown="if(event.key==='Enter') sendTestMessage()">
-        <button class="btn" onclick="sendTestMessage()">Send</button>
+        <button class="btn" onclick="sendTestMessage()" type="button">Send</button>
       </div>
     </div>
   </div>
@@ -1023,6 +1023,7 @@
     }
 
     function closeTestChat() {
+      console.log("Closing test chat");
       document.getElementById('test-chat-overlay').classList.add('hidden');
     }
 
@@ -1072,6 +1073,7 @@
         const data = await res.json();
         lDiv.textContent = data.reply || "Error: No reply";
       } catch (e) {
+        console.error(e);
         lDiv.textContent = "Error connecting to bot.";
         lDiv.style.backgroundColor = "#ef4444";
         lDiv.style.color = "white";
