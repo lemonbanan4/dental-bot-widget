@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Lemon Techno | Intelligent AI Solutions</title>
+  <title>Lemon Techno | Enterprise AI Workforce</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍋</text></svg>">
@@ -14,7 +14,7 @@
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: #ffffff;
+      background: #f8fafc;
       color: #1e293b; /* Slate-900 for better contrast than pure black */
       overflow-x: hidden;
     }
@@ -79,18 +79,19 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 32px;
     }
 
     .section {
-      padding: 80px 0;
+      padding: 100px 0;
     }
 
     /* --- HERO SECTION --- */
     .hero-section {
-      padding: 120px 0 80px;
+      padding: 160px 0 100px;
       text-align: center;
       position: relative;
+      background: radial-gradient(circle at 50% 0%, rgba(13, 148, 136, 0.05) 0%, transparent 70%);
     }
 
     .hero-content {
@@ -112,7 +113,7 @@
 
     /* --- TYPOGRAPHY --- */
     h1 {
-      font-size: 3.5rem;
+      font-size: 4rem;
       letter-spacing: -0.02em;
       color: #0f172a;
       margin: 0 0 16px 0;
@@ -152,7 +153,7 @@
     }
 
     /* --- FEATURES --- */
-    .features-section { background: #f8fafc; }
+    .features-section { background: #fff; }
     .features-section h2 { font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
     .features-grid {
       display: grid;
@@ -196,78 +197,108 @@
       display: block;
     }
 
-    /* --- AGENTS GRID (NEW) --- */
-    .agents-section { text-align: center; }
-    .agents-grid {
+    /* --- INDUSTRIES BENTO GRID --- */
+    .industries-section { text-align: center; }
+    .bento-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
-      margin-top: 40px;
+      margin-top: 60px;
     }
-    @media (min-width: 768px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 768px) { 
+      .bento-grid { 
+        grid-template-columns: repeat(3, 1fr); 
+        grid-template-rows: repeat(2, 300px);
+      } 
+    }
     
-    .agent-card {
+    .bento-card {
       background: white;
       border: 1px solid #e2e8f0;
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 32px;
       text-align: left;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .agent-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1);
+    
+    /* Make the first card span 2 columns for emphasis */
+    @media (min-width: 768px) {
+      .bento-card.featured { grid-column: span 2; background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border: none; }
+      .bento-card.featured .bento-title { color: white; }
+      .bento-card.featured .bento-desc { color: #94a3b8; }
+      .bento-card.featured .bento-icon { background: rgba(255,255,255,0.1); color: white; }
+    }
+
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1);
       border-color: #0d9488;
     }
-    .agent-avatar {
-      width: 64px;
-      height: 64px;
+    
+    .bento-icon {
+      width: 56px;
+      height: 56px;
       background: #f0fdfa;
+      color: #0d9488;
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 28px;
       margin-bottom: 20px;
     }
-    .agent-role {
-      font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #0d9488;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: block;
-    }
-    .agent-name {
+    
+    .bento-title {
       font-size: 1.5rem;
-      font-weight: 800;
+      font-weight: 700;
       color: #0f172a;
-      margin: 0 0 12px 0;
+      margin: 0 0 8px 0;
     }
-    .agent-desc {
+    
+    .bento-desc {
       color: #64748b;
       line-height: 1.6;
-      margin-bottom: 24px;
+      font-size: 1rem;
     }
-    .agent-capabilities {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .cap-tag {
-      background: #f1f5f9;
-      color: #475569;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
+    
+    .bento-link {
+      margin-top: 24px;
       font-weight: 600;
+      color: #0d9488;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .bento-card.featured .bento-link { color: #2dd4bf; }
+    .bento-link:hover { gap: 8px; transition: gap 0.2s; }
+
+    /* --- LOGO STRIP --- */
+    .logo-strip {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      opacity: 0.5;
+      margin-top: 60px;
+      filter: grayscale(100%);
+    }
+    .logo-item {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* --- HOW IT WORKS --- */
-    .how-it-works-section { text-align: center; background: #fff; }
+    .how-it-works-section { text-align: center; background: #f8fafc; }
     .how-it-works-section h2 { font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
     .steps-grid { display: grid; grid-template-columns: 1fr; gap: 24px; text-align: center; }
     @media (min-width: 768px) { .steps-grid { grid-template-columns: 1fr 1fr 1fr; } }
@@ -338,7 +369,7 @@
     }
 
     /* --- PRICING --- */
-    .pricing-section { text-align: center; background: #f8fafc; }
+    .pricing-section { text-align: center; background: #fff; }
     .pricing-section h2 { font-size: 2rem; margin-bottom: 40px; color: #0f172a; }
     .pricing-grid { display: grid; grid-template-columns: 1fr; gap: 24px; text-align: left; }
     @media (min-width: 768px) { .pricing-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
@@ -373,7 +404,7 @@
     .site-footer {
       padding: 60px 0;
       background: #0f172a;
-      text-align: center;
+      text-align: left;
       font-size: 0.875rem;
       color: #94a3b8;
       position: relative;
@@ -387,6 +418,13 @@
     }
     .site-footer a:hover {
       color: #fff;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
     /* --- NAVBAR --- */
@@ -410,9 +448,48 @@
     }
     .nav-logo { font-weight: 800; font-size: 1.25rem; color: #0f172a; text-decoration: none; display: flex; align-items: center; gap: 8px; }
     .nav-links { display: none; gap: 32px; }
-    @media (min-width: 768px) { .nav-links { display: flex; } }
-    .nav-link { color: #64748b; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+    @media (min-width: 768px) { .nav-links { display: flex; align-items: center; height: 100%; } }
+    .nav-link { color: #64748b; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; display: flex; align-items: center; height: 100%; }
     .nav-link:hover { color: #0f172a; }
+
+    /* --- DROPDOWN MENU --- */
+    .nav-item { position: relative; height: 100%; display: flex; align-items: center; }
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: white;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      padding: 8px;
+      min-width: 260px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    .nav-item:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #334155;
+      border-radius: 8px;
+      transition: background 0.1s;
+    }
+    .dropdown-item:hover { background: #f8fafc; color: #0d9488; }
+    .dropdown-icon { font-size: 1.2rem; }
+    .dropdown-text { display: flex; flex-direction: column; }
+    .dropdown-title { font-weight: 600; font-size: 0.9rem; }
+    .dropdown-desc { font-size: 0.75rem; color: #94a3b8; }
 
     /* NOTE: 
        We do NOT add styling for .dbot-launcher or .dbot-panel here.
@@ -432,7 +509,16 @@
     <div class="nav-container">
       <a href="#" class="nav-logo">🍋 Lemon Techno</a>
       <div class="nav-links">
-        <a href="#agents" class="nav-link">AI Agents</a>
+        <div class="nav-item">
+          <a href="#solutions" class="nav-link">Solutions ▾</a>
+          <div class="dropdown-menu">
+            <a href="#dental" class="dropdown-item"><span class="dropdown-icon">🦷</span><div class="dropdown-text"><span class="dropdown-title">Dental & Medical</span><span class="dropdown-desc">Booking & Triage</span></div></a>
+            <a href="#retail" class="dropdown-item"><span class="dropdown-icon">🛍️</span><div class="dropdown-text"><span class="dropdown-title">Retail & E-commerce</span><span class="dropdown-desc">Sales & Support</span></div></a>
+            <a href="#beauty" class="dropdown-item"><span class="dropdown-icon">✨</span><div class="dropdown-text"><span class="dropdown-title">Aesthetics & Spa</span><span class="dropdown-desc">High-ticket Booking</span></div></a>
+            <a href="#realestate" class="dropdown-item"><span class="dropdown-icon">🏠</span><div class="dropdown-text"><span class="dropdown-title">Real Estate</span><span class="dropdown-desc">Lead Qualification</span></div></a>
+            <a href="#support" class="dropdown-item"><span class="dropdown-icon">🎧</span><div class="dropdown-text"><span class="dropdown-title">Customer Support</span><span class="dropdown-desc">24/7 Helpdesk</span></div></a>
+          </div>
+        </div>
         <a href="#how-it-works" class="nav-link">How it Works</a>
         <a href="#pricing" class="nav-link">Pricing</a>
       </div>
@@ -451,59 +537,69 @@
         <div class="orb-core"></div>
       </div>
 
-      <h1>The AI Workforce for <br><span id="typewriter">Engagement</span></h1>
-      <p class="subtitle">Deploy specialized AI agents to handle bookings, support, and patient reactivation. 24/7 coverage for your clinic.</p>
+      <h1>The AI Workforce for <br><span id="typewriter">Every Industry</span></h1>
+      <p class="subtitle">Deploy specialized AI agents to handle bookings, sales, and support. <br>Pre-trained for your specific industry.</p>
     
       <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px;">
         <a id="try-it" href="#demo" class="btn btn-primary">Try Live Demo &rarr;</a>
         <a href="#contact" class="btn btn-secondary" style="margin-top:0;">Contact Sales</a>
       </div>
+
+      <div class="logo-strip">
+        <div class="logo-item"><span>🏥</span> MEDI-CORP</div>
+        <div class="logo-item"><span>🦷</span> SMILE STUDIO</div>
+        <div class="logo-item"><span>🛍️</span> SHOP-NOW</div>
+        <div class="logo-item"><span>🏠</span> PRIME ESTATES</div>
+        <div class="logo-item"><span>⚖️</span> LEGAL PARTNERS</div>
+      </div>
     </div>
   </div>
 
-  <div id="agents" class="section agents-section">
+  <div id="solutions" class="section industries-section">
     <div class="container">
-      <h2 style="font-size: 2.5rem; margin-bottom: 16px; color: #0f172a;">Meet Your New AI Team</h2>
-      <p style="color: #64748b; max-width: 600px; margin: 0 auto;">Don't just hire a chatbot. Hire a specialist. Choose the agents that fit your clinic's needs.</p>
+      <h2 style="font-size: 2.5rem; margin-bottom: 16px; color: #0f172a;">Specialized Intelligence</h2>
+      <p style="color: #64748b; max-width: 600px; margin: 0 auto;">Don't settle for a generic chatbot. Choose an AI agent trained on your industry's specific workflows and vocabulary.</p>
       
-      <div class="agents-grid">
-        <!-- Agent 1 -->
-        <div class="agent-card">
-          <div class="agent-avatar">👩‍💼</div>
-          <span class="agent-role">Front Desk</span>
-          <h3 class="agent-name">Sarah</h3>
-          <p class="agent-desc">Handles general inquiries, directions, and opening hours. The perfect first point of contact for new visitors.</p>
-          <div class="agent-capabilities">
-            <span class="cap-tag">FAQs</span>
-            <span class="cap-tag">Directions</span>
-            <span class="cap-tag">Triage</span>
+      <div class="bento-grid">
+        <!-- Card 1: Dental (Featured) -->
+        <div id="dental" class="bento-card featured">
+          <div>
+            <div class="bento-icon">🦷</div>
+            <h3 class="bento-title">Dental & Medical</h3>
+            <p class="bento-desc">HIPAA-aware booking assistants that understand treatments, triage emergencies, and sync with your EHR calendar.</p>
           </div>
+          <a href="#contact" class="bento-link">View Pricing &rarr;</a>
         </div>
 
-        <!-- Agent 2 -->
-        <div class="agent-card" style="border-color: #0d9488; box-shadow: 0 10px 30px -5px rgba(13, 148, 136, 0.15);">
-          <div class="agent-avatar" style="background: #f0fdfa; color: #0d9488;">📅</div>
-          <span class="agent-role">Booking Coordinator</span>
-          <h3 class="agent-name">Marcus</h3>
-          <p class="agent-desc">Specializes in converting visitors into appointments. Integrates with your calendar to fill slots.</p>
-          <div class="agent-capabilities">
-            <span class="cap-tag">Scheduling</span>
-            <span class="cap-tag">Reminders</span>
-            <span class="cap-tag">Cancellations</span>
+        <!-- Card 2: Retail -->
+        <div id="retail" class="bento-card">
+          <div>
+            <div class="bento-icon">🛍️</div>
+            <h3 class="bento-title">Retail & E-com</h3>
+            <p class="bento-desc">Product recommendations, order tracking, and return handling. Increases conversion rate by 24%.</p>
           </div>
+          <a href="#contact" class="bento-link">Learn more &rarr;</a>
         </div>
 
-        <!-- Agent 3 -->
-        <div class="agent-card">
-          <div class="agent-avatar">🚑</div>
-          <span class="agent-role">Emergency Triage</span>
-          <h3 class="agent-name">Dr. Bot</h3>
-          <p class="agent-desc">Screens for dental emergencies after hours and escalates urgent cases to your on-call staff.</p>
-          <div class="agent-capabilities">
-            <span class="cap-tag">Symptom Check</span>
-            <span class="cap-tag">Escalation</span>
-            <span class="cap-tag">24/7</span>
-          </div>
+        <!-- Card 3: Aesthetics -->
+        <div id="beauty" class="bento-card">
+          <div class="bento-icon">✨</div>
+          <h3 class="bento-title">Plastic Surgery</h3>
+          <p class="bento-desc">High-touch concierge for premium clinics. Qualifies leads and handles deposit-based booking.</p>
+        </div>
+
+        <!-- Card 4: Real Estate -->
+        <div id="realestate" class="bento-card">
+          <div class="bento-icon">🏠</div>
+          <h3 class="bento-title">Real Estate</h3>
+          <p class="bento-desc">Instantly qualifies buyers and schedules viewings. Never miss a lead from Zillow or your site.</p>
+        </div>
+
+        <!-- Card 5: Support -->
+        <div id="support" class="bento-card">
+          <div class="bento-icon">🎧</div>
+          <h3 class="bento-title">Customer Support</h3>
+          <p class="bento-desc">Deflect 80% of tickets. Trained on your knowledge base to answer "How-to" questions instantly.</p>
         </div>
       </div>
     </div>
@@ -606,7 +702,7 @@
 
   <div class="section testimonials-section">
     <div class="container">
-      <h2 style="font-size: 2rem; margin-bottom: 40px; color: #0f172a;">Trusted by Dental Leaders</h2>
+      <h2 style="font-size: 2rem; margin-bottom: 40px; color: #0f172a;">Trusted by Industry Leaders</h2>
       <div class="testimonials-grid">
         <div class="testimonial-card">
           "Since installing DentalBot, our after-hours bookings have increased by 30%. It pays for itself in one day."
@@ -622,7 +718,7 @@
 
   <div id="pricing" class="section pricing-section">
     <div class="container">
-      <h2>Simple, Transparent Pricing</h2>
+      <h2>Platform Pricing</h2>
       <div class="pricing-grid">
         <div class="pricing-card">
           <h3>Starter</h3>
@@ -630,12 +726,11 @@
           <ul class="features-list">
             <li>✅ 24/7 Assistant on your website</li>
             <li>✅ Answers patient questions instantly</li>
-            <li>✅ Guides visitors to booking or callback</li>
+            <li>✅ Standard Industry Model</li>
             <li>✅ Works on desktop & mobile</li>
-            <li>✅ GDPR-friendly setup</li>
             <li>✅ Email support</li>
             <li><strong>Setup: </strong>Free</li>
-            <li><strong>Commitment: </strong>Cancel anytime</li>
+            <li><strong>Model: </strong>General Purpose</li>
             <li>👉 Best for small clinics</li>
           </ul>
           <a href="#contact" class="btn btn-secondary" style="width:100%">Get Started</a>
@@ -646,12 +741,11 @@
           <div class="price">€89<span>/mo</span></div>
           <ul class="features-list">
             <li>Everything in Starter, plus:</li>
-            <li>✅ Custom answers tailored to your practice</li>
+            <li>✅ <strong>Advanced Industry Model</strong></li>
             <li>✅ Branding customization (avatar, colors, message)</li>
             <li>✅ Priority Support</li>
             <li>✅ Monthly usage insights</li>
             <li>✅ Integration with your existing systems</li>
-            <li><strong>Setup: </strong>Free</li>
             <li><strong>Commitment: </strong>Cancel anytime</li>
             <li>👉 Best for busy clinics & group practices</li>
           </ul>
@@ -659,11 +753,11 @@
         </div>
         <div class="pricing-card">
           <h3>🦷 Multi-Clinic / Agency</h3>
-          <div class="price" style="font-size: 2rem;">Custom<span> pricing</span></div>
+          <div class="price" style="font-size: 2rem;">Custom<span> /license</span></div>
           <ul class="features-list">
-            <li>Multiple clinic websites</li>
+            <li>Unlimited sub-accounts</li>
             <li>White-label option</li>
-            <li>Central dashboard</li>
+            <li>API Access</li>
             <li>Dedicated onboarding</li>
           </ul>
           <a href="mailto:info@lemontechno.org?subject=Agency Inquiry" class="btn btn-secondary" style="width:100%">👉 Contact Sales</a>
@@ -721,12 +815,25 @@
   </div>
 
   <footer class="site-footer">
-    <a href="/privacy.html">Privacy Policy</a>
-    <a href="/terms.html">Terms of Service</a>
-    <a href="/dashboard.html">Client Login</a>
-    <p style="margin-top: 12px; opacity: 0.7;">&copy; 2023 Lemon Techno. All rights reserved.</p>
-    <p style="margin-top: 24px; font-size: 0.8rem; color: #94a3b8;">Built for dental clinics by independent developers<br>
-    Based in EU • Secure infrastructure • Human support</p>
+    <div class="footer-grid">
+      <div style="text-align: left;">
+        <h3 style="color: white; margin-top: 0;">🍋 Lemon Techno</h3>
+        <p>Intelligent workforce automation for forward-thinking businesses.</p>
+        <p>&copy; 2023 Lemon Techno.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+        <strong style="color: white;">Platform</strong>
+        <a href="#dental" style="margin:0;">Dental & Medical</a>
+        <a href="#retail" style="margin:0;">Retail & E-com</a>
+        <a href="#realestate" style="margin:0;">Real Estate</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+        <strong style="color: white;">Company</strong>
+        <a href="/privacy.html" style="margin:0;">Privacy Policy</a>
+        <a href="/terms.html" style="margin:0;">Terms of Service</a>
+        <a href="/dashboard.html" style="margin:0;">Client Login</a>
+      </div>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -792,7 +899,7 @@
 
   // Typewriter Effect
   const textElement = document.getElementById('typewriter');
-  const words = ["Engagement", "Acquisition", "Retention", "Service"];
+  const words = ["Dental", "Retail", "Real Estate", "Medical", "Support"];
   let wordIndex = 0;
   let charIndex = words[0].length;
   let isDeleting = true;
