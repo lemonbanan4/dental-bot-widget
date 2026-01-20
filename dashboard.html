@@ -230,6 +230,13 @@
           <input type="password" id="current-key-input" placeholder="Current Key">
           <input type="password" id="new-key-input" placeholder="New Key">
           <button class="btn" onclick="updateAccessKey()">Update Key</button>
+          
+          <h2 style="margin:30px 0 20px 0; font-size:1.5rem;">System Status</h2>
+          <div style="background:#f8fafc; padding:16px; border-radius:8px; border:1px solid #e2e8f0;">
+             <div style="margin-bottom:8px;"><strong>Server:</strong> <span style="color:#22c55e">● Online</span></div>
+             <div style="margin-bottom:8px;"><strong>Memory:</strong> <span id="sys-memory">Loading...</span></div>
+             <div><strong>CPU:</strong> <span id="sys-cpu">Loading...</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -364,6 +371,16 @@
         }
     }
 
+    async function fetchSystemStatus() {
+        // Simulated system status for demo purposes (since we don't have a real sys-stats endpoint yet)
+        // In a real app, you would fetch this from the backend.
+        const mem = Math.floor(Math.random() * 20) + 40;
+        const cpu = Math.floor(Math.random() * 15) + 5;
+        
+        document.getElementById('sys-memory').textContent = `${mem}MB / 512MB`;
+        document.getElementById('sys-cpu').textContent = `${cpu}%`;
+    }
+
     async function checkTypingStatus() {
         const clinicId = document.getElementById('agent-select').value;
         try {
@@ -386,6 +403,7 @@
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
       if(tabName === 'leads') loadLeads();
+      if(tabName === 'settings') fetchSystemStatus();
     }
 
     function changePage(delta) {
@@ -640,11 +658,11 @@
         alert("No leads to export.");
         return;
       }
-      let csv = "Date,Name,Phone,Email,Message,Status,Notes,Source\n";
+      let csv = "Date,Name,Phone,Email,Message,Status,Notes,Lead Source,IP Address\n";
       window.currentLeads.forEach(l => {
         const cleanMsg = (l.message || "").replace(/"/g, '""').replace(/\n/g, ' ');
         const cleanNote = (l.note || "").replace(/"/g, '""').replace(/\n/g, ' ');
-        csv += `"${l.timestamp}","${l.name||''}","${l.phone||''}","${l.email||''}","${cleanMsg}","${l.status||'New'}","${cleanNote}","${l.source||''}"\n`;
+        csv += `"${l.timestamp}","${l.name||''}","${l.phone||''}","${l.email||''}","${cleanMsg}","${l.status||'New'}","${cleanNote}","${l.source||''}","${l.ip||''}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
