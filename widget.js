@@ -187,6 +187,15 @@ console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
             : fetch(analyticsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: name, ts: Date.now(), ...payload }) }).catch(()=>{});
         } catch (e) {}
       }
+      
+      // Send feedback to backend
+      if (name === 'feedback' && payload.type) {
+          fetch(`${apiUrl}/feedback`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clinic_id: clinicId, type: payload.type, message: payload.message })
+          }).catch(()=>{});
+      }
     } catch (e) {
       /* ignore */
     }

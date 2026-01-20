@@ -216,6 +216,14 @@
                <div id="total-leads-display" style="font-size:3rem; font-weight:800; color:#0f172a;">0</div>
                <div style="color:#64748b; font-weight:600;">Total Leads</div>
             </div>
+            <div style="height:200px; position:relative; display:flex; align-items:center; justify-content:center;">
+              <canvas id="feedbackChart"></canvas>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; flex-direction:column;">
+               <div style="font-size:1.5rem; font-weight:800; color:#16a34a;">👍 <span id="feedback-up">0</span></div>
+               <div style="font-size:1.5rem; font-weight:800; color:#dc2626; margin-top:8px;">👎 <span id="feedback-down">0</span></div>
+               <div style="color:#64748b; font-weight:600; margin-top:4px;">Feedback</div>
+            </div>
           </div>
 
           <div id="leads-list"></div>
@@ -310,6 +318,7 @@
     let leadPollInterval = null;
     let lastLeadCount = -1;
     let sourceChartInstance = null;
+    let feedbackChartInstance = null;
     let mapInstance = null;
     let mapMarkers = [];
     let activeChatSession = null;
@@ -662,6 +671,7 @@
         
         // Update Stats & Chart
         updateLeadStats(leads);
+        updateFeedbackStats();
 
         // Notifications
         if (notificationsEnabled && leads.length > lastLeadCount && lastLeadCount !== -1) {
@@ -686,6 +696,38 @@
       } catch(e) {
         console.error("Failed to save note", e);
       }
+    }
+
+    async function updateFeedbackStats() {
+        const clinicId = document.getElementById('agent-select').value;
+        try {
+            const res = await fetch(`${API_URL}/admin/feedback/${clinicId}?key=${currentKey}`);
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            document.getElementById('feedback-up').textContent = data.up;
+            document.getElementById('feedback-down').textContent = data.down;
+
+            const ctx = document.getElementById('feedbackChart').getContext('2d');
+            if (feedbackChartInstance) {
+                feedbackChartInstance.data.datasets[0].data = [data.up, data.down];
+                feedbackChartInstance.update();
+            } else {
+                feedbackChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Positive', 'Negative'],
+                        datasets: [{
+                            label: 'Feedback',
+                            data: [data.up, data.down],
+                            backgroundColor: ['#22c55e', '#ef4444'],
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+        } catch(e) {}
     }
 
     function updateLeadStats(leads) {
