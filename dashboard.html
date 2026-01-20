@@ -223,6 +223,7 @@
                <div style="font-size:1.5rem; font-weight:800; color:#16a34a;">👍 <span id="feedback-up">0</span></div>
                <div style="font-size:1.5rem; font-weight:800; color:#dc2626; margin-top:8px;">👎 <span id="feedback-down">0</span></div>
                <div style="color:#64748b; font-weight:600; margin-top:4px;">Feedback</div>
+               <button class="btn" onclick="resetFeedbackStats()" style="padding:4px 8px; font-size:0.7rem; margin-top:8px; background:#64748b;">Reset</button>
             </div>
           </div>
 
@@ -731,6 +732,18 @@
                 });
             }
         } catch(e) {}
+    }
+
+    async function resetFeedbackStats() {
+      if(!confirm("Reset feedback statistics?")) return;
+      const clinicId = document.getElementById('agent-select').value;
+      try {
+        const res = await fetch(`${API_URL}/admin/feedback/${clinicId}?key=${currentKey}`, { method: 'DELETE' });
+        if(res.ok) updateFeedbackStats();
+        else alert("Failed to reset stats.");
+      } catch(e) {
+        alert("Error connecting to server.");
+      }
     }
 
     function updateLeadStats(leads) {
