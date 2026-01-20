@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------
 // CANONICAL SOURCE: dental-bot-widget (Vercel)
 // ------------------------------------------------------------------
-console.log("DentalBot Widget LIVE — v1.3.22", new Date().toISOString());
+console.log("DentalBot Widget LIVE — v1.3.23", new Date().toISOString());
 
 (() => {
   // Prevent duplicate widget instances
@@ -68,7 +68,9 @@ console.log("DentalBot Widget LIVE — v1.3.22", new Date().toISOString());
     /* --- HEADER --- */
     .header{background:#0d9488;padding:16px;display:flex;align-items:center;justify-content:space-between;color:white;flex-shrink:0}
     .header-left{display:flex;align-items:center;gap:12px}
-    .avatar{width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d9488;background-size:cover;background-position:center}
+    .avatar{width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d9488;background-size:cover;background-position:center;transition:box-shadow 0.3s ease}
+    .avatar.typing{animation:avatar-pulse 1.5s infinite}
+    @keyframes avatar-pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,0.7)}70%{box-shadow:0 0 0 10px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
     .bot-info h3{margin:0;font-size:16px;font-weight:700}
     .bot-info span{font-size:12px;opacity:0.9}
     .header-actions{display:flex;gap:8px}
@@ -708,6 +710,7 @@ console.log("DentalBot Widget LIVE — v1.3.22", new Date().toISOString());
     state.sending = true;
     ui.sendBtn.disabled = true;
     ui.launcher.classList.add('typing');
+    if (ui.avatar) ui.avatar.classList.add('typing');
     // send-button spinner
     ui.sendBtn.dataset._orig = ui.sendBtn.textContent;
     ui.sendBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
@@ -858,6 +861,7 @@ console.log("DentalBot Widget LIVE — v1.3.22", new Date().toISOString());
       state.sending = false;
       ui.sendBtn.disabled = false;
       ui.launcher.classList.remove('typing');
+      if (ui.avatar) ui.avatar.classList.remove('typing');
       // restore send button
       if (ui.sendBtn.dataset._orig) {
         ui.sendBtn.innerHTML = ui.sendBtn.dataset._orig;
