@@ -318,6 +318,7 @@
     const API_URL = "https://dental-bot-api.onrender.com";
     let currentKey = "";
     let liveVisitorInterval = null;
+    let typingPollInterval = null;
     let testSessionId = "";
     let notificationsEnabled = false;
     let leadPollInterval = null;
@@ -344,7 +345,7 @@
         } else {
             statusEl.textContent = "🔴 API Mismatch (Wrong Backend Version)";
             statusEl.style.color = "#dc2626";
-            alert("Warning: The server is running an old version of the backend. Please update your Render Start Command to: 'uvicorn main:app --host 0.0.0.0 --port 10000'");
+            alert("Warning: The server may be running an old version of the backend. Please ensure your Procfile or Render Start Command is: 'uvicorn app.main:app --host 0.0.0.0 --port 10000'");
         }
       })
       .catch(e => {
@@ -409,7 +410,8 @@
         if (liveVisitorInterval) clearInterval(liveVisitorInterval);
         liveVisitorInterval = setInterval(fetchLiveVisitors, 5000); // Poll every 5 seconds
         fetchLiveVisitors(); // Initial call
-        setInterval(checkTypingStatus, 2000); // Poll typing status
+        if (typingPollInterval) clearInterval(typingPollInterval);
+        typingPollInterval = setInterval(checkTypingStatus, 2000); // Poll typing status
       } else {
         document.getElementById('login-error').textContent = "Please enter a key.";
       }
@@ -428,7 +430,13 @@
         if (!counter) return;
         try {
             const res = await fetch(`${API_URL}/admin/live_visitors?key=${currentKey}`);
-            if (!res.ok) throw new Error('Failed to fetch');
+            if (!res.ok) {
+                if (res.status === 404) {
+                    console.warn("API missing live_visitors endpoint - stopping poll");
+                    if (liveVisitorInterval) clearInterval(liveVisitorInterval);
+                }
+                throw new Error('Failed to fetch');
+            }
             const data = await res.json();
             counter.textContent = data.live_visitors || 0;
         } catch (e) {
@@ -450,7 +458,13 @@
         const clinicId = document.getElementById('agent-select').value;
         try {
             const res = await fetch(`${API_URL}/admin/typing_status/${clinicId}?key=${currentKey}`);
-            if (!res.ok) return;
+            if (!res.ok) {
+                 if (res.status === 404) {
+                     console.warn("API missing typing_status endpoint - stopping poll");
+                     if (typingPollInterval) clearInterval(typingPollInterval);
+                 }
+                 return;
+            }
             const data = await res.json();
             const typingSessions = data.typing_sessions || [];
             
