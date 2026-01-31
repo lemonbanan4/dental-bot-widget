@@ -190,10 +190,10 @@ console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
       
       // Send feedback to backend
       if (name === 'feedback' && payload.type) {
-          fetch(`${apiUrl}/feedback`, {
+          fetch(`${apiUrl}/chat/feedback`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ clinic_id: clinicId, type: payload.type, message: payload.message })
+              body: JSON.stringify({ clinic_id: clinicId, session_id: state.sessionId, rating: payload.type, comment: payload.message })
           }).catch(()=>{});
       }
     } catch (e) {
@@ -847,16 +847,6 @@ console.log("DentalBot Widget LIVE — v1.3.25", new Date().toISOString());
         // remove typing bubble if present
         const typing = ui.messages.querySelector('.message.typing');
         if (typing) typing.remove();
-
-        // Hard-wire booking URL from response (if provided)
-        if (data && data.booking_url) {
-          // enable header book button
-          if (ui.bookBtn) {
-            ui.bookBtn.disabled = false;
-            ui.bookBtn.dataset.bookingUrl = data.booking_url;
-            ui.bookBtn.onclick = function() { try { trackEvent('cta_book', { clinic: clinicId, source: 'header_reply' }); } catch (e) {} ; const url = this.dataset.bookingUrl; if (url) window.open(url, '_blank', 'noopener,noreferrer'); };
-          }
-        }
 
         trackEvent('reply', { clinic: clinicId });
         // Append the assistant reply
